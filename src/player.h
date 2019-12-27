@@ -133,8 +133,5 @@ public:
     texRect = animator.getFrame();
 
     SDL_RenderCopy(renderer, texture, &texRect, &rect);
-
-    SDL_RenderPresent(renderer);
-    printf("w: %d h: %d\n", texRect.w, texRect.h);
   }
 };

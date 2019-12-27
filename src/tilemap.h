@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 
+const int TILE_SIZE = 32;
+
 class Tilemap
 {
   public:
@@ -51,6 +53,25 @@ class Tilemap
           }
         }
         printf("\n");
+      }
+    }
+
+    void draw(SDL_Renderer* renderer, SDL_Texture* tilesetTexture) {
+      SDL_Rect texRect = { 0 *  TILE_SIZE , 0 * TILE_SIZE, TILE_SIZE * 2, TILE_SIZE * 2 };
+
+      for (int y = 0; y < _tiles.size(); y ++) {
+        for (int x = 0; x < _tiles[y].size(); x ++) {
+          if (_tiles[y][x] == 'x') {
+            SDL_Rect posRect = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+
+            SDL_RenderCopy(
+                renderer,
+                tilesetTexture,
+                &texRect,
+                &posRect
+            );
+          }
+        }
       }
     }
 
