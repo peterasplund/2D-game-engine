@@ -1,37 +1,29 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include "math.h"
 #include "assetManager.h"
 #include "object.h"
 #include "animation.h"
 #include "animator.h"
 #include "inputHandler.h"
+#include "camera.h"
 
-class Player : Object
+class Player : public Object
 {
 private:
-  SDL_Texture* texture;
-  SDL_Rect rect;
-  SDL_Rect texRect;
-
-  v2 position = { 0.0f, 0.0f };
-  v2 velocity = { 0.0f, 0.0f };
-  v2 size = { 32.0f, 50.0f };
-
-  float speed = 2.0;
-
   Animator animator;
-  SDL_Event event;
   InputHandler* _inputHandler;
 public:
-  Player(SDL_Renderer* renderer) : Object(renderer) {
+  Player(SDL_Renderer* renderer) : Object() {
+    size = { 32.0f, 50.0f };
+    speed = 2.0;
+
     _inputHandler = InputHandler::Instance();
     texture = AssetManager::Instance(renderer)->getTexture("sprites/character_ness_walk.png");
 
-    texRect.w = 32;
-    texRect.h = 50;
-    texRect.x = 0;
-    texRect.y = 0;
+    textureRect.w = 32;
+    textureRect.h = 50;
+    textureRect.x = 0;
+    textureRect.y = 0;
 
     int tw = 32;
     int th = 50;
@@ -89,21 +81,6 @@ public:
       velocity.y = 1.0f;
     }
 
-    position.x += (velocity.x / 10) * speed * dt;
-    position.y += (velocity.y / 10) * speed * dt;
-
-    // clamp
-    if (position.x < 0) {
-      position.x = 0;
-    } else if (position.x > 640 - size.x) {
-      position.x = 640 - size.x;
-    }
-    if (position.y < 0) {
-      position.y = 0;
-    } else if (position.y > 480 - size.y) {
-      position.y = 480 - size.y;
-    }
-
     if (velocity.x > 0) {
       animator.setAnimation("right");
     }
@@ -125,13 +102,8 @@ public:
       animator.play();
     }
 
-  }
+    textureRect = animator.getFrame();
 
-  void draw(SDL_Renderer* renderer) {
-    rect = { (int)position.x, (int)position.y, (int)size.x, (int)size.y };
-
-    texRect = animator.getFrame();
-
-    SDL_RenderCopy(renderer, texture, &texRect, &rect);
+    Object::update(dt);
   }
 };

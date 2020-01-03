@@ -1,48 +1,59 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <vector>
 #include "assetManager.h"
 #include "scene.h"
 #include "player.h"
 #include "tilemap.h"
-
-char map[] = {
-  'x', 'x', ' ', ' ', ' ', ' ', 'x', 'x',
-  'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x',
-  ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-  ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-  ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ',
-  ' ', ' ', ' ', ' ', 'x', 'x', 'x', ' ',
-  ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ',
-  'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x',
-  'x', 'x', ' ', ' ', ' ', ' ', 'x', 'x',
-};
+#include "camera.h"
+#include "game/hud.h"
+#include "game/gameState.h"
 
 class DemoScene : public Scene
 {
 private:
   Player* player;
   Tilemap* tilemap;
+  Camera* camera;
+  Hud* hud;
+  GameState* state;
 
-  SDL_Texture* tilemapTexture;
+  std::vector<Object*> entities;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
   }
 
   void init() {
+    state = new GameState();
     player = new Player(_renderer);
+    hud = new Hud(_renderer, state);
 
-    tilemapTexture = AssetManager::Instance(_renderer)->getTexture("tileset.png");
+    camera = new Camera({ 640, 480 }, { 0, 0, 2000, 2000 });
+    camera->follow(player);
 
-    tilemap = new Tilemap(map, 8, 9);
+    SDL_Texture* tilemapTexture = AssetManager::Instance(_renderer)->getTexture("tileset.png");
+    tilemap = new Tilemap("resources/maps/demo.level", tilemapTexture);
+
+    entities.push_back(player);
   }
 
   void update(float dt) {
-    player->update(dt);
+    for (int i = 0; i < entities.size(); i ++) {
+      entities[i]->update(dt);
+    }
+
+    camera->update(dt);
   }
 
   void draw(SDL_Renderer* renderer) {
-    tilemap->draw(renderer, tilemapTexture);
-    player->draw(renderer);
+    tilemap->draw(renderer, camera);
+
+    for (int i = 0; i < entities.size(); i ++) {
+      entities[i]->draw(renderer, camera->getRect());
+    }
+
+    hud->draw(renderer);
+
     SDL_RenderPresent(renderer);
   }
 };
