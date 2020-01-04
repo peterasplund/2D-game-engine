@@ -29,16 +29,20 @@ private:
   float _gravity = 0.035f;
   float _jumpPower = 2.2f;
   float _maxFallSpeed = 15.0f;
+  float friction = 0.08f;
   State _state = State::S_IDLE;
+
+  Timer _timer;
 public:
 
   Player(SDL_Renderer* renderer) : Object() {
     size = { 48.0f, 48.0f };
-    hitBox = { (int)10.0f, (int)10.0f, (int)28.0f, (int)38.0f };
+    hitBox = { (int)14.0f, (int)14.0f, (int)22.0f, (int)34.0f };
     speed = 1.0;
     velocity = { 0, 0 };
     id = "player";
 
+    _timer = Timer();
     _inputHandler = InputHandler::Instance();
     SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
@@ -80,11 +84,11 @@ public:
     animator.addAnimation("fall", animFall);
 
     animator.setAnimation("fall");
+
+    animator.play();
   }
 
   void update(float dt, std::vector<Object> tiles) {
-    velocity.x = 0.0f;
-
     leftRect = getHitBox();
     leftRect.w = 5;
     leftRect.h = leftRect.h / 2;
@@ -108,6 +112,47 @@ public:
     bottomRect.h = 5;
     bottomRect.x = bottomRect.x + (bottomRect.w / 2);
     bottomRect.y = bottomRect.y + getHitBox().h - 5;
+
+    onFloor = false;
+
+    //resolve collisions
+    for (int j = 0; j < tiles.size(); j ++) {
+      if (!tiles[j].getSolid()) {
+        continue;
+      }
+
+      // collision
+      if (Object::intersectsWith(&tiles[j])) {
+        if (tiles[j].intersectsWithRect(&bottomRect) && velocity.y > 0) {
+          // handle landing collision
+          position.y = tiles[j].getPosition().y - size.y;
+          onFloor = true;
+          velocity.y = 0.0f;
+        } else if (tiles[j].intersectsWithRect(&topRect) && velocity.y < 0) {
+          // handle top collision
+          position.y = tiles[j].getPosition().y + tiles[j].getSize().y - hitBox.y;
+          velocity.y = 0.0f;
+        } else if (tiles[j].intersectsWithRect(&leftRect)) {
+          // handle left collision
+          position.x = tiles[j].getRect().x + tiles[j].getRect().w - hitBox.x;
+          velocity.x = 0.0f;
+        } else if (tiles[j].intersectsWithRect(&rightRect)) {
+          // handle right collision
+          position.x = tiles[j].getRect().x - hitBox.w - hitBox.x + 1;
+          velocity.x = 0.0f;
+        }
+      }
+    }
+
+    Object::update(dt);
+
+    if (velocity.x > 0.2) {
+      velocity.x -= friction;
+    } else if (velocity.x < -0.2) {
+      velocity.x += friction;
+    } else {
+      velocity.x = 0;
+    }
 
     if (_state != State::S_ATTACK) {
       if (_inputHandler->isPressed(BUTTON::LEFT)) {
@@ -138,13 +183,13 @@ public:
       printf("ATTACK\n");
       _state = State::S_ATTACK;
       animator.setAnimation("attack");
+      animator.reset();
+      _timer.reset();
     }
 
-    if (velocity.x == 0.0f && velocity.y == 0.0f) {
-      animator.stop();
-      animator.reset();
-    } else {
-      animator.play();
+    // 500 = 100ms on each frame of attack animation
+    if (_state == State::S_ATTACK && _timer.elapsed() > 500) {
+      _state = State::S_IDLE;
     }
 
     if (_state != State::S_ATTACK) {
@@ -170,43 +215,12 @@ public:
       }
     }
 
-    onFloor = false;
-    Object::update(dt);
-
-    //resolve collisions
-    for (int j = 0; j < tiles.size(); j ++) {
-      if (!tiles[j].getSolid()) {
-        continue;
-      }
-
-      // collision
-      if (Object::intersectsWith(&tiles[j])) {
-        if (tiles[j].intersectsWithRect(&bottomRect) && velocity.y > 0) {
-          // handle landing collision
-          position.y = tiles[j].getPosition().y - size.y;
-          onFloor = true;
-          velocity.y = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&topRect) && velocity.y < 0) {
-          // handle top collision
-          position.y = tiles[j].getPosition().y + tiles[j].getSize().y - hitBox.y;
-          velocity.y = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&leftRect)) {
-          // handle left collision
-          position.x = tiles[j].getRect().x + tiles[j].getRect().w - hitBox.x;
-          velocity.x = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&rightRect)) {
-          // handle right collision
-          position.x = tiles[j].getRect().x - hitBox.w - hitBox.x;
-          velocity.x = 0.0f;
-        }
-      }
-    }
-
   }
 
 
   virtual void draw(SDL_Renderer* renderer, SDL_Rect origin) {
-    printf("animation: %s\n", animator.getCurrent().c_str());
+    //printf("animation: %s\n", animator.getCurrent().c_str());
+    printf("x: %f\n", position.x);
     textureRect = animator.getFrame();
     setTexture(animator.getTexture());
 

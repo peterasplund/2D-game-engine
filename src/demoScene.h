@@ -17,7 +17,6 @@ private:
   Camera* camera;
   Hud* hud;
   GameState* state;
-
   std::vector<Object*> entities;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {

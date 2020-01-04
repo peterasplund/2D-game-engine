@@ -38,7 +38,7 @@ class Tilemap
             o.setSize({ TILE_SIZE, TILE_SIZE });
             o.setTextureRect({
               0 * (TILE_SIZE),
-              8 * (TILE_SIZE),
+              7 * (TILE_SIZE),
               TILE_SIZE, TILE_SIZE
             });
 
