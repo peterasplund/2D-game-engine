@@ -55,6 +55,10 @@ class Animator
       return _currentAnimation;
     }
 
+    SDL_Texture* getTexture() {
+      return _animations[_currentAnimation]->getTexture();
+    }
+
     SDL_Rect getFrame() {
       if (_animations[_currentAnimation] != nullptr) {
         return _animations[_currentAnimation]->getFrame();

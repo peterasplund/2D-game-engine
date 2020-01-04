@@ -26,6 +26,7 @@ public:
   void init() {
     state = new GameState();
     player = new Player(_renderer);
+    player->setPosition({ 64.0f, 64.0f });
     hud = new Hud(_renderer, state);
 
     camera = new Camera({ 640, 480 }, { 0, 0, 2000, 2000 });
@@ -40,6 +41,12 @@ public:
   void update(float dt) {
     for (int i = 0; i < entities.size(); i ++) {
       entities[i]->update(dt);
+
+      if (entities[i]->getId() == "player") {
+        ((Player*)entities[i])->update(dt, tilemap->getTiles());
+      } else {
+        entities[i]->update(dt);
+      }
     }
 
     camera->update(dt);

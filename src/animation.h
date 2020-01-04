@@ -18,8 +18,10 @@ class Animation
   };
 
   public:
-    Animation() {
+    Animation(SDL_Texture* texture, bool looping = true) {
       timer = new Timer();
+      this->texture = texture;
+      this->looping = looping;
     }
 
     ~Animation() {
@@ -50,20 +52,34 @@ class Animation
           return frames.at(0).rect;
         }
 
-        currentFrame++;
+        if (currentFrame != frames.size()) {
+          currentFrame++;
+        }
+
         timer->reset();
 
         if (currentFrame == frames.size()) {
-          currentFrame = 0;
+          if (looping) {
+            currentFrame = 0;
+          } else {
+            currentFrame = frames.size() - 1;
+          }
         }
       }
       return frames.at(currentFrame).rect;
     }
+
+    SDL_Texture* getTexture() {
+      return texture;
+    }
+
   private:
     bool active = true;
+    bool looping = true;
     std::vector<Frame> frames;
     unsigned int ellapsedMS = 0;
     int currentFrame = 0;
+    SDL_Texture* texture;
     Timer* timer;
 
 };

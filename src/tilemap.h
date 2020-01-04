@@ -10,12 +10,13 @@
 #include <iostream>
 
 const int TILE_SIZE = 32;
-const int ZOOM = 1;
 
 class Tilemap
 {
   public:
     Tilemap(const char* mapFile, SDL_Texture* texture) {
+      int y = 0;
+      std::string line;
       std::ifstream in(mapFile);
 
       if (!in.is_open()) {
@@ -23,8 +24,6 @@ class Tilemap
         return;
       }
       
-      int y = 0;
-      std::string line;
       while (!in.eof()) {
         getline(in, line);
 
@@ -61,10 +60,21 @@ class Tilemap
     }
 
     void draw(SDL_Renderer* renderer, Camera* camera) {
+      SDL_Rect c = camera->getRect();
+
       for (int i = 0; i < _map.size(); i ++) {
-        _map[i].draw(renderer, camera->getRect());
+        v2 p = _map[i].getPosition();
+        v2 s = _map[i].getSize();
+
+        SDL_Rect o = { (int)p.x, (int)p.y, (int)s.x, (int)s.y };
+
+        if (SDL_HasIntersection(&o, &c)) {
+          _map[i].draw(renderer, camera->getRect());
+        }
       }
     }
+
+    std::vector<Object> getTiles() { return _map; }
 
   private:
     std::vector<Object> _map;
