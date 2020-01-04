@@ -41,7 +41,7 @@ class Camera
     void update(float dt) {
       if (following != nullptr) {
         position.x = following->getPosition().x + (following->getSize().x / 2) - (size.x / 2);
-        position.y = following->getPosition().y + (following->getSize().y / 2) - (size.y / 2);
+        //position.y = following->getPosition().y + (following->getSize().y / 2) - (size.y / 2);
 
         // clamp
         if (position.x < bounds.x) { position.x = bounds.x; }

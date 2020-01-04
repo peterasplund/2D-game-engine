@@ -6,6 +6,7 @@
 #include "player.h"
 #include "tilemap.h"
 #include "camera.h"
+#include "bg.h"
 #include "game/hud.h"
 #include "game/gameState.h"
 
@@ -18,8 +19,13 @@ private:
   Hud* hud;
   GameState* state;
   std::vector<Object*> entities;
+  SDL_Renderer* _renderer;
+
+  Bg* bg1;
+  Bg* bg2;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
+    _renderer = renderer;
   }
 
   void init() {
@@ -28,11 +34,14 @@ public:
     player->setPosition({ 64.0f, 64.0f });
     hud = new Hud(_renderer, state);
 
-    camera = new Camera({ 640, 480 }, { 0, 0, 2000, 2000 });
+    camera = new Camera({ 512, 352 }, { 0, 0, 2000, 2000 });
     camera->follow(player);
 
     SDL_Texture* tilemapTexture = AssetManager::Instance(_renderer)->getTexture("tileset.png");
     tilemap = new Tilemap("resources/maps/demo.level", tilemapTexture);
+
+    bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
+    bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
 
     entities.push_back(player);
   }
@@ -52,13 +61,16 @@ public:
   }
 
   void draw(SDL_Renderer* renderer) {
+    bg1->draw(renderer, -camera->getRect().x * 0.04);
+    bg2->draw(renderer, -camera->getRect().x * 0.2);
+
     tilemap->draw(renderer, camera);
 
     for (int i = 0; i < entities.size(); i ++) {
       entities[i]->draw(renderer, camera->getRect());
     }
 
-    hud->draw(renderer);
+    // hud->draw(renderer);
 
     SDL_RenderPresent(renderer);
   }

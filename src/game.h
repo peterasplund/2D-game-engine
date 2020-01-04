@@ -5,8 +5,8 @@
 #include "scene.h"
 #include "demoScene.h"
 
-const int WINDOW_WIDTH  = 640 * 2;
-const int WINDOW_HEIGHT = 480 * 2;
+const int WINDOW_WIDTH  = 512 * 2;
+const int WINDOW_HEIGHT = 352 * 2;
 const int WINDOW_FPS    = 60;
 
 class Game

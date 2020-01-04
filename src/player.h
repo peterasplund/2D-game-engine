@@ -27,9 +27,12 @@ private:
   SDL_Rect bottomRect;
 
   float _gravity = 0.035f;
-  float _jumpPower = 2.2f;
+  float _jumpPower = 2.4f;
   float _maxFallSpeed = 15.0f;
   float friction = 0.08f;
+  float backDashSpeed = 1.5f;
+  bool isBackDashing = false;
+  std::string direction = "right";
   State _state = State::S_IDLE;
 
   Timer _timer;
@@ -54,6 +57,7 @@ public:
     Animation* animAttack = new Animation(texture, false);
     Animation* animJump = new Animation(texture, false);
     Animation* animFall = new Animation(texture, false);
+    Animation* animBackDash = new Animation(texture, false);
 
     animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
     animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
@@ -76,12 +80,15 @@ public:
 
     animFall->addFrame({ tw * 5, th * 4, tw, th }, 100);
 
+    animBackDash->addFrame({ tw * 1, th * 4, tw, th }, 100);
+
 
     animator.addAnimation("idle", animIdle);
     animator.addAnimation("run", animRun);
     animator.addAnimation("attack", animAttack);
     animator.addAnimation("jump", animJump);
     animator.addAnimation("fall", animFall);
+    animator.addAnimation("backDash", animBackDash);
 
     animator.setAnimation("fall");
 
@@ -111,7 +118,7 @@ public:
     bottomRect.w = bottomRect.w / 2;
     bottomRect.h = 5;
     bottomRect.x = bottomRect.x + (bottomRect.w / 2);
-    bottomRect.y = bottomRect.y + getHitBox().h - 5;
+    bottomRect.y = bottomRect.y + getHitBox().h - 6;
 
     onFloor = false;
 
@@ -125,7 +132,7 @@ public:
       if (Object::intersectsWith(&tiles[j])) {
         if (tiles[j].intersectsWithRect(&bottomRect) && velocity.y > 0) {
           // handle landing collision
-          position.y = tiles[j].getPosition().y - size.y;
+          position.y = tiles[j].getPosition().y - size.y + 2;
           onFloor = true;
           velocity.y = 0.0f;
         } else if (tiles[j].intersectsWithRect(&topRect) && velocity.y < 0) {
@@ -156,11 +163,13 @@ public:
 
     if (_state != State::S_ATTACK) {
       if (_inputHandler->isPressed(BUTTON::LEFT)) {
+        direction = "left";
         velocity.x = -1.0f;
         textureFlip = SDL_FLIP_NONE;
       }
 
       if (_inputHandler->isPressed(BUTTON::RIGHT)) {
+        direction = "right";
         velocity.x = 1.0f;
         textureFlip = SDL_FLIP_HORIZONTAL;
       }
@@ -187,8 +196,24 @@ public:
       _timer.reset();
     }
 
+    // back dash after attack
+    if (_state == State::S_ATTACK && _timer.elapsed() > 300) {
+      if (direction == "right" && _inputHandler->isPressed(BUTTON::LEFT)) {
+        isBackDashing = true;
+        velocity.x = -backDashSpeed;
+        animator.setAnimation("backDash");
+        animator.reset();
+      } else if (direction == "left" && _inputHandler->isPressed(BUTTON::RIGHT)) {
+        isBackDashing = true;
+        velocity.x = backDashSpeed;
+        animator.setAnimation("backDash");
+        animator.reset();
+      }
+    }
+
     // 500 = 100ms on each frame of attack animation
     if (_state == State::S_ATTACK && _timer.elapsed() > 500) {
+      isBackDashing = false;
       _state = State::S_IDLE;
     }
 
