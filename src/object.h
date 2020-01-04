@@ -12,6 +12,7 @@ protected:
   v2 velocity = { 0.0f, 0.0f };
 
   SDL_Rect textureRect;
+  SDL_Rect hitBox;
   SDL_Texture* texture;
 
   std::string id = "";
@@ -20,7 +21,9 @@ protected:
   std::vector<Object*> children;
   SDL_RendererFlip textureFlip = SDL_FLIP_NONE;
 public:
-  Object() { }
+  Object() {
+    hitBox = { 0, 0, (int)size.x, (int)size.y };
+  }
 
   std::string getId() { return id; }
 
@@ -29,9 +32,16 @@ public:
 
   void setTexture(SDL_Texture* texture) { this->texture = texture; }
 
+  SDL_Rect getHitBox() {
+    return {
+      (int)position.x + hitBox.x, (int)position.y + hitBox.y, hitBox.w, hitBox.h
+    };
+  }
   void setTextureRect(SDL_Rect textureRect) { this->textureRect = textureRect; }
 
-  SDL_Rect getRect() { return { (int)position.x, (int)position.y, (int)size.x, (int)size.y }; }
+  SDL_Rect getRect() { return { 
+    (int)position.x, (int)position.y, (int)size.x, (int)size.y };
+  }
 
   v2 getSize() { return size; }
   void setSize(v2 v) { size = v; }
@@ -40,13 +50,13 @@ public:
   void setSolid(bool v) { isSolid = v; }
 
   bool intersectsWith(Object* other) {
-    SDL_Rect r1 = getRect();
+    SDL_Rect r1 = { (int)position.x + hitBox.x, (int)position.y + hitBox.y, hitBox.w, hitBox.h };
     SDL_Rect r2 = other->getRect();
     return SDL_HasIntersection(&r1, &r2);
   }
 
   bool intersectsWithRect(SDL_Rect* other) {
-    SDL_Rect r1 = getRect();
+    SDL_Rect r1 = { (int)position.x + hitBox.x, (int)position.y + hitBox.y, hitBox.w, hitBox.h };
     return SDL_HasIntersection(&r1, other);
   }
 

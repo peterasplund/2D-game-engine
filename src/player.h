@@ -7,6 +7,13 @@
 #include "inputHandler.h"
 #include "camera.h"
 
+enum State {
+  S_IDLE,
+  S_RUN,
+  S_JUMP,
+  S_ATTACK,
+};
+
 class Player : public Object
 {
 private:
@@ -22,60 +29,53 @@ private:
   float _gravity = 0.035f;
   float _jumpPower = 2.2f;
   float _maxFallSpeed = 15.0f;
+  State _state = State::S_IDLE;
 public:
 
   Player(SDL_Renderer* renderer) : Object() {
-    size = { 66.0f, 48.0f };
+    size = { 48.0f, 48.0f };
+    hitBox = { (int)10.0f, (int)10.0f, (int)28.0f, (int)38.0f };
     speed = 1.0;
     velocity = { 0, 0 };
     id = "player";
 
     _inputHandler = InputHandler::Instance();
-    SDL_Texture* idleTexture = AssetManager::Instance(renderer)->getTexture("sprites/gothic-hero-idle.png");
-    SDL_Texture* runTexture = AssetManager::Instance(renderer)->getTexture("sprites/gothic-hero-run.png");
-    SDL_Texture* jumpTexture = AssetManager::Instance(renderer)->getTexture("sprites/gothic-hero-jump.png");
+    SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
-    int tw = 38;
+    int tw = 48;
     int th = 48;
 
-    Animation* animIdle = new Animation(idleTexture);
-    Animation* animRun = new Animation(runTexture);
-    Animation* animJump = new Animation(jumpTexture, false);
-    Animation* animFall = new Animation(jumpTexture, false);
+    Animation* animIdle = new Animation(texture);
+    Animation* animRun = new Animation(texture);
+    Animation* animAttack = new Animation(texture, false);
+    Animation* animJump = new Animation(texture, false);
+    Animation* animFall = new Animation(texture, false);
 
-    tw = 38;
     animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
     animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
     animIdle->addFrame({ tw * 2, th * 0, tw, th }, 500);
     animIdle->addFrame({ tw * 3, th * 0, tw, th }, 500);
 
-    tw = 66;
-    animRun->addFrame({ tw * 0, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 1, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 2, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 3, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 4, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 5, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 6, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 7, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 8, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 9, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 10, th * 0, tw, th }, 100);
-    animRun->addFrame({ tw * 11, th * 0, tw, th }, 100);
+    animRun->addFrame({ tw * 0, th * 1, tw, th }, 100);
+    animRun->addFrame({ tw * 1, th * 1, tw, th }, 100);
+    animRun->addFrame({ tw * 2, th * 1, tw, th }, 100);
+    animRun->addFrame({ tw * 3, th * 1, tw, th }, 100);
+    animRun->addFrame({ tw * 4, th * 1, tw, th }, 100);
 
-    tw = 61;
-    th = 77;
-    animJump->addFrame({ tw * 0, th * 0, tw, th }, 100);
-    animJump->addFrame({ tw * 1, th * 0, tw, th }, 100);
-    animJump->addFrame({ tw * 2, th * 0, tw, th }, 100);
-    animJump->addFrame({ tw * 3, th * 0, tw, th }, 100);
-    animJump->addFrame({ tw * 4, th * 0, tw, th }, 100);
+    animAttack->addFrame({ tw * 3, th * 2, tw, th }, 100);
+    animAttack->addFrame({ tw * 4, th * 2, tw, th }, 100);
+    animAttack->addFrame({ tw * 5, th * 2, tw, th }, 100);
+    animAttack->addFrame({ tw * 6, th * 2, tw, th }, 100);
+    animAttack->addFrame({ tw * 7, th * 2, tw, th }, 100);
 
-    tw = 61;
-    animFall->addFrame({ tw * 4, th * 0, tw, th }, 100);
+    animJump->addFrame({ tw * 5, th * 4, tw, th }, 100);
+
+    animFall->addFrame({ tw * 5, th * 4, tw, th }, 100);
+
 
     animator.addAnimation("idle", animIdle);
     animator.addAnimation("run", animRun);
+    animator.addAnimation("attack", animAttack);
     animator.addAnimation("jump", animJump);
     animator.addAnimation("fall", animFall);
 
@@ -85,29 +85,93 @@ public:
   void update(float dt, std::vector<Object> tiles) {
     velocity.x = 0.0f;
 
-    leftRect = getRect();
+    leftRect = getHitBox();
     leftRect.w = 5;
     leftRect.h = leftRect.h / 2;
     leftRect.x = leftRect.x;
     leftRect.y = leftRect.y + (leftRect.h / 2);
 
-    rightRect = getRect();
+    rightRect = getHitBox();
     rightRect.w = 5;
     rightRect.h = rightRect.h / 2;
-    rightRect.x = rightRect.x + getRect().w - 5;
+    rightRect.x = rightRect.x + getHitBox().w - 5;
     rightRect.y = rightRect.y + (rightRect.h / 2);
 
-    topRect = getRect();
+    topRect = getHitBox();
     topRect.w = topRect.w / 2;
     topRect.h = 5;
     topRect.x = topRect.x + (topRect.w / 2);
     topRect.y = topRect.y;
 
-    bottomRect = getRect();
+    bottomRect = getHitBox();
     bottomRect.w = bottomRect.w / 2;
     bottomRect.h = 5;
     bottomRect.x = bottomRect.x + (bottomRect.w / 2);
-    bottomRect.y = bottomRect.y + getRect().h - 5;
+    bottomRect.y = bottomRect.y + getHitBox().h - 5;
+
+    if (_state != State::S_ATTACK) {
+      if (_inputHandler->isPressed(BUTTON::LEFT)) {
+        velocity.x = -1.0f;
+        textureFlip = SDL_FLIP_NONE;
+      }
+
+      if (_inputHandler->isPressed(BUTTON::RIGHT)) {
+        velocity.x = 1.0f;
+        textureFlip = SDL_FLIP_HORIZONTAL;
+      }
+
+      if (_inputHandler->isPressed(BUTTON::UP) && onFloor) {
+        velocity.y = -_jumpPower;
+        onFloor = false;
+      }
+    }
+
+    if (!onFloor) {
+      velocity.y += _gravity;
+    }
+
+    if (velocity.y > _maxFallSpeed) {
+      velocity.y = _maxFallSpeed;
+    }
+
+    if (_inputHandler->isPressed(BUTTON::ATTACK) && onFloor && _state == State::S_IDLE) {
+      printf("ATTACK\n");
+      _state = State::S_ATTACK;
+      animator.setAnimation("attack");
+    }
+
+    if (velocity.x == 0.0f && velocity.y == 0.0f) {
+      animator.stop();
+      animator.reset();
+    } else {
+      animator.play();
+    }
+
+    if (_state != State::S_ATTACK) {
+      if (velocity.y > .4f && !onFloor) {
+        if (animator.getCurrent() != "fall") {
+          animator.reset();
+          animator.setAnimation("fall");
+        }
+      } else if (velocity.y < 0 && !onFloor) {
+        if (animator.getCurrent() != "jump") {
+          animator.reset();
+          animator.setAnimation("jump");
+        }
+      } else if (velocity.x != 0 && onFloor) {
+        if (animator.getCurrent() != "run") {
+          animator.setAnimation("run");
+        }
+      } else if (onFloor) {
+        if (animator.getCurrent() != "idle") {
+          printf("setting idle\n");
+          animator.setAnimation("idle");
+        }
+      }
+    }
+
+    onFloor = false;
+    Object::update(dt);
 
     //resolve collisions
     for (int j = 0; j < tiles.size(); j ++) {
@@ -124,73 +188,20 @@ public:
           velocity.y = 0.0f;
         } else if (tiles[j].intersectsWithRect(&topRect) && velocity.y < 0) {
           // handle top collision
-          position.y = tiles[j].getPosition().y + tiles[j].getSize().y;
+          position.y = tiles[j].getPosition().y + tiles[j].getSize().y - hitBox.y;
           velocity.y = 0.0f;
         } else if (tiles[j].intersectsWithRect(&leftRect)) {
           // handle left collision
-          position.x = tiles[j].getPosition().x + tiles[j].getSize().x;
+          position.x = tiles[j].getRect().x + tiles[j].getRect().w - hitBox.x;
           velocity.x = 0.0f;
         } else if (tiles[j].intersectsWithRect(&rightRect)) {
           // handle right collision
-          position.x = tiles[j].getPosition().x - size.x;
+          position.x = tiles[j].getRect().x - hitBox.w - hitBox.x;
           velocity.x = 0.0f;
         }
       }
     }
 
-    if (_inputHandler->isPressed(BUTTON::LEFT)) {
-      velocity.x = -1.0f;
-      textureFlip = SDL_FLIP_HORIZONTAL;
-    }
-
-    if (_inputHandler->isPressed(BUTTON::RIGHT)) {
-      velocity.x = 1.0f;
-      textureFlip = SDL_FLIP_NONE;
-    }
-
-    if (!onFloor) {
-      velocity.y += _gravity;
-    }
-
-    if (velocity.y > _maxFallSpeed) {
-      velocity.y = _maxFallSpeed;
-    }
-
-    if (_inputHandler->isPressed(BUTTON::UP) && onFloor) {
-      velocity.y = -_jumpPower;
-      onFloor = false;
-    }
-
-    if (velocity.x == 0.0f && velocity.y == 0.0f) {
-      animator.stop();
-      animator.reset();
-    } else {
-      animator.play();
-    }
-
-    if (velocity.y > .4f && !onFloor) {
-      if (animator.getCurrent() != "fall") {
-        animator.reset();
-        animator.setAnimation("fall");
-      }
-    } else if (velocity.y < 0 && !onFloor) {
-      if (animator.getCurrent() != "jump") {
-        animator.reset();
-        animator.setAnimation("jump");
-      }
-    } else if (velocity.x != 0 && onFloor) {
-      if (animator.getCurrent() != "run") {
-        animator.setAnimation("run");
-      }
-    } else if (onFloor) {
-      if (animator.getCurrent() != "idle") {
-        animator.setAnimation("idle");
-      }
-    }
-
-    onFloor = false;
-
-    Object::update(dt);
   }
 
 

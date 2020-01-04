@@ -6,7 +6,8 @@ enum BUTTON {
   UP,
   RIGHT,
   DOWN,
-  LEFT
+  LEFT,
+  ATTACK
 };
 
 class InputHandler
@@ -16,7 +17,7 @@ private:
   std::map<BUTTON, bool> _state;
 
   InputHandler() {
-    for (int i = UP; i != LEFT; i++) {
+    for (int i = UP; i != ATTACK; i++) {
       BUTTON button = static_cast<BUTTON>(i);
 
       _state.insert(std::pair<BUTTON, bool>(button, false));
