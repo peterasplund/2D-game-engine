@@ -147,6 +147,8 @@ private:
       std::cerr << "Failed to create renderer.\n";
       return 0;
     }
+
+    SDL_RenderSetScale(_renderer, 2, 2);
   
     _inputHandler = InputHandler::Instance();
 
