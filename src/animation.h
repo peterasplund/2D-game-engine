@@ -19,7 +19,6 @@ class Animation
 
   public:
     Animation(SDL_Texture* texture, bool looping = true) {
-      timer = new Timer();
       this->texture = texture;
       this->looping = looping;
     }
@@ -35,7 +34,7 @@ class Animation
       active = false;
     }
 
-    void play() {
+    void start() {
       active = true;
     }
 
@@ -43,7 +42,7 @@ class Animation
       currentFrame = 0;
     }
 
-    SDL_Rect getFrame() {
+    SDL_Rect getFrame(Timer* timer) {
       ellapsedMS  = timer->elapsed();
 
       if (ellapsedMS >= frames.at(currentFrame).timeToNextFrame)
@@ -80,6 +79,5 @@ class Animation
     unsigned int ellapsedMS = 0;
     int currentFrame = 0;
     SDL_Texture* texture;
-    Timer* timer;
 
 };

@@ -26,10 +26,10 @@ private:
   SDL_Rect topRect;
   SDL_Rect bottomRect;
 
-  float _gravity = 0.035f;
+  float _gravity = 0.05f;
   float _jumpPower = 2.4f;
   float _maxFallSpeed = 15.0f;
-  float friction = 0.08f;
+  float friction = 0.12f;
   float backDashSpeed = 1.5f;
   bool isBackDashing = false;
   std::string direction = "right";
@@ -92,7 +92,7 @@ public:
 
     animator.setAnimation("fall");
 
-    animator.play();
+    animator.start();
   }
 
   void update(float dt, std::vector<Object> tiles) {
@@ -156,7 +156,7 @@ public:
     if (velocity.x > 0.2) {
       velocity.x -= friction;
     } else if (velocity.x < -0.2) {
-      velocity.x += friction;
+      velocity.x += (friction * dt) / 10;
     } else {
       velocity.x = 0;
     }
@@ -174,14 +174,14 @@ public:
         textureFlip = SDL_FLIP_HORIZONTAL;
       }
 
-      if (_inputHandler->isPressed(BUTTON::UP) && onFloor) {
+      if (_inputHandler->isPressed(BUTTON::JUMP) && onFloor) {
         velocity.y = -_jumpPower;
         onFloor = false;
       }
     }
 
     if (!onFloor) {
-      velocity.y += _gravity;
+      velocity.y += (_gravity * dt) / 10;
     }
 
     if (velocity.y > _maxFallSpeed) {
@@ -240,12 +240,15 @@ public:
       }
     }
 
+    if (position.y > 370) {
+      position.y = -size.y;
+    }
+
   }
 
 
   virtual void draw(SDL_Renderer* renderer, SDL_Rect origin) {
     //printf("animation: %s\n", animator.getCurrent().c_str());
-    printf("x: %f\n", position.x);
     textureRect = animator.getFrame();
     setTexture(animator.getTexture());
 

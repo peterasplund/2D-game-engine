@@ -38,7 +38,7 @@ public:
     camera->follow(player);
 
     SDL_Texture* tilemapTexture = AssetManager::Instance(_renderer)->getTexture("tileset.png");
-    tilemap = new Tilemap("resources/maps/demo.level", tilemapTexture);
+    tilemap = new Tilemap("assets/maps/demo.level", tilemapTexture);
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);

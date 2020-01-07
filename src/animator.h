@@ -10,6 +10,7 @@ class Animator
 {
   public:
     Animator() {
+      timer = new Timer();
     }
 
     ~Animator() {
@@ -33,9 +34,9 @@ class Animator
       return false;
     }
 
-    void play() {
+    void start() {
       if (_animations[_currentAnimation] != nullptr) {
-        _animations[_currentAnimation]->play();
+        _animations[_currentAnimation]->start();
       }
     }
 
@@ -61,7 +62,7 @@ class Animator
 
     SDL_Rect getFrame() {
       if (_animations[_currentAnimation] != nullptr) {
-        return _animations[_currentAnimation]->getFrame();
+        return _animations[_currentAnimation]->getFrame(timer);
       }
 
       return {};
@@ -70,4 +71,5 @@ class Animator
   private:
     std::map<std::string, Animation*> _animations;
     std::string _currentAnimation;
+    Timer* timer;
 };
