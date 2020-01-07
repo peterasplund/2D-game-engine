@@ -7,6 +7,7 @@ enum BUTTON {
   RIGHT,
   DOWN,
   LEFT,
+  JUMP,
   ATTACK
 };
 

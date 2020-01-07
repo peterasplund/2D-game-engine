@@ -86,6 +86,9 @@ public:
               case SDLK_j:
                 _inputHandler->setState(BUTTON::ATTACK, true);
                 break;
+              case SDLK_k:
+                _inputHandler->setState(BUTTON::JUMP, true);
+                break;
             }
             break;
           case SDL_KEYUP:
@@ -104,6 +107,9 @@ public:
                 break;
               case SDLK_j:
                 _inputHandler->setState(BUTTON::ATTACK, false);
+                break;
+              case SDLK_k:
+                _inputHandler->setState(BUTTON::JUMP, false);
                 break;
             }
             break;
