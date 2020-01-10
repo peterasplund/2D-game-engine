@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include "physicsObject.h"
 #include "assetManager.h"
 #include "object.h"
 #include "animation.h"
@@ -14,31 +15,28 @@ enum State {
   S_ATTACK,
 };
 
-class Player : public Object
+class Player : public PhysicsObject
 {
 private:
   Animator animator;
   InputHandler* _inputHandler;
-  bool onFloor = false;
 
   SDL_Rect leftRect;
   SDL_Rect rightRect;
   SDL_Rect topRect;
   SDL_Rect bottomRect;
 
-  float _gravity = 0.05f;
-  float _jumpPower = 2.4f;
-  float _maxFallSpeed = 15.0f;
-  float friction = 0.12f;
+  float _jumpPower = 3.0f;
   float backDashSpeed = 1.5f;
   bool isBackDashing = false;
+  float runSpeed = 1.1f;
   std::string direction = "right";
   State _state = State::S_IDLE;
 
   Timer _timer;
 public:
 
-  Player(SDL_Renderer* renderer) : Object() {
+  Player(SDL_Renderer* renderer) : PhysicsObject() {
     size = { 48.0f, 48.0f };
     hitBox = { (int)14.0f, (int)14.0f, (int)22.0f, (int)34.0f };
     speed = 1.0;
@@ -95,101 +93,42 @@ public:
     animator.start();
   }
 
+  void onCollisionTop() {
+
+  }
+
+  void onCollisionBottom() {
+
+  }
+
+  void onCollisionLeft() {
+
+  }
+
+  void onCollisionRight() {
+
+  }
+
   void update(float dt, std::vector<Object> tiles) {
-    leftRect = getHitBox();
-    leftRect.w = 5;
-    leftRect.h = leftRect.h / 2;
-    leftRect.x = leftRect.x;
-    leftRect.y = leftRect.y + (leftRect.h / 2);
-
-    rightRect = getHitBox();
-    rightRect.w = 5;
-    rightRect.h = rightRect.h / 2;
-    rightRect.x = rightRect.x + getHitBox().w - 5;
-    rightRect.y = rightRect.y + (rightRect.h / 2);
-
-    topRect = getHitBox();
-    topRect.w = topRect.w / 2;
-    topRect.h = 5;
-    topRect.x = topRect.x + (topRect.w / 2);
-    topRect.y = topRect.y;
-
-    bottomRect = getHitBox();
-    bottomRect.w = bottomRect.w / 2;
-    bottomRect.h = 5;
-    bottomRect.x = bottomRect.x + (bottomRect.w / 2);
-    bottomRect.y = bottomRect.y + getHitBox().h - 6;
-
-    onFloor = false;
-
-    //resolve collisions
-    for (int j = 0; j < tiles.size(); j ++) {
-      if (!tiles[j].getSolid()) {
-        continue;
-      }
-
-      // collision
-      if (Object::intersectsWith(&tiles[j])) {
-        if (tiles[j].intersectsWithRect(&bottomRect) && velocity.y > 0) {
-          // handle landing collision
-          position.y = tiles[j].getPosition().y - size.y + 2;
-          onFloor = true;
-          velocity.y = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&topRect) && velocity.y < 0) {
-          // handle top collision
-          position.y = tiles[j].getPosition().y + tiles[j].getSize().y - hitBox.y;
-          velocity.y = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&leftRect)) {
-          // handle left collision
-          position.x = tiles[j].getRect().x + tiles[j].getRect().w - hitBox.x;
-          velocity.x = 0.0f;
-        } else if (tiles[j].intersectsWithRect(&rightRect)) {
-          // handle right collision
-          position.x = tiles[j].getRect().x - hitBox.w - hitBox.x + 1;
-          velocity.x = 0.0f;
-        }
-      }
-    }
-
-    Object::update(dt);
-
-    if (velocity.x > 0.2) {
-      velocity.x -= friction;
-    } else if (velocity.x < -0.2) {
-      velocity.x += (friction * dt) / 10;
-    } else {
-      velocity.x = 0;
-    }
-
     if (_state != State::S_ATTACK) {
       if (_inputHandler->isPressed(BUTTON::LEFT)) {
         direction = "left";
-        velocity.x = -1.0f;
+        velocity.x = -runSpeed;
         textureFlip = SDL_FLIP_NONE;
       }
 
       if (_inputHandler->isPressed(BUTTON::RIGHT)) {
         direction = "right";
-        velocity.x = 1.0f;
+        velocity.x = runSpeed;
         textureFlip = SDL_FLIP_HORIZONTAL;
       }
 
       if (_inputHandler->isPressed(BUTTON::JUMP) && onFloor) {
         velocity.y = -_jumpPower;
-        onFloor = false;
       }
     }
 
-    if (!onFloor) {
-      velocity.y += (_gravity * dt) / 10;
-    }
-
-    if (velocity.y > _maxFallSpeed) {
-      velocity.y = _maxFallSpeed;
-    }
-
     if (_inputHandler->isPressed(BUTTON::ATTACK) && onFloor && _state == State::S_IDLE) {
-      printf("ATTACK\n");
       _state = State::S_ATTACK;
       animator.setAnimation("attack");
       animator.reset();
@@ -234,36 +173,25 @@ public:
         }
       } else if (onFloor) {
         if (animator.getCurrent() != "idle") {
-          printf("setting idle\n");
           animator.setAnimation("idle");
         }
       }
     }
 
     if (position.y > 370) {
+      // die and respawn
       position.y = -size.y;
     }
 
+    PhysicsObject::update(dt);
+    PhysicsObject::resolveCollisions(tiles);
   }
 
-
   virtual void draw(SDL_Renderer* renderer, SDL_Rect origin) {
-    //printf("animation: %s\n", animator.getCurrent().c_str());
     textureRect = animator.getFrame();
     setTexture(animator.getTexture());
 
     Object::draw(renderer, origin);
-
-    // debug collision rectangles
-    /*
-    SDL_SetRenderDrawColor(renderer, 20, 255, 20, 255);
-    SDL_RenderFillRect(renderer, &leftRect);
-    SDL_SetRenderDrawColor(renderer, 20, 20, 255, 255);
-    SDL_RenderFillRect(renderer, &rightRect);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 20, 255);
-    SDL_RenderFillRect(renderer, &topRect);
-    SDL_SetRenderDrawColor(renderer, 255, 20, 20, 255);
-    SDL_RenderFillRect(renderer, &bottomRect);
-    */
+    //PhysicsObject::drawCollisionRectangles(renderer, origin);
   }
 };

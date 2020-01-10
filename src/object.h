@@ -61,8 +61,8 @@ public:
   }
 
   virtual void update(float dt) {
-    position.x += (velocity.x / 10) * speed * dt;
-    position.y += (velocity.y / 10) * speed * dt;
+    position.x += (velocity.x / 10) * dt;
+    position.y += (velocity.y / 10) * dt;
 
     for (int i = 0; i < children.size(); i ++) {
       children[i]->update(dt);
