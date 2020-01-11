@@ -7,11 +7,6 @@ class PhysicsObject : public Object
 protected:
   bool onFloor = false;
 
-  SDL_Rect leftRect;
-  SDL_Rect rightRect;
-  SDL_Rect topRect;
-  SDL_Rect bottomRect;
-
   float _gravity = 0.04f;
   float _maxFallSpeed = 3.5f;
   float friction = 0.12f;
@@ -32,36 +27,8 @@ public:
   virtual void onRightCollision(Object* other) {
   }
 
-  void updateRectPositions() {
-    leftRect = getHitBox();
-    leftRect.w = 5;
-    leftRect.h = leftRect.h / 2.2;
-    leftRect.x = leftRect.x;
-    leftRect.y = leftRect.y + (leftRect.h / 2);
-
-    rightRect = getHitBox();
-    rightRect.w = 5;
-    rightRect.h = rightRect.h / 2.2;
-    rightRect.x = rightRect.x + getHitBox().w - 5;
-    rightRect.y = rightRect.y + (rightRect.h / 2);
-
-    topRect = getHitBox();
-    topRect.w = topRect.w / 2;
-    topRect.h = 5;
-    topRect.x = topRect.x + (topRect.w / 2);
-    topRect.y = topRect.y;
-
-    bottomRect = getHitBox();
-    //bottomRect.w = bottomRect.w / 2;
-    bottomRect.h = 5;
-    //bottomRect.x = bottomRect.x + (bottomRect.w / 2);
-    bottomRect.y = bottomRect.y + getHitBox().h - 6;
-  }
-
   void resolveCollisions(std::vector<Object> tiles) {
     onFloor = false;
-
-    updateRectPositions();
     
     for (int j = 0; j < tiles.size(); j ++) {
       auto tile = tiles[j];
@@ -72,33 +39,63 @@ public:
 
       // collision
       if (Object::intersectsWith(&tile)) {
-        if (tile.intersectsWithRect(&topRect) && velocity.y < 0) {
-          // handle top collision
-          onTopCollision(&tile);
-          position.y = tile.getPosition().y + tile.getSize().y - hitBox.y;
+        SDL_Rect r1 = getHitBox();
+        SDL_Rect r2 = tile.getHitBox();
+
+        float r1t = r1.y;
+        float r1b = r1.y + r1.h;
+        float r1l = r1.x;
+        float r1r = r1.x + r1.w;
+
+        float r1ot = prevHitBox.y;
+        float r1ob = prevHitBox.y + prevHitBox.h;
+        float r1ol = prevHitBox.x;
+        float r1or = prevHitBox.x + prevHitBox.w;
+
+
+        float r2t = r2.y;
+        float r2b = r2.y + r2.h;
+        float r2l = r2.x;
+        float r2r = r2.x + r2.w;
+
+        float r2ot = r2t;
+        float r2ob = r2b;
+        float r2ol = r2l;
+        float r2or = r2r;
+
+        if (r1b >= r2t && r1ob <= r2ot) {
+          // handle landing collision
+          onBottomCollision(&tile);
+          position.y = r2t - (size.y - 2);
+          onFloor = true;
           velocity.y = 0.0f;
-        } else if (tile.intersectsWithRect(&leftRect) && velocity.x <= 0) {
-          // handle left collision
-          onLeftCollision(&tile);
-          position.x = tile.getRect().x + tile.getRect().w - hitBox.x;
-          velocity.x = 0.0f;
-        } else if (tile.intersectsWithRect(&rightRect) && velocity.x >= 0) {
+        } else if (r1t <= r2b && r1ot >= r2ob) {
+          // extra guard to prevent getting stuck on horizontal corners
+          // @TODO; fix jump diagonal through blocks bug
+          if (r1ol < r2r && r1or > r2l) {
+            // handle top collision
+            printf("TOP\n");
+            onTopCollision(&tile);
+            position.y = r2b - (size.y - hitBox.h);
+            velocity.y = 0.0f;
+          }
+        } else if (r1r >= r2l && r1or <= r2ol) {
           // handle right collision
           onRightCollision(&tile);
           position.x = tile.getRect().x - hitBox.w - hitBox.x;
           velocity.x = 0.0f;
-        } else if (tile.intersectsWithRect(&bottomRect) && velocity.y > 0) {
-          // handle landing collision
-          onBottomCollision(&tile);
-          position.y = tile.getPosition().y - size.y + 2;
-          onFloor = true;
-          velocity.y = 0.0f;
+        } else if (r1l <= r2r && r1ol >= r2or) {
+          // handle left collision
+          onLeftCollision(&tile);
+          position.x = tile.getRect().x + tile.getRect().w - hitBox.x;
+          velocity.x = 0.0f;
         }
       }
     }
   }
 
   void update(float dt) {
+
     if (velocity.x > 0.2) {
       velocity.x -= friction;
     } else if (velocity.x < -0.2) {
@@ -123,20 +120,5 @@ public:
   }
 
   virtual void drawCollisionRectangles(SDL_Renderer* renderer, SDL_Rect origin) {
-    updateRectPositions();
-
-    SDL_Rect leftRectWithOrigin = { leftRect.x - origin.x, leftRect.y - origin.y, leftRect.w, leftRect.h };
-    SDL_Rect rightRectWithOrigin = { rightRect.x - origin.x, rightRect.y - origin.y, rightRect.w, rightRect.h };
-    SDL_Rect topRectWithOrigin = { topRect.x - origin.x, topRect.y - origin.y, topRect.w, topRect.h };
-    SDL_Rect bottomRectWithOrigin = { bottomRect.x - origin.x, bottomRect.y - origin.y, bottomRect.w, bottomRect.h };
-
-    SDL_SetRenderDrawColor(renderer, 20, 255, 20, 255);
-    SDL_RenderFillRect(renderer, &leftRectWithOrigin);
-    SDL_SetRenderDrawColor(renderer, 20, 20, 255, 255);
-    SDL_RenderFillRect(renderer, &rightRectWithOrigin);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 20, 255);
-    SDL_RenderFillRect(renderer, &topRectWithOrigin);
-    SDL_SetRenderDrawColor(renderer, 255, 20, 20, 255);
-    SDL_RenderFillRect(renderer, &bottomRectWithOrigin);
   }
 };

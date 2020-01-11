@@ -38,7 +38,7 @@ public:
 
   Player(SDL_Renderer* renderer) : PhysicsObject() {
     size = { 48.0f, 48.0f };
-    hitBox = { (int)14.0f, (int)14.0f, (int)22.0f, (int)34.0f };
+    setHitBox({ (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f });
     speed = 1.0;
     velocity = { 0, 0 };
     id = "player";

@@ -13,6 +13,7 @@ protected:
 
   SDL_Rect textureRect;
   SDL_Rect hitBox;
+  SDL_Rect prevHitBox;
   SDL_Texture* texture;
 
   std::string id = "";
@@ -28,7 +29,9 @@ public:
   std::string getId() { return id; }
 
   v2 getPosition() { return position; }
-  void setPosition(v2 v) { position = v; }
+  void setPosition(v2 v) {
+    position = v;
+  }
 
   void setTexture(SDL_Texture* texture) { this->texture = texture; }
 
@@ -37,6 +40,11 @@ public:
       (int)position.x + hitBox.x, (int)position.y + hitBox.y, hitBox.w, hitBox.h
     };
   }
+
+  void setHitBox(SDL_Rect v) {
+    hitBox = v;
+  }
+
   void setTextureRect(SDL_Rect textureRect) { this->textureRect = textureRect; }
 
   SDL_Rect getRect() { return { 
@@ -70,9 +78,20 @@ public:
   }
 
   virtual void draw(SDL_Renderer* renderer, SDL_Rect origin) {
+    prevHitBox = getHitBox();
     SDL_Rect r = { (int)position.x - origin.x, (int)position.y - origin.y, (int)textureRect.w, (int)textureRect.h };
 
     SDL_RenderCopyEx(renderer, texture, &textureRect, &r, 0, 0, textureFlip);
+
+/*
+    if (this->id == "player") {
+      SDL_SetRenderDrawColor(renderer, 20, 255, 20, 100);
+      SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+      SDL_Rect currentHitbox = getHitBox();
+      SDL_RenderFillRect(renderer, &currentHitbox);
+      SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    }
+*/
 
     for (int i = 0; i < children.size(); i ++) {
       children[i]->draw(renderer, r);
