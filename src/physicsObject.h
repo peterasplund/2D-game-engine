@@ -69,16 +69,6 @@ public:
           position.y = r2t - (size.y - 2);
           onFloor = true;
           velocity.y = 0.0f;
-        } else if (r1t <= r2b && r1ot >= r2ob) {
-          // extra guard to prevent getting stuck on horizontal corners
-          // @TODO; fix jump diagonal through blocks bug
-          if (r1ol < r2r && r1or > r2l) {
-            // handle top collision
-            printf("TOP\n");
-            onTopCollision(&tile);
-            position.y = r2b - (size.y - hitBox.h);
-            velocity.y = 0.0f;
-          }
         } else if (r1r >= r2l && r1or <= r2ol) {
           // handle right collision
           onRightCollision(&tile);
@@ -89,6 +79,11 @@ public:
           onLeftCollision(&tile);
           position.x = tile.getRect().x + tile.getRect().w - hitBox.x;
           velocity.x = 0.0f;
+        } else if (r1t <= r2b) {
+          // handle top collision
+          onTopCollision(&tile);
+          position.y = r2b - (size.y - hitBox.h) + 2;
+          velocity.y = 0.0f;
         }
       }
     }
