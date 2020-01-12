@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <iostream>
-#include "inputHandler.h"
 
 class Window
 {
@@ -23,100 +22,19 @@ public:
     return _renderer;
   }
 
-  void pollEvents() {
-    /*
-    SDL_Event event;
-
-    if (SDL_PollEvent(&event)) {
-      switch (event.type) {
-        case SDL_QUIT:
-          _closed = true;
-          break;
-        case SDL_KEYDOWN:
-          switch (event.key.keysym.sym) {
-            case SDLK_ESCAPE:
-              _closed = true;
-              break;
-            case SDLK_a:
-              _inputHandler->setState(BUTTON::LEFT, true);
-              break;
-            case SDLK_d:
-              _inputHandler->setState(BUTTON::RIGHT, true);
-              break;
-          }
-          break;
-        case SDL_KEYUP:
-          switch (event.key.keysym.sym) {
-            case SDLK_a:
-              _inputHandler->setState(BUTTON::LEFT, false);
-              break;
-            case SDLK_d:
-              _inputHandler->setState(BUTTON::RIGHT, false);
-              break;
-          }
-          break;
-        default:
-          break;
-      }
-    }
-*/
-    SDL_Event event;
-    while( SDL_PollEvent(&event)) {
-        switch (event.type) {
-          case SDL_QUIT:
+  void pollEvent(SDL_Event event) {
+    switch (event.type) {
+      case SDL_QUIT:
+        _closed = true;
+        break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
             _closed = true;
             break;
-          case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
-              case SDLK_ESCAPE:
-                _closed = true;
-                break;
-              case SDLK_a:
-                _inputHandler->setState(BUTTON::LEFT, true);
-                break;
-              case SDLK_d:
-                _inputHandler->setState(BUTTON::RIGHT, true);
-                break;
-              case SDLK_w:
-                _inputHandler->setState(BUTTON::UP, true);
-                break;
-              case SDLK_s:
-                _inputHandler->setState(BUTTON::DOWN, true);
-                break;
-              case SDLK_j:
-                _inputHandler->setState(BUTTON::ATTACK, true);
-                break;
-              case SDLK_k:
-                _inputHandler->setState(BUTTON::JUMP, true);
-                break;
-            }
-            break;
-          case SDL_KEYUP:
-            switch (event.key.keysym.sym) {
-              case SDLK_a:
-                _inputHandler->setState(BUTTON::LEFT, false);
-                break;
-              case SDLK_d:
-                _inputHandler->setState(BUTTON::RIGHT, false);
-                break;
-              case SDLK_w:
-                _inputHandler->setState(BUTTON::UP, false);
-                break;
-              case SDLK_s:
-                _inputHandler->setState(BUTTON::DOWN, false);
-                break;
-              case SDLK_j:
-                _inputHandler->setState(BUTTON::ATTACK, false);
-                break;
-              case SDLK_k:
-                _inputHandler->setState(BUTTON::JUMP, false);
-                break;
-            }
-            break;
-          default:
-            break;
         }
-      }
+        break;
+    }
   }
 
   void clear() const {
@@ -126,7 +44,6 @@ public:
 
   inline bool isClosed() { return _closed; }
 private:
-  InputHandler* _inputHandler;
   bool init() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
       std::cerr << "Failed to initialize SDL: " << SDL_GetError() << "\n";
@@ -155,8 +72,6 @@ private:
     }
 
     SDL_RenderSetScale(_renderer, 2, 2);
-  
-    _inputHandler = InputHandler::Instance();
 
     return true;
   }

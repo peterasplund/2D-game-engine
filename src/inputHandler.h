@@ -15,13 +15,14 @@ class InputHandler
 {
 private:
   static InputHandler* _instance;
-  std::map<BUTTON, bool> _state;
+  std::map<int, BUTTON> _buttons;
+  std::map<BUTTON, bool> _buttonsHold;
 
   InputHandler() {
     for (int i = UP; i != ATTACK; i++) {
       BUTTON button = static_cast<BUTTON>(i);
 
-      _state.insert(std::pair<BUTTON, bool>(button, false));
+      _buttonsHold.insert(std::pair<BUTTON, bool>(button, false));
     }
   }
 
@@ -37,19 +38,40 @@ public:
     return _instance;
   }
 
-  void setState(BUTTON button, bool state) {
-    if (_state[button] != state) {
-      _state[button] = state;
-    }
+  void addButton(int keyCode, BUTTON button) {
+    _buttons[keyCode] = button;
   }
 
-  bool isPressed(BUTTON button) {
-    return _state[button];
+  bool isHeld(BUTTON button) {
+    return _buttonsHold[button];
   }
 
   static void release() {
     delete _instance;
     _instance = NULL;
+  }
+
+  void pollEvent(SDL_Event event) {
+    std::map<int, BUTTON>::iterator it;
+    
+    switch (event.type) {
+      case SDL_KEYDOWN:
+        for (it = _buttons.begin(); it != _buttons.end(); it ++) {
+          if (event.key.keysym.sym == it->first) {
+            _buttonsHold[it->second] = true;
+          }
+        }
+
+        break;
+      case SDL_KEYUP:
+        for (it = _buttons.begin(); it != _buttons.end(); it ++) {
+          if (event.key.keysym.sym == it->first) {
+            _buttonsHold[it->second] = false;
+          }
+        }
+
+        break;
+    }
   }
 };
 

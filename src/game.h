@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include "window.h"
+#include "inputHandler.h"
 #include "sceneManager.h"
 #include "scene.h"
 #include "demoScene.h"
@@ -13,6 +14,13 @@ class Game
 {
 public:
   Game() {
+    InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
+    InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
+    InputHandler::Instance()->addButton(SDLK_a, BUTTON::LEFT);
+    InputHandler::Instance()->addButton(SDLK_d, BUTTON::RIGHT);
+    InputHandler::Instance()->addButton(SDLK_k, BUTTON::JUMP);
+    InputHandler::Instance()->addButton(SDLK_j, BUTTON::ATTACK);
+
     SceneManager* _sceneManager = new SceneManager();
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* renderer = window.getRenderer();
@@ -27,9 +35,16 @@ public:
       deltaTime = (double)((NOW - LAST)*1000 / SDL_GetPerformanceFrequency() );
 
       window.clear();
-      window.pollEvents();
+
+      SDL_Event event;
+      while (SDL_PollEvent(&event)) {
+        window.pollEvent(event);
+        InputHandler::Instance()->pollEvent(event);
+      }
+
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
+
     }
   }
 

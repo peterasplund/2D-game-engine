@@ -111,24 +111,24 @@ public:
 
   void update(float dt, std::vector<Object> tiles) {
     if (_state != State::S_ATTACK) {
-      if (_inputHandler->isPressed(BUTTON::LEFT)) {
+      if (_inputHandler->isHeld(BUTTON::LEFT)) {
         direction = "left";
         velocity.x = -runSpeed;
         textureFlip = SDL_FLIP_NONE;
       }
 
-      if (_inputHandler->isPressed(BUTTON::RIGHT)) {
+      if (_inputHandler->isHeld(BUTTON::RIGHT)) {
         direction = "right";
         velocity.x = runSpeed;
         textureFlip = SDL_FLIP_HORIZONTAL;
       }
 
-      if (_inputHandler->isPressed(BUTTON::JUMP) && onFloor) {
+      if (_inputHandler->isHeld(BUTTON::JUMP) && onFloor) {
         velocity.y = -_jumpPower;
       }
     }
 
-    if (_inputHandler->isPressed(BUTTON::ATTACK) && onFloor && _state == State::S_IDLE) {
+    if (_inputHandler->isHeld(BUTTON::ATTACK) && onFloor && _state == State::S_IDLE) {
       _state = State::S_ATTACK;
       animator.setAnimation("attack");
       animator.reset();
@@ -137,12 +137,12 @@ public:
 
     // back dash after attack
     if (_state == State::S_ATTACK && _timer.elapsed() > 300) {
-      if (direction == "right" && _inputHandler->isPressed(BUTTON::LEFT)) {
+      if (direction == "right" && _inputHandler->isHeld(BUTTON::LEFT)) {
         isBackDashing = true;
         velocity.x = -backDashSpeed;
         animator.setAnimation("backDash");
         animator.reset();
-      } else if (direction == "left" && _inputHandler->isPressed(BUTTON::RIGHT)) {
+      } else if (direction == "left" && _inputHandler->isHeld(BUTTON::RIGHT)) {
         isBackDashing = true;
         velocity.x = backDashSpeed;
         animator.setAnimation("backDash");
