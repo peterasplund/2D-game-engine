@@ -64,7 +64,7 @@ private:
       return 0;
     }
 
-    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
     if (_renderer == nullptr) {
       std::cerr << "Failed to create renderer.\n";
