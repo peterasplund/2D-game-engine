@@ -90,7 +90,6 @@ public:
   }
 
   void update(float dt) {
-
     if (velocity.x > 0.2) {
       velocity.x -= friction;
     } else if (velocity.x < -0.2) {

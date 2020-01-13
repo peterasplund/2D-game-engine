@@ -21,11 +21,6 @@ private:
   Animator animator;
   InputHandler* _inputHandler;
 
-  SDL_Rect leftRect;
-  SDL_Rect rightRect;
-  SDL_Rect topRect;
-  SDL_Rect bottomRect;
-
   float _jumpPower = 3.0f;
   float backDashSpeed = 1.5f;
   bool isBackDashing = false;
@@ -192,6 +187,5 @@ public:
     setTexture(animator.getTexture());
 
     Object::draw(renderer, origin);
-    //PhysicsObject::drawCollisionRectangles(renderer, origin);
   }
 };
