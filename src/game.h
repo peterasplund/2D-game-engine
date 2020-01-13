@@ -23,6 +23,7 @@ public:
 
     SceneManager* _sceneManager = new SceneManager();
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
+    Timer fpsTimer;
     SDL_Renderer* renderer = window.getRenderer();
 
     DemoScene* _demoScene = new DemoScene(renderer);
@@ -44,6 +45,11 @@ public:
 
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
+
+      if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
+        //Sleep the remaining frame time
+        SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
+      }
 
     }
   }
