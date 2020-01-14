@@ -67,7 +67,7 @@ public:
 
   SDL_Texture* getTexture(std::string filename) {
     std::string fullPath = SDL_GetBasePath();
-    fullPath.append("../assets/" + filename);
+    fullPath.append("assets/" + filename);
 
     if (_textures[fullPath] == nullptr) {
       _textures[fullPath] = this->loadTexture(fullPath);
