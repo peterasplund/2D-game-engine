@@ -1,11 +1,13 @@
 #include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_image.h>
+#include "SDL.h"
+#include "SDL_timer.h"
+#include "SDL_image.h"
 #include "game.h"
 #include "renderable.h"
 #include <vector>
 
-int main(void) {
+int main(int argc, char* args[]) {
   Game game;
+  
+  return 0;
 }

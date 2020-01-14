@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include "SDL.h"
 #include "physicsObject.h"
 #include "assetManager.h"
 #include "object.h"
