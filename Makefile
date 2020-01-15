@@ -1,7 +1,7 @@
 TARGET = main
 CC = clang++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image
-CFLAGS = -Wwritable-strings -std=c++11 -I/usr/local/include
+CFLAGS = -Wwritable-strings -std=c++11 -I/usr/local/include -I/opt/local/include/SDL2
 SRC=./src
 BIN=./bin
 
@@ -10,7 +10,7 @@ BIN=./bin
 OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(wildcard $(SRC)/*.cc))
 HEADERS = $(wildcard $(SRC)*.h)
 
-default: clean $(TARGET) #run
+default: clean $(TARGET) copyassets #run
 all: default
 
 $(BIN)/%.o: $(SRC)/%.cc $(HEADERS)
@@ -20,6 +20,9 @@ $(BIN)/%.o: $(SRC)/%.cc $(HEADERS)
 
 $(TARGET): $(OBJECTS)
 		$(CC) $(OBJECTS) -Wall $(LIBS) -o $(BIN)/$@
+
+copyassets: ./assets
+		-cp -r assets/ $(BIN)/assets
 
 clean:
 		-rm -f $(BIN)/*
