@@ -4,56 +4,104 @@
 #include <vector>
 #include "animation.h"
 #include "camera.h"
+#include <math.h>
 #include <map>
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <iostream>
+#include "assetManager.h"
+#include "../lib/pugixml-1.10/src/pugixml.hpp"
+#include "../lib/pugixml-1.10/src/pugixml.cpp"
 
 const int TILE_SIZE = 32;
 
 class Tilemap
 {
+  pugi::xml_document doc;
+
+  std::vector<std::pair<std::string, std::string>> getLayers(pugi::xml_parse_result result) {
+    std::vector<std::pair<std::string, std::string>> layers;
+
+    pugi::xml_node layerNodes = doc.child("map");
+
+    for (pugi::xml_node node = layerNodes.first_child(); node; node = node.next_sibling()) {
+      if ((std::string)node.name() != "layer") { continue; }
+
+      std::string data = node.child("data").child_value();
+      layers.push_back(std::pair<std::string, std::string>(node.attribute("name").as_string(), data.c_str()));
+    }
+
+    return layers;
+  }
+
   public:
-    Tilemap(const char* mapFile, SDL_Texture* texture) {
-      int y = 0;
-      std::string line;
-      std::ifstream in(mapFile);
+    Tilemap(const char* mapFile, SDL_Renderer* renderer) {
 
-      if (!in.is_open()) {
-        printf("Failed to open file \"%s\"\n", mapFile);
-        return;
-      }
+      pugi::xml_parse_result result = doc.load_file(mapFile);
+
+      std::vector<std::pair<std::string, std::string>> layers = getLayers(result);
+
+      // int mapWidth = doc.child("map").attribute("width").as_int();
+      // int mapHeight = doc.child("map").attribute("height").as_int();
+      std::string image = doc.child("map").child("tileset").child("image").attribute("source").as_string();
+
+      SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("maps/" + image);
       
-      while (!in.eof()) {
-        getline(in, line);
+      int tileMapWidth, tileMapHeight;
+      SDL_QueryTexture(texture, NULL, NULL, &tileMapWidth, &tileMapHeight);
 
-        for (int x = 0; x < line.size(); x ++) {
-          char current = line[x];
+      int tileMapTilesWidth = floor(tileMapWidth / 32);
+      int tileMapTilesHeight = floor(tileMapHeight / 32);
 
-          if (current != ' ') {
+
+      for (int i = 0; i < layers.size(); i ++) {
+        std::string name = layers[i].first;
+        std::string data = layers[i].second;
+
+        std::stringstream  dataStream(data);
+        std::stringstream lineStream;
+
+        int y = 0, x = 0, numTilesX;
+        std::string line;
+        std::string cell;
+        while(std::getline(dataStream, line)) {
+          x = 0;
+
+          lineStream.clear();
+          lineStream.str(line);
+
+          while(std::getline(lineStream, cell, ',')) {
+            if (cell == "0") { x ++; continue; }
+
             Object o;
 
             o.setTexture(texture);
             o.setPosition({ (float)(x * TILE_SIZE), (float)(y * TILE_SIZE) });
             o.setSize({ TILE_SIZE, TILE_SIZE });
+
+            int cellVal = stoi(cell);
+            int tileAtX = ((cellVal - 1) % tileMapTilesWidth);
+            int tileAtY = ceil(cellVal / tileMapTilesWidth);
+
             o.setTextureRect({
-              0 * (TILE_SIZE),
-              7 * (TILE_SIZE),
+              tileAtX * (TILE_SIZE),
+              tileAtY * (TILE_SIZE),
               TILE_SIZE, TILE_SIZE
             });
 
-            if (current == 'x') {
+            if (name == "solid") {
               o.setSolid(true);
             }
 
             _map.push_back(o);
+
+            x ++;
           }
+
+          y ++;
         }
-
-        y ++;
       }
-
-      in.close();
     }
 
     ~Tilemap() {

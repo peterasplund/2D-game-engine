@@ -1,7 +1,6 @@
 #pragma once
 #include "SDL.h"
 #include <vector>
-#include "assetManager.h"
 #include "scene.h"
 #include "player.h"
 #include "tilemap.h"
@@ -37,8 +36,7 @@ public:
     camera = new Camera({ 512, 352 }, { 0, 0, 2000, 2000 });
     camera->follow(player);
 
-    SDL_Texture* tilemapTexture = AssetManager::Instance(_renderer)->getTexture("tileset.png");
-    tilemap = new Tilemap("assets/maps/demo.level", tilemapTexture);
+    tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);

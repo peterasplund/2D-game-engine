@@ -25,7 +25,7 @@ copyassets: ./assets
 		-cp -r assets/ $(BIN)/assets
 
 clean:
-		-rm -f $(BIN)/*
+		-rm -rf $(BIN)/*
 
 
 #.PHONY: run
