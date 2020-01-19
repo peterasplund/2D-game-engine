@@ -11,7 +11,7 @@ public:
   Hud(SDL_Renderer* renderer, GameState* state) {
     _state = state;
     int bgHeight = 128;
-    _background = { 0, 480 - bgHeight, 640, bgHeight };
+    _background = { 0, 0, 640, 32 };
   }
 
   void draw(SDL_Renderer* renderer) {

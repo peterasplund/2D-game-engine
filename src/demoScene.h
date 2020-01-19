@@ -30,7 +30,7 @@ public:
   void init() {
     state = new GameState();
     player = new Player(_renderer);
-    player->setPosition({ 64.0f, 64.0f });
+    player->setPosition({ 128.0f, 64.0f });
     hud = new Hud(_renderer, state);
 
     camera = new Camera({ 512, 352 }, { 0, 0, 2000, 2000 });
@@ -68,7 +68,7 @@ public:
       entities[i]->draw(renderer, camera->getRect());
     }
 
-    // hud->draw(renderer);
+    //hud->draw(renderer);
 
     SDL_RenderPresent(renderer);
   }

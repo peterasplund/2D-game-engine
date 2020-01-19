@@ -48,7 +48,8 @@ public:
 
       if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
         //Sleep the remaining frame time
-        SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
+        // comment out for now since we're using VSYNC
+        // SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
       }
 
     }

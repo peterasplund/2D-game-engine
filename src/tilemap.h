@@ -77,7 +77,8 @@ class Tilemap
             Object o;
 
             o.setTexture(texture);
-            o.setPosition({ (float)(x * TILE_SIZE), (float)(y * TILE_SIZE) });
+            // TODO: Should not be "y - 1" here. Just "y"
+            o.setPosition({ (float)(x * TILE_SIZE), (float)((y - 1) * TILE_SIZE) });
             o.setSize({ TILE_SIZE, TILE_SIZE });
 
             int cellVal = stoi(cell);
