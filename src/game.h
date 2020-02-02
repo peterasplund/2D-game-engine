@@ -12,8 +12,7 @@ const int WINDOW_FPS    = 60;
 
 class Game
 {
-public:
-  Game() {
+public: Game() {
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
     InputHandler::Instance()->addButton(SDLK_a, BUTTON::LEFT);

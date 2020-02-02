@@ -93,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -119,6 +120,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -144,24 +146,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\characterController.h" />
+    <ClInclude Include="src\systems\characterControllerSystem.h" />
     <ClInclude Include="src\animation.h" />
     <ClInclude Include="src\animator.h" />
     <ClInclude Include="src\assetManager.h" />
     <ClInclude Include="src\bg.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\components\animator.h" />
+    <ClInclude Include="src\components\position.h" />
+    <ClInclude Include="src\components\renderable.h" />
+    <ClInclude Include="src\components\velocity.h" />
     <ClInclude Include="src\demoScene.h" />
+    <ClInclude Include="src\eventHandler.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\game\gameState.h" />
     <ClInclude Include="src\game\hud.h" />
     <ClInclude Include="src\inputHandler.h" />
     <ClInclude Include="src\math.h" />
     <ClInclude Include="src\object.h" />
+    <ClInclude Include="src\objects\player.h" />
     <ClInclude Include="src\physicsObject.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\renderable.h" />
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\sceneManager.h" />
+    <ClInclude Include="src\systems\animationSystem.h" />
+    <ClInclude Include="src\systems\renderableSystem.h" />
+    <ClInclude Include="src\systems\velocitySystem.h" />
     <ClInclude Include="src\texture.h" />
     <ClInclude Include="src\tilemap.h" />
     <ClInclude Include="src\timer.h" />
