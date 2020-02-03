@@ -1,8 +1,8 @@
 #pragma once
 #include "SDL.h"
-#include "../lib/entt/entt.hpp"
-#include "components/renderable.h"
-#include "components/position.h"
+#include "../../lib/entt/entt.hpp"
+#include "../components/renderable.h"
+#include "../components/position.h"
 
 void renderableSystem(SDL_Renderer* renderer, entt::registry &registry) {
   auto view = registry.view<renderable, position>();

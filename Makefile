@@ -1,7 +1,7 @@
 TARGET = main
 CC = clang++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image
-CFLAGS = -Wwritable-strings -std=c++11 -I/usr/local/include -I/opt/local/include/SDL2
+CFLAGS = -Wwritable-strings -std=c++17 -I/usr/local/include -I/opt/local/include/SDL2
 SRC=./src
 BIN=./bin
 
