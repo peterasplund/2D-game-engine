@@ -3,7 +3,6 @@
 #include <vector>
 #include "scene.h"
 #include "tilemap.h"
-#include "camera.h"
 #include "bg.h"
 #include "game/hud.h"
 #include "game/gameState.h"
@@ -12,26 +11,29 @@
 #include "components/position.h"
 #include "components/velocity.h"
 #include "components/renderable.h"
+#include "components/camera.h"
 #include "systems/renderableSystem.h"
 #include "systems/velocitySystem.h"
 #include "systems/animationSystem.h"
 #include "systems/characterControllerSystem.h"
+#include "systems/cameraSystem.h"
+#include "systems/collisionSystem.h"
+#include "systems/gravitySystem.h"
+#include "systems/debugSystem.h"
 #include "objects/player.h"
+#include "objects/camera.h"
 
 class DemoScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
   entt::registry registry;
-  //Player* player;
-  //Tilemap* tilemap;
-  //Camera* camera;
+  Tilemap* tilemap;
   //Hud* hud;
   //GameState* state;
-  //std::vector<Object*> entities;
 
-  //Bg* bg1;
-  //Bg* bg2;
+  Bg* bg1;
+  Bg* bg2;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
     _renderer = renderer;
@@ -39,55 +41,49 @@ public:
 
   void init() {
     //state = new GameState();
-    //player = new Player(_renderer);
-    //player->setPosition({ 128.0f, 64.0f });
     //hud = new Hud(_renderer, state);
+    tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
 
-    //camera = new Camera({ 512, 352 }, { 0, 0, 2000, 2000 });
-    //camera->follow(player);
+    bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
+    bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
 
-    //tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
-
-    //bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
-    //bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
-
-    createPlayer(&registry, _renderer);
+    entt::entity playerEntity = createPlayer(&registry, _renderer);
+    entt::entity cameraEntity = createCamera(&registry);
   }
 
   void update(float dt) {
-    velocitySystem(dt, registry);
     animationSystem(dt, registry);
+    cameraSystem(registry);
+
     characterControllerSystem(InputHandler::Instance(), registry);
+    gravitySystem(dt, registry);
+    setCollisionSystemPrevCollisionBox(registry);
+    velocitySystem(dt, registry);
 
-    /*
-    for (int i = 0; i < entities.size(); i ++) {
-      entities[i]->update(dt);
-
-      if (entities[i]->getId() == "player") {
-        ((Player*)entities[i])->update(dt, tilemap->getTiles());
-      } else {
-        entities[i]->update(dt);
-      }
-    }
-
-    camera->update(dt);
-    */
+    // Run collisions last
+    collisionSystem(tilemap, registry);
   }
 
   void draw(SDL_Renderer* renderer) {
-    //bg1->draw(renderer, -camera->getRect().x * 0.04);
-    //bg2->draw(renderer, -camera->getRect().x * 0.2);
+    auto view = registry.view<camera>();
+    camera c;
+    SDL_Rect cr;
 
-    //tilemap->draw(renderer, camera);
+    for (auto entity : view) {
+      c = view.get<camera>(entity);
+      cr = Camera::getRect(&c);
+    }
 
+    bg1->draw(renderer, -cr.x * 0.04);
+    bg2->draw(renderer, -cr.x * 0.2);
+    tilemap->draw(renderer, &c);
     renderableSystem(renderer, registry);
+    debugSystem(_renderer, registry);
 
-    //for (int i = 0; i < entities.size(); i ++) {
-      //entities[i]->draw(renderer, camera->getRect());
-    //}
 
     //hud->draw(renderer);
 
     SDL_RenderPresent(renderer);
+
   }
 };

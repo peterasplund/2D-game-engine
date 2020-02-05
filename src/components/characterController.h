@@ -14,11 +14,11 @@ enum State {
 };
 
 struct characterController {
-  float _jumpPower = 3.0f;
+  float jumpPower = 7.5f;
   float backDashSpeed = 1.5f;
   bool isBackDashing = false;
-  float runSpeed = 1.1f;
+  float runSpeed = 3.0f;
   std::string direction = "right";
-  State _state = State::S_IDLE;
-  // Timer _timer;
+  State state = State::S_IDLE;
+  // Timer timer;
 };

@@ -11,10 +11,15 @@ void renderableSystem(SDL_Renderer* renderer, entt::registry &registry) {
     auto &r = view.get<renderable>(entity);
     auto &p = view.get<position>(entity);
 
-    SDL_Rect sr = r.textureRect;
-    SDL_Rect dr = { (int)p.x, (int)p.y, (int)sr.w, (int)sr.h };
+    auto cameraView = registry.view<camera>();
+    for (auto entity : cameraView) {
+      camera &c = cameraView.get<camera>(entity);
 
-    SDL_RenderCopyEx(renderer, r.texture, &sr, &dr, 0, 0, r.textureFlip);
+      SDL_Rect sr = r.textureRect;
+      SDL_Rect dr = { (int)p.x - c.pos.x, (int)p.y - c.pos.y, (int)sr.w, (int)sr.h };
+
+      SDL_RenderCopyEx(renderer, r.texture, &sr, &dr, 0, 0, r.textureFlip);
+    }
   }
 }
 

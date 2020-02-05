@@ -8,14 +8,18 @@ void velocitySystem(float dt, entt::registry &registry) {
   auto view = registry.view<position, velocity>();
 
   for (auto entity : view) {
-    auto &vel = view.get<velocity>(entity);
-    auto &pos = view.get<position>(entity);
+    auto &v = view.get<velocity>(entity);
+    auto &p = view.get<position>(entity);
 
-    pos.x += (vel.dx * dt / 40) * vel.speed;
-    pos.y += (vel.dy * dt / 40) * vel.speed;
+    if (v.x > 0.2) {
+      v.x -= v.friction;
+    } else if (v.x < -0.2) {
+      v.x += (v.friction * dt) / 10;
+    } else {
+      v.x = 0;
+    }
 
-    vel.dx = 0;
-    vel.dy = 0;
+    p.x += (v.x / 10) * dt;
+    p.y += (v.y / 10) * dt;
   }
 }
-

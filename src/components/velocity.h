@@ -1,7 +1,8 @@
 #pragma once
 
 struct velocity {
-  float dx;
-  float dy;
+  float x;
+  float y;
+  float friction = 0.12f;
   float speed = 7.0f;
 };

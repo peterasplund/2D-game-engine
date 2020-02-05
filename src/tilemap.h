@@ -3,7 +3,6 @@
 #include "SDL.h"
 #include <vector>
 #include "animation.h"
-#include "camera.h"
 #include <math.h>
 #include <map>
 #include <string>
@@ -11,8 +10,20 @@
 #include <fstream>
 #include <iostream>
 #include "assetManager.h"
+#include "components/camera.h"
 #include "../lib/pugixml-1.10/src/pugixml.hpp"
 #include "../lib/pugixml-1.10/src/pugixml.cpp"
+
+enum TileType {
+  NORMAL,
+};
+
+struct Tile {
+  int x, y;
+  SDL_Rect textureRect;
+  bool solid = false;
+  TileType type = TileType::NORMAL;
+};
 
 const int TILE_SIZE = 32;
 
@@ -37,16 +48,14 @@ class Tilemap
 
   public:
     Tilemap(const char* mapFile, SDL_Renderer* renderer) {
-
       pugi::xml_parse_result result = doc.load_file(mapFile);
 
       std::vector<std::pair<std::string, std::string>> layers = getLayers(result);
 
-      // int mapWidth = doc.child("map").attribute("width").as_int();
-      // int mapHeight = doc.child("map").attribute("height").as_int();
       std::string image = doc.child("map").child("tileset").child("image").attribute("source").as_string();
 
       SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("maps/" + image);
+      _texture = texture;
       
       int tileMapWidth, tileMapHeight;
       SDL_QueryTexture(texture, NULL, NULL, &tileMapWidth, &tileMapHeight);
@@ -74,28 +83,19 @@ class Tilemap
           while(std::getline(lineStream, cell, ',')) {
             if (cell == "0") { x ++; continue; }
 
-            Object o;
-
-            o.setTexture(texture);
-            // TODO: Should not be "y - 1" here. Just "y"
-            o.setPosition({ (float)(x * TILE_SIZE), (float)((y - 1) * TILE_SIZE) });
-            o.setSize({ TILE_SIZE, TILE_SIZE });
+            int tileX = (float)(x * TILE_SIZE);
+            int tileY = (float)((y - 1) * TILE_SIZE);
 
             int cellVal = stoi(cell);
             int tileAtX = ((cellVal - 1) % tileMapTilesWidth);
             int tileAtY = ceil(cellVal / tileMapTilesWidth);
 
-            o.setTextureRect({
-              tileAtX * (TILE_SIZE),
-              tileAtY * (TILE_SIZE),
-              TILE_SIZE, TILE_SIZE
+            _tiles.push_back({
+              (x * TILE_SIZE),                                                    // x position
+              ((y - 1) * TILE_SIZE),                                              // y position (should not be "y - 1" here. Just "y")
+              { tileAtX * TILE_SIZE, tileAtY * TILE_SIZE, TILE_SIZE, TILE_SIZE }, // Texture rect
+              name == "solid",                                                    // Solid?
             });
-
-            if (name == "solid") {
-              o.setSolid(true);
-            }
-
-            _map.push_back(o);
 
             x ++;
           }
@@ -108,23 +108,26 @@ class Tilemap
     ~Tilemap() {
     }
 
-    void draw(SDL_Renderer* renderer, Camera* camera) {
-      SDL_Rect c = camera->getRect();
+    void draw(SDL_Renderer* renderer, camera* camera) {
+      SDL_Rect c = Camera::getRect(camera);
 
-      for (int i = 0; i < _map.size(); i ++) {
-        v2 p = _map[i].getPosition();
-        v2 s = _map[i].getSize();
+      for (int i = 0; i < _tiles.size(); i ++) {
+        Tile t = _tiles[i];
 
-        SDL_Rect o = { (int)p.x, (int)p.y, (int)s.x, (int)s.y };
+        SDL_Rect o = { t.x, t.y, TILE_SIZE, TILE_SIZE };
 
         if (SDL_HasIntersection(&o, &c)) {
-          _map[i].draw(renderer, camera->getRect());
+          SDL_Rect r = { t.x - c.x, t.y - c.y, TILE_SIZE, TILE_SIZE };
+          SDL_RenderCopy(renderer, _texture, &t.textureRect, &r);
         }
       }
     }
 
-    std::vector<Object> getTiles() { return _map; }
+    std::vector<Tile>* getTiles() {
+      return &_tiles;
+    }
 
   private:
-    std::vector<Object> _map;
+    std::vector<Tile> _tiles;
+    SDL_Texture* _texture;
 };

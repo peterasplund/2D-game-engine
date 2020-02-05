@@ -5,8 +5,10 @@
 #include "../components/renderable.h"
 #include "../components/animator.h"
 #include "../components/characterController.h"
+#include "../components/gravity.h"
+#include "../components/collidable.h"
 
-void createPlayer(entt::registry* registry, SDL_Renderer* renderer) {
+entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer) {
 
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
@@ -52,10 +54,16 @@ void createPlayer(entt::registry* registry, SDL_Renderer* renderer) {
     std::make_pair("backDash", animBackDash),
   };
 
+  SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
+
   auto entity = registry->create();
-  registry->assign<position>(entity, 10.0f, 50.0f);
+  registry->assign<position>(entity, 90.0f, 50.0f);
   registry->assign<velocity>(entity);
   registry->assign<renderable>(entity, texture);
   registry->assign<animator>(entity, animations, "run");
   registry->assign<characterController>(entity);
+  registry->assign<gravity>(entity);
+  registry->assign<collidable>(entity, collisionBox);
+
+  return entity;
 }

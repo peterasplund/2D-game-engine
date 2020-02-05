@@ -146,13 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\camera.h" />
     <ClInclude Include="src\components\characterController.h" />
+    <ClInclude Include="src\components\collidable.h" />
+    <ClInclude Include="src\components\gravity.h" />
+    <ClInclude Include="src\objects\camera.h" />
+    <ClInclude Include="src\systems\cameraSystem.h" />
     <ClInclude Include="src\systems\characterControllerSystem.h" />
     <ClInclude Include="src\animation.h" />
     <ClInclude Include="src\animator.h" />
     <ClInclude Include="src\assetManager.h" />
     <ClInclude Include="src\bg.h" />
-    <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\components\animator.h" />
     <ClInclude Include="src\components\position.h" />
     <ClInclude Include="src\components\renderable.h" />
@@ -173,6 +177,8 @@
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\sceneManager.h" />
     <ClInclude Include="src\systems\animationSystem.h" />
+    <ClInclude Include="src\systems\collisionSystem.h" />
+    <ClInclude Include="src\systems\debugSystem.h" />
     <ClInclude Include="src\systems\renderableSystem.h" />
     <ClInclude Include="src\systems\velocitySystem.h" />
     <ClInclude Include="src\texture.h" />

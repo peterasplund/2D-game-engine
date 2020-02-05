@@ -36,9 +36,6 @@
     <ClInclude Include="src\bg.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\camera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\demoScene.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -121,6 +118,27 @@
       <Filter>Source Files\systems</Filter>
     </ClInclude>
     <ClInclude Include="src\components\characterController.h">
+      <Filter>Source Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\cameraSystem.h">
+      <Filter>Source Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\camera.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\collidable.h">
+      <Filter>Source Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\collisionSystem.h">
+      <Filter>Source Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\camera.h">
+      <Filter>Source Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\debugSystem.h">
+      <Filter>Source Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\gravity.h">
       <Filter>Source Files\components</Filter>
     </ClInclude>
   </ItemGroup>
