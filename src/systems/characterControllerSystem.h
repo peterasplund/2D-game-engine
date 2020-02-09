@@ -19,7 +19,7 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry &regis
     auto &r = view.get<renderable>(entity);
     auto &a = view.get<animator>(entity);
     auto &g = view.get<gravity>(entity);
-    printf("onFloor: %d\n", g.onFloor);
+    // printf("onFloor: %d\n", g.onFloor);
 
     if (inputHandler->isHeld(BUTTON::JUMP) && g.onFloor) {
       v.y = -c.jumpPower;

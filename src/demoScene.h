@@ -21,7 +21,18 @@
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
 #include "objects/player.h"
+#include "objects/bat.h"
 #include "objects/camera.h"
+
+void foo(int a) {
+  printf("CALLED FOO %d \n", a);
+}
+
+//typedef void(*CreateFunction)(int);
+//typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
+
+typedef entt::entity(*CreateFunction)(entt::registry*, SDL_Renderer*, v2);
+typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
 
 class DemoScene : public Scene
 {
@@ -44,10 +55,24 @@ public:
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
 
+    PrefabMap prefabs;
+    prefabs.emplace("player", &createPlayer);
+    prefabs.emplace("bat", &createBat);
+
+
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
 
-    entt::entity playerEntity = createPlayer(&registry, _renderer);
+    std::vector<std::pair<std::string, v2>> objects = tilemap->getObjects();
+    for (std::pair<std::string, v2> pair : objects) {
+      CreateFunction fn = prefabs.at(pair.first);
+      v2 position = pair.second;
+
+      if (fn != nullptr) {
+        fn(&registry, _renderer, position);
+      }
+    }
+
     entt::entity cameraEntity = createCamera(&registry);
   }
 

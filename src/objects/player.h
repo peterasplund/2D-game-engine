@@ -8,7 +8,7 @@
 #include "../components/gravity.h"
 #include "../components/collidable.h"
 
-entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer) {
+entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition) {
 
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
@@ -57,7 +57,7 @@ entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer) {
   SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
 
   auto entity = registry->create();
-  registry->assign<position>(entity, 90.0f, 50.0f);
+  registry->assign<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
   registry->assign<velocity>(entity);
   registry->assign<renderable>(entity, texture);
   registry->assign<animator>(entity, animations, "run");

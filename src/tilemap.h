@@ -29,6 +29,8 @@ const int TILE_SIZE = 32;
 
 class Tilemap
 {
+  const std::string OBJECT_POSITIONS_NAME = "objects";
+    
   pugi::xml_document doc;
 
   std::vector<std::pair<std::string, std::string>> getLayers(pugi::xml_parse_result result) {
@@ -63,6 +65,19 @@ class Tilemap
       int tileMapTilesWidth = floor(tileMapWidth / 32);
       int tileMapTilesHeight = floor(tileMapHeight / 32);
 
+      // get object positions
+      for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
+        printf("group: %s\n", group.attribute("name").as_string());
+        if (group.attribute("name").as_string() == OBJECT_POSITIONS_NAME) {
+          for (pugi::xml_node object = group.first_child(); object; object = object.next_sibling()) {
+            printf("\tobject: %s\n", object.attribute("name").as_string());
+            std::string name = object.attribute("name").as_string();
+            v2 pos = { object.attribute("x").as_float(), object.attribute("y").as_float() };
+
+            _objects.push_back(std::pair<std::string, v2>(name, pos));
+          }
+        }
+      }
 
       for (int i = 0; i < layers.size(); i ++) {
         std::string name = layers[i].first;
@@ -127,7 +142,12 @@ class Tilemap
       return &_tiles;
     }
 
+    std::vector<std::pair<std::string, v2>> getObjects() {
+      return _objects;
+    }
+
   private:
     std::vector<Tile> _tiles;
+    std::vector<std::pair<std::string, v2>> _objects;
     SDL_Texture* _texture;
 };
