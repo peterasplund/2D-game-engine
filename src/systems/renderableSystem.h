@@ -16,7 +16,7 @@ void renderableSystem(SDL_Renderer* renderer, entt::registry &registry) {
       camera &c = cameraView.get<camera>(entity);
 
       SDL_Rect sr = r.textureRect;
-      SDL_Rect dr = { (int)p.x - c.pos.x, (int)p.y - c.pos.y, (int)sr.w, (int)sr.h };
+      SDL_Rect dr = { (int)p.x - (int)c.pos.x, (int)p.y - (int)c.pos.y, sr.w, sr.h };
 
       SDL_RenderCopyEx(renderer, r.texture, &sr, &dr, 0, 0, r.textureFlip);
     }
