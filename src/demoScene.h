@@ -55,10 +55,10 @@ public:
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
 
-    PrefabMap prefabs;
-    prefabs.emplace("player", &createPlayer);
-    prefabs.emplace("bat", &createBat);
-
+    PrefabMap prefabs = {
+      { "player", &createPlayer },
+      { "bat", &createBat }
+    };
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
