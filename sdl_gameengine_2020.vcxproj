@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\objects\bat.h" />
     <ClInclude Include="src\components\camera.h" />
     <ClInclude Include="src\components\characterController.h" />
     <ClInclude Include="src\components\collidable.h" />

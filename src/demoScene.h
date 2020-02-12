@@ -77,6 +77,7 @@ public:
   }
 
   void update(float dt) {
+
     animationSystem(dt, registry);
     cameraSystem(registry);
 

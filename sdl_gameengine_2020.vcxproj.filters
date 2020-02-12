@@ -141,6 +141,9 @@
     <ClInclude Include="src\components\gravity.h">
       <Filter>Source Files\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\objects\bat.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cc">

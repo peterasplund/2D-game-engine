@@ -15,14 +15,14 @@ void collisionSystem(Tilemap* map, entt::registry &registry) {
   auto view = registry.view<collidable, position, gravity, velocity>();
 
   for (auto entity : view) {
-    bool didCollide = false;
+    bool floorBelow = false;
     auto &p = view.get<position>(entity);
     auto &v = view.get<velocity>(entity);
     auto &c = view.get<collidable>(entity);
     auto &g = view.get<gravity>(entity);
-    g.onFloor = false;
 
     SDL_Rect r1 = { (int)p.x + c.rect.x, (int)p.y + c.rect.y, c.rect.w, c.rect.h };
+    SDL_Rect r1below = { (int)p.x + c.rect.x, (int)p.y + c.rect.y, c.rect.w, c.rect.h + 1 };
 
     // do collision resolve
     std::vector<Tile>* tiles = map->getTiles();
@@ -37,8 +37,6 @@ void collisionSystem(Tilemap* map, entt::registry &registry) {
 
       // collision
       if (SDL_HasIntersection(&r1, &r2)) {
-        didCollide = true;
-
         float r1t = r1.y;
         float r1b = r1.y + r1.h;
         float r1l = r1.x;
@@ -62,17 +60,17 @@ void collisionSystem(Tilemap* map, entt::registry &registry) {
 
         if (r1r >= r2l && r1or <= r2ol) {
           // onRightCollision(&tile);
-          //printf("right\n");
+          printf("right\n");
           p.x = tile.x - c.rect.w - c.rect.x;
           v.x = 0.0f;
         } else if (r1l <= r2r && r1ol >= r2or) {
           // onLeftCollision(&tile);
-          //printf("left\n");
+          printf("left\n");
           p.x = r2r - c.rect.x;
           v.x = 0.0f;
         } else if (r1b >= r2t && r1ob <= r2ot) {
           // onBottomCollision(&tile);
-          //printf("landing\n");
+          printf("landing\n");
           p.y = r2t - c.rect.h - c.rect.y;
           g.onFloor = true;
           v.y = 0.0f;
@@ -83,6 +81,15 @@ void collisionSystem(Tilemap* map, entt::registry &registry) {
           v.y = 0.0f;
         }
       }
+
+      if (SDL_HasIntersection(&r1below, &r2)) {
+        floorBelow = true;
+      }
+    }
+
+
+    if (!floorBelow) {
+      g.onFloor = false;
     }
   }
 }
