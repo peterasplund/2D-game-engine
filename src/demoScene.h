@@ -53,7 +53,8 @@ public:
   void init() {
     //state = new GameState();
     //hud = new Hud(_renderer, state);
-    tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
+    //tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
+    tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
     PrefabMap prefabs;
     prefabs.emplace("player", &createPlayer);
@@ -100,11 +101,11 @@ public:
       cr = Camera::getRect(&c);
     }
 
-    bg1->draw(renderer, -cr.x * 0.04);
-    bg2->draw(renderer, -cr.x * 0.2);
+    //bg1->draw(renderer, -cr.x * 0.04);
+    //bg2->draw(renderer, -cr.x * 0.2);
     tilemap->draw(renderer, &c);
     renderableSystem(renderer, registry);
-    debugSystem(_renderer, registry);
+    //debugSystem(_renderer, registry);
 
 
     //hud->draw(renderer);
