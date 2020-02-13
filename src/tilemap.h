@@ -25,7 +25,7 @@ struct Tile {
   TileType type = TileType::NORMAL;
 };
 
-const int TILE_SIZE = 32;
+const int TILE_SIZE = 16;
 
 class Tilemap
 {
@@ -62,8 +62,8 @@ class Tilemap
       int tileMapWidth, tileMapHeight;
       SDL_QueryTexture(texture, NULL, NULL, &tileMapWidth, &tileMapHeight);
 
-      int tileMapTilesWidth = floor(tileMapWidth / 32);
-      int tileMapTilesHeight = floor(tileMapHeight / 32);
+      int tileMapTilesWidth = floor(tileMapWidth / TILE_SIZE);
+      int tileMapTilesHeight = floor(tileMapHeight / TILE_SIZE);
 
       // get object positions
       for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
@@ -104,6 +104,12 @@ class Tilemap
             int cellVal = stoi(cell);
             int tileAtX = ((cellVal - 1) % tileMapTilesWidth);
             int tileAtY = ceil(cellVal / tileMapTilesWidth);
+
+            //printf("cellVal: %d\n", cellVal);
+            if (cellVal == 34) {
+              printf("x: %d y: %d\n", tileAtX, tileAtY);
+              printf("width: %d\n", tileMapTilesWidth);
+            }
 
             _tiles.push_back({
               (x * TILE_SIZE),                                                    // x position
