@@ -24,13 +24,6 @@
 #include "objects/bat.h"
 #include "objects/camera.h"
 
-void foo(int a) {
-  printf("CALLED FOO %d \n", a);
-}
-
-//typedef void(*CreateFunction)(int);
-//typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
-
 typedef entt::entity(*CreateFunction)(entt::registry*, SDL_Renderer*, v2);
 typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
 
@@ -53,8 +46,8 @@ public:
   void init() {
     //state = new GameState();
     //hud = new Hud(_renderer, state);
-    //tilemap = new Tilemap("assets/maps/demo2.tmx", _renderer);
     tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
     PrefabMap prefabs = {
       { "player", &createPlayer },
@@ -78,17 +71,16 @@ public:
   }
 
   void update(float dt) {
+    animationSystem(dt, &registry);
+    cameraSystem(&registry);
 
-    animationSystem(dt, registry);
-    cameraSystem(registry);
-
-    characterControllerSystem(InputHandler::Instance(), registry);
-    gravitySystem(dt, registry);
-    setCollisionSystemPrevCollisionBox(registry);
-    velocitySystem(dt, registry);
+    characterControllerSystem(InputHandler::Instance(), &registry, _renderer);
+    gravitySystem(dt, &registry);
+    setCollisionSystemPrevCollisionBox(&registry);
+    velocitySystem(dt, &registry);
 
     // Run collisions last
-    collisionSystem(tilemap, registry);
+    collisionSystem(tilemap, &registry);
   }
 
   void draw(SDL_Renderer* renderer) {
@@ -101,11 +93,11 @@ public:
       cr = Camera::getRect(&c);
     }
 
-    //bg1->draw(renderer, -cr.x * 0.04);
-    //bg2->draw(renderer, -cr.x * 0.2);
+    bg1->draw(renderer, -cr.x * 0.04);
+    bg2->draw(renderer, -cr.x * 0.2);
     tilemap->draw(renderer, &c);
-    renderableSystem(renderer, registry);
-    //debugSystem(_renderer, registry);
+    renderableSystem(renderer, &registry);
+    //debugSystem(_renderer, &registry);
 
 
     //hud->draw(renderer);

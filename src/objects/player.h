@@ -58,7 +58,7 @@ entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer, v2 i
 
   auto entity = registry->create();
   registry->assign<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
-  registry->assign<velocity>(entity);
+  registry->assign<velocity>(entity, 0.0f, 0.0f, 0.2f);
   registry->assign<renderable>(entity, texture);
   registry->assign<animator>(entity, animations, "run");
   registry->assign<characterController>(entity);

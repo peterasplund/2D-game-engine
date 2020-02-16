@@ -59,8 +59,8 @@ namespace AnimationHelpers {
   }
 }
 
-void animationSystem(float dt, entt::registry &registry) {
-  auto view = registry.view<animator, renderable>();
+void animationSystem(float dt, entt::registry* registry) {
+  auto view = registry->view<animator, renderable>();
 
   for (auto entity : view) {
     auto &a = view.get<animator>(entity);

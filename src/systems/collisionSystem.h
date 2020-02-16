@@ -9,10 +9,10 @@
 #include "../components/gravity.h"
 #include "../tilemap.h"
 
-void collisionSystem(Tilemap* map, entt::registry &registry) {
+void collisionSystem(Tilemap* map, entt::registry* registry) {
   // @TODO: make gravity optional. We only want to update "onFloor" if gravity object
   // @TODO: make velocity optional.
-  auto view = registry.view<collidable, position, gravity, velocity>();
+  auto view = registry->view<collidable, position, gravity, velocity>();
 
   for (auto entity : view) {
     bool floorBelow = false;
@@ -94,8 +94,8 @@ void collisionSystem(Tilemap* map, entt::registry &registry) {
   }
 }
 
-void setCollisionSystemPrevCollisionBox(entt::registry &registry) {
-  auto view = registry.view<collidable, position, gravity, velocity>();
+void setCollisionSystemPrevCollisionBox(entt::registry* registry) {
+  auto view = registry->view<collidable, position, gravity, velocity>();
 
   for (auto entity : view) {
     auto &p = view.get<position>(entity);

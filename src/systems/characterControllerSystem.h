@@ -8,9 +8,11 @@
 #include "../components/renderable.h"
 #include "../components/animator.h"
 #include "../components/gravity.h"
+#include "../components/collidable.h"
+#include "../objects/knife.h"
 
-void characterControllerSystem(InputHandler* inputHandler, entt::registry &registry) {
-  auto view = registry.view<characterController, position, velocity, renderable, animator, gravity>();
+void characterControllerSystem(InputHandler* inputHandler, entt::registry* registry, SDL_Renderer* renderer) {
+  auto view = registry->view<characterController, position, velocity, renderable, collidable, animator, gravity>();
 
   for (auto entity : view) {
     auto &p = view.get<position>(entity);
@@ -19,6 +21,7 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry &regis
     auto &r = view.get<renderable>(entity);
     auto &a = view.get<animator>(entity);
     auto &g = view.get<gravity>(entity);
+    auto &co = view.get<collidable>(entity);
     // printf("onFloor: %d\n", g.onFloor);
 
     if (inputHandler->isHeld(BUTTON::JUMP) && g.onFloor) {
@@ -35,6 +38,19 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry &regis
       c.direction = "right";
       v.x = c.runSpeed;
       r.textureFlip = SDL_FLIP_HORIZONTAL;
+    }
+
+    if (inputHandler->isHeld(BUTTON::ATTACK) && c.attackTimer.elapsed() > c.attackDelay) {
+      createKnife(registry, renderer, {
+        p.x + co.rect.w / 2 + 10.0f,
+        p.y + co.rect.h / 2
+        }, {
+          c.direction == "right" ?
+            c.attackSpeed :
+            -c.attackSpeed,
+          0.0f
+        });
+      c.attackTimer.reset();
     }
 
     if (v.x == 0.0f) {
