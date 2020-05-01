@@ -216,12 +216,12 @@ class basic_snapshot_loader {
             if constexpr(std::is_empty_v<Type>) {
                 archive(entt);
                 force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt);
+                reg->template emplace<Type>(args..., entt);
             } else {
                 Type instance{};
                 archive(entt, instance);
                 force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt, std::as_const(instance));
+                reg->template emplace<Type>(args..., entt, std::as_const(instance));
             }
         }
     }
@@ -314,7 +314,7 @@ private:
  * @brief Utility class for _continuous loading_.
  *
  * A _continuous loader_ is designed to load data from a source registry to a
- * (possibly) non-empty destination. The loader can accomodate in a registry
+ * (possibly) non-empty destination. The loader can accommodate in a registry
  * more than one snapshot in a sort of _continuous loading_ that updates the
  * destination one step at a time.<br/>
  * Identifiers that entities originally had are not transferred to the target.
@@ -388,7 +388,7 @@ class basic_continuous_loader {
     }
 
     template<typename Other, typename Type, typename Member>
-    void update(Other &instance, Member Type:: *member) {
+    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type:: *member) {
         if constexpr(!std::is_same_v<Other, Type>) {
             return;
         } else if constexpr(std::is_same_v<Member, Entity>) {
@@ -433,13 +433,13 @@ class basic_continuous_loader {
             if constexpr(std::is_empty_v<Other>) {
                 archive(entt);
                 restore(entt);
-                reg->template assign_or_replace<Other>(map(entt));
+                reg->template emplace_or_replace<Other>(map(entt));
             } else {
                 Other instance{};
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template assign_or_replace<Other>(map(entt), std::as_const(instance));
+                reg->template emplace_or_replace<Other>(map(entt), std::as_const(instance));
             }
         }
     }
