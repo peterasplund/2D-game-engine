@@ -11,9 +11,9 @@ void destroyOnTouchSolidBind(entt::dispatcher* dispatcher) {
   struct collisionListener {
     void receive(const collisionEvent &e) {
       if (e.registry->has<destroyOnTouchSolid>(e.self)) {
-      //if (e.registry->get<collidable>(e.other).solid) {
+      if (e.registry->get<collidable>(e.other).solid) {
         e.registry->destroy(e.self);
-      //}
+      }
       }
     }
   };

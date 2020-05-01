@@ -150,7 +150,6 @@
     <ClInclude Include="src\components\lifetime.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\objects\knife.h" />
-    <ClInclude Include="src\systems\destroyOnTouchSolidSystem.h" />
     <ClInclude Include="src\systems\gravitySystem.h" />
     <ClInclude Include="src\systems\lifetimeSystem.h" />
     <ClInclude Include="src\objects\bat.h" />
@@ -178,7 +177,6 @@
     <ClInclude Include="src\math.h" />
     <ClInclude Include="src\object.h" />
     <ClInclude Include="src\objects\player.h" />
-    <ClInclude Include="src\physicsObject.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\renderable.h" />
     <ClInclude Include="src\renderer.h" />

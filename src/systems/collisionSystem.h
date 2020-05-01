@@ -7,14 +7,12 @@
 #include "../components/velocity.h"
 #include "../components/collidable.h"
 #include "../components/gravity.h"
-#include "../tilemap.h"
 #include "../events.h"
 
-void collisionSystem(Tilemap* map, entt::registry* registry, entt::dispatcher* dispatcher) {
+void collisionSystem(entt::registry* registry, entt::dispatcher* dispatcher) {
   // @TODO: make gravity optional. We only want to update "onFloor" if gravity object
-  // @TODO: make velocity optional.
   auto view = registry->view<collidable, position, gravity, velocity>();
-
+  auto collidables = registry->view<collidable, position>();
 
   for (auto entity : view) {
     bool floorBelow = false;
@@ -28,15 +26,18 @@ void collisionSystem(Tilemap* map, entt::registry* registry, entt::dispatcher* d
     SDL_Rect r1below = { (int)p.x + c.rect.x, (int)p.y + c.rect.y, c.rect.w, c.rect.h + 1 };
 
     // do collision resolve
-    std::vector<Tile>* tiles = map->getTiles();
-    for (int j = 0; j < tiles->size(); j ++) {
-      Tile tile = tiles->at(j);
-
-      if (!tile.solid) {
+    for (auto otherEntity : collidables) {
+      if (entity == otherEntity) {
         continue;
       }
 
-      SDL_Rect r2 = { tile.x, tile.y, TILE_SIZE, TILE_SIZE }; 
+      auto &cc = collidables.get<collidable>(otherEntity);
+      auto &cp = collidables.get<position>(otherEntity);
+      if (!cc.solid) {
+        continue;
+      }
+
+      SDL_Rect r2 = { (int)cp.x + cc.rect.x, (int)cp.y + cc.rect.y, cc.rect.w, cc.rect.h };
 
       // collision
       if (SDL_HasIntersection(&r1, &r2)) {
@@ -65,7 +66,7 @@ void collisionSystem(Tilemap* map, entt::registry* registry, entt::dispatcher* d
           if (r1r >= r2l && r1or <= r2ol) {
             // onRightCollision(&tile);
             printf("right\n");
-            p.x = tile.x - c.rect.w - c.rect.x;
+            p.x = r2.x - c.rect.w - c.rect.x;
             v.x = 0.0f;
           } else if (r1l <= r2r && r1ol >= r2or) {
             // onLeftCollision(&tile);
@@ -87,7 +88,7 @@ void collisionSystem(Tilemap* map, entt::registry* registry, entt::dispatcher* d
         }
 
         if (!hasCollided) {
-          dispatcher->enqueue<collisionEvent>({ registry, entity });
+          dispatcher->enqueue<collisionEvent>({ registry, entity, otherEntity });
         }
 
         hasCollided = true;

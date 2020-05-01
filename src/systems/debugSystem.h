@@ -12,7 +12,8 @@ void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
   for (auto entity : view) {
     auto &r = view.get<renderable>(entity);
     auto &p = view.get<position>(entity);
-    auto &cr = view.get<collidable>(entity).rect;
+    auto &co = view.get<collidable>(entity);
+    auto &cr = co.rect;
 
     auto cameraView = registry->view<camera>();
     for (auto entity : cameraView) {
@@ -20,7 +21,13 @@ void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
 
       SDL_Rect dr = { (int)p.x + (int)cr.x - (int)c.pos.x, (int)p.y + (int)cr.y - (int)c.pos.y, (int)cr.w, (int)cr.h };
 
-      SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+      if (co.solid) {
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+      }
+      else {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+      }
+
       SDL_RenderDrawRect(renderer, &dr);
     }
   }

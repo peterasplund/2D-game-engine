@@ -5,7 +5,7 @@
 struct collisionEvent {
   entt::registry* registry;
   entt::entity self;
-  // entt::entity other;
+  entt::entity other;
 };
 
 struct dummyEvent {

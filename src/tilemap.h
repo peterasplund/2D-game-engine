@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL.h"
+#include "../lib/entt/entt.hpp"
 #include <vector>
 #include "animation.h"
 #include <math.h>
@@ -11,6 +12,8 @@
 #include <iostream>
 #include "assetManager.h"
 #include "components/camera.h"
+#include "components/collidable.h"
+#include "components/renderable.h"
 #include "../lib/pugixml-1.10/src/pugixml.hpp"
 #include "../lib/pugixml-1.10/src/pugixml.cpp"
 
@@ -129,17 +132,16 @@ class Tilemap
     ~Tilemap() {
     }
 
-    void draw(SDL_Renderer* renderer, camera* camera) {
-      SDL_Rect c = Camera::getRect(camera);
+    void addTilesToRegistry(entt::registry* registry) {
+      for (Tile t : _tiles) {
+        SDL_Rect r = { t.x, t.y, TILE_SIZE, TILE_SIZE };
+        SDL_Rect collisionR = { 0, 0, r.w, r.h };
+        auto entity = registry->create();
+        registry->emplace<position>(entity, (float)t.x, (float)t.y);
+        registry->emplace<renderable>(entity, _texture, t.textureRect);
 
-      for (int i = 0; i < _tiles.size(); i ++) {
-        Tile t = _tiles[i];
-
-        SDL_Rect o = { t.x, t.y, TILE_SIZE, TILE_SIZE };
-
-        if (SDL_HasIntersection(&o, &c)) {
-          SDL_Rect r = { t.x - c.x, t.y - c.y, TILE_SIZE, TILE_SIZE };
-          SDL_RenderCopy(renderer, _texture, &t.textureRect, &r);
+        if (t.solid) {
+          registry->emplace<collidable>(entity, collisionR, true);
         }
       }
     }

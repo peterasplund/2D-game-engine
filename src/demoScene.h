@@ -21,7 +21,6 @@
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
 #include "systems/lifetimeSystem.h"
-#include "systems/destroyOnTouchSolidSystem.h"
 #include "objects/player.h"
 #include "objects/bat.h"
 #include "objects/camera.h"
@@ -34,7 +33,6 @@ class DemoScene : public Scene
 private:
   SDL_Renderer* _renderer;
   entt::registry registry;
-  Tilemap* tilemap;
   entt::dispatcher dispatcher{};
   //Hud* hud;
   //GameState* state;
@@ -52,8 +50,10 @@ public:
 
     //state = new GameState();
     //hud = new Hud(_renderer, state);
-    tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    Tilemap* tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+
+    tilemap->addTilesToRegistry(&registry);
 
     PrefabMap prefabs = {
       { "player", &createPlayer },
@@ -84,11 +84,10 @@ public:
     gravitySystem(dt, &registry);
     setCollisionSystemPrevCollisionBox(&registry);
     velocitySystem(dt, &registry);
-    // destroyOnTouchSolidSystem(tilemap, &registry);
     lifetimeSystem(dt, &registry);
 
     // Run collisions last
-    collisionSystem(tilemap, &registry, &dispatcher);
+    //collisionSystem(&registry, &dispatcher);
 
     dispatcher.update<collisionEvent>();
   }
@@ -105,7 +104,6 @@ public:
 
     bg1->draw(renderer, -cr.x * 0.04);
     bg2->draw(renderer, -cr.x * 0.2);
-    tilemap->draw(renderer, &c);
     renderableSystem(renderer, &registry);
     //debugSystem(_renderer, &registry);
 
