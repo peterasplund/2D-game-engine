@@ -5,7 +5,7 @@
 
 entt::entity createCamera(entt::registry* registry) {
   auto entity = registry->create();
-  registry->assign<camera>(entity);
+  registry->emplace<camera>(entity);
 
   return entity;
 }

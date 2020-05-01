@@ -20,6 +20,8 @@
 #include "systems/collisionSystem.h"
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
+#include "systems/lifetimeSystem.h"
+#include "systems/destroyOnTouchSolidSystem.h"
 #include "objects/player.h"
 #include "objects/bat.h"
 #include "objects/camera.h"
@@ -33,6 +35,7 @@ private:
   SDL_Renderer* _renderer;
   entt::registry registry;
   Tilemap* tilemap;
+  entt::dispatcher dispatcher{};
   //Hud* hud;
   //GameState* state;
 
@@ -44,6 +47,9 @@ public:
   }
 
   void init() {
+    // bind events
+    destroyOnTouchSolidBind(&dispatcher);
+
     //state = new GameState();
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
@@ -78,9 +84,13 @@ public:
     gravitySystem(dt, &registry);
     setCollisionSystemPrevCollisionBox(&registry);
     velocitySystem(dt, &registry);
+    // destroyOnTouchSolidSystem(tilemap, &registry);
+    lifetimeSystem(dt, &registry);
 
     // Run collisions last
-    collisionSystem(tilemap, &registry);
+    collisionSystem(tilemap, &registry, &dispatcher);
+
+    dispatcher.update<collisionEvent>();
   }
 
   void draw(SDL_Renderer* renderer) {

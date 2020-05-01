@@ -7,7 +7,7 @@
 struct camera {
   v2 viewport = { 512, 352 }; // viewport size. In this case same as window size. Make this less tall when implementing the HUD.
   v2 pos = { 0, 0 }; // viewport size. In this case same as window size. Make this less tall when implementing the HUD.
-  SDL_Rect bounds = { 0, 0, 2000, 2000 }; // clamping bounds. Limit camera position within
+  SDL_Rect bounds = { 0, 0, 2000, 352 }; // clamping bounds. Limit camera position within
   position* following; // entity to follow, eg. the player
   float zoom = 1.0f; // camera zoom
 };

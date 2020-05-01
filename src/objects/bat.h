@@ -30,11 +30,11 @@ entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 init
   SDL_Rect collisionBox = { (int)2.0f, (int)1.0f, (int)13.0f, (int)8.0f };
 
   auto entity = registry->create();
-  registry->assign<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
-  registry->assign<velocity>(entity);
-  registry->assign<renderable>(entity, texture);
-  registry->assign<animator>(entity, animations, "fly");
-  registry->assign<collidable>(entity, collisionBox);
+  registry->emplace<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
+  registry->emplace<velocity>(entity);
+  registry->emplace<renderable>(entity, texture);
+  registry->emplace<animator>(entity, animations, "fly");
+  registry->emplace<collidable>(entity, collisionBox);
 
   return entity;
 }
