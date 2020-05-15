@@ -3,9 +3,11 @@
 #include "../components/camera.h"
 #include "../components/characterController.h"
 
-entt::entity createCamera(entt::registry* registry) {
+entt::entity createCamera(entt::registry* registry, Tilemap* tilemap) {
   auto entity = registry->create();
-  registry->emplace<camera>(entity);
+  camera &c = registry->emplace<camera>(entity);
+
+  c.bounds = { 0, 0, tilemap->getWidthInPixels(), tilemap->getHeightInPixels() };
 
   return entity;
 }

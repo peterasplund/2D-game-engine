@@ -12,7 +12,7 @@ void cameraSystem(entt::registry* registry) {
     auto &c = view.get<camera>(entity);
 
     // follow player with camera
-    int px, py, pw, ph;
+    float px, py, pw, ph;
     auto playerView = registry->view<characterController, position, renderable>();
     for (auto entity : playerView) {
       position &playerPosition = playerView.get<position>(entity);

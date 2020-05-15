@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include <string>
 #include <iostream>
+#include "globals.h"
 
 class Window
 {
@@ -71,7 +72,7 @@ private:
       return 0;
     }
 
-    SDL_RenderSetScale(_renderer, 2, 2);
+    SDL_RenderSetScale(_renderer, WINDOW_ZOOM, WINDOW_ZOOM);
 
     return true;
   }

@@ -1,5 +1,6 @@
 #pragma once
 #include "../../lib/entt/entt.hpp"
+#include "../tilemap.h"
 #include "../components/position.h"
 #include "../components/velocity.h"
 #include "../components/renderable.h"
@@ -7,9 +8,9 @@
 #include "../components/characterController.h"
 #include "../components/gravity.h"
 #include "../components/collidable.h"
+#include "../components/solid.h"
 
-entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition) {
-
+entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer, TiledObject o) {
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
   int tw = 48;
@@ -57,13 +58,14 @@ entt::entity createPlayer(entt::registry* registry, SDL_Renderer* renderer, v2 i
   SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
 
   auto entity = registry->create();
-  registry->emplace<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
+  registry->emplace<position>(entity, o.position.x - collisionBox.w, o.position.y - collisionBox.h);
   registry->emplace<velocity>(entity, 0.0f, 0.0f, 0.2f);
   registry->emplace<renderable>(entity, texture);
   registry->emplace<animator>(entity, animations, "run");
   registry->emplace<characterController>(entity);
   registry->emplace<gravity>(entity);
-  registry->emplace<collidable>(entity, collisionBox, true);
+  registry->emplace<collidable>(entity, collisionBox);
+  registry->emplace<solid>(entity, true);
 
   return entity;
 }

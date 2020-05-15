@@ -1,5 +1,8 @@
 #pragma once
 #include "../../lib/entt/entt.hpp"
+#include "../assetManager.h";
+#include "../math.h";
+#include "../components/bat.h"
 #include "../components/position.h"
 #include "../components/velocity.h"
 #include "../components/renderable.h"
@@ -8,7 +11,7 @@
 #include "../components/gravity.h"
 #include "../components/collidable.h"
 
-entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition) {
+entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition, v2 initVelocity) {
 
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/bat.png");
 
@@ -30,11 +33,12 @@ entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 init
   SDL_Rect collisionBox = { (int)2.0f, (int)1.0f, (int)13.0f, (int)8.0f };
 
   auto entity = registry->create();
+  registry->emplace<bat>(entity);
   registry->emplace<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
-  registry->emplace<velocity>(entity);
-  registry->emplace<renderable>(entity, texture);
+  registry->emplace<velocity>(entity, initVelocity.x, initVelocity.y, 0.0f);
   registry->emplace<animator>(entity, animations, "fly");
   registry->emplace<collidable>(entity, collisionBox);
+  registry->emplace<renderable>(entity, texture, collisionBox, SDL_FLIP_HORIZONTAL);
 
   return entity;
 }

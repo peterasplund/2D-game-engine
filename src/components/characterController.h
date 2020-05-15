@@ -17,7 +17,7 @@ struct characterController {
   float jumpPower = 7.5f;
   float backDashSpeed = 1.5f;
   float attackSpeed = 3.0f;
-  float attackDelay = 30.0f;
+  float attackDelay = 5.0f;
   bool isBackDashing = false;
   float runSpeed = 2.0f;
   std::string direction = "right";

@@ -12,6 +12,7 @@
 #include "components/velocity.h"
 #include "components/renderable.h"
 #include "components/camera.h"
+#include "components/batSpawner.h"
 #include "systems/renderableSystem.h"
 #include "systems/velocitySystem.h"
 #include "systems/animationSystem.h"
@@ -21,11 +22,17 @@
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
 #include "systems/lifetimeSystem.h"
+#include "systems/batSpawnerSystem.h"
+#include "systems/skeletonAISystem.h"
+#include "systems/batSystem.h"
 #include "objects/player.h"
 #include "objects/bat.h"
 #include "objects/camera.h"
+#include "objects/movingPlatform.h"
+#include "objects/skeleton.h"
+#include "objects/batSpawner.h"
 
-typedef entt::entity(*CreateFunction)(entt::registry*, SDL_Renderer*, v2);
+typedef entt::entity(*CreateFunction)(entt::registry*, SDL_Renderer*, TiledObject);
 typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
 
 class DemoScene : public Scene
@@ -57,23 +64,38 @@ public:
 
     PrefabMap prefabs = {
       { "player", &createPlayer },
-      { "bat", &createBat }
+      //{ "bat", &createBat },
+      { "batSpawner", &createBatSpawner },
+      { "skeleton", &createSkeleton }
     };
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
 
-    std::vector<std::pair<std::string, v2>> objects = tilemap->getObjects();
-    for (std::pair<std::string, v2> pair : objects) {
-      CreateFunction fn = prefabs.at(pair.first);
-      v2 position = pair.second;
+    registry.create();
+
+    std::vector<TiledObject> objects = tilemap->getObjects();
+    for (TiledObject o : objects) {
+      if (prefabs.find(o.name) == prefabs.end()) {
+        continue;
+      }
+
+      CreateFunction fn = prefabs.at(o.name);
 
       if (fn != nullptr) {
-        fn(&registry, _renderer, position);
+        fn(&registry, _renderer, o);
       }
     }
 
-    entt::entity cameraEntity = createCamera(&registry);
+    createMovingPlatform(&registry, _renderer, { 64, 192 }, { .5f, 0 });
+
+    createCamera(&registry, tilemap);
+
+    // Lag bats
+    // for (int i = 0; i < 2000; i++) { createBat(&registry, _renderer, { 0, 0 }); }
+
+    // @TODO: set prevRect to rect in collidable constructor instead.
+    initCollisionSystem(&registry);
   }
 
   void update(float dt) {
@@ -85,11 +107,16 @@ public:
     setCollisionSystemPrevCollisionBox(&registry);
     velocitySystem(dt, &registry);
     lifetimeSystem(dt, &registry);
+    batSystem(&registry);
+
+    batSpawnerSystem(_renderer, &registry);
+    skeletonAISystem(&registry);
 
     // Run collisions last
-    //collisionSystem(&registry, &dispatcher);
+    collisionSystem(&registry, &dispatcher);
 
     dispatcher.update<collisionEvent>();
+    dispatcher.update<collisionSideEvent>();
   }
 
   void draw(SDL_Renderer* renderer) {
@@ -106,7 +133,6 @@ public:
     bg2->draw(renderer, -cr.x * 0.2);
     renderableSystem(renderer, &registry);
     //debugSystem(_renderer, &registry);
-
 
     //hud->draw(renderer);
 

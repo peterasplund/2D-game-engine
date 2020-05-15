@@ -4,6 +4,7 @@
 #include "../components/renderable.h"
 #include "../components/position.h"
 #include "../components/collidable.h"
+#include "../components/solid.h"
 #include "../components/camera.h"
 
 void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
@@ -13,6 +14,7 @@ void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
     auto &r = view.get<renderable>(entity);
     auto &p = view.get<position>(entity);
     auto &co = view.get<collidable>(entity);
+    auto s = registry->try_get<solid>(entity);
     auto &cr = co.rect;
 
     auto cameraView = registry->view<camera>();
@@ -21,7 +23,7 @@ void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
 
       SDL_Rect dr = { (int)p.x + (int)cr.x - (int)c.pos.x, (int)p.y + (int)cr.y - (int)c.pos.y, (int)cr.w, (int)cr.h };
 
-      if (co.solid) {
+      if (s != nullptr) {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
       }
       else {

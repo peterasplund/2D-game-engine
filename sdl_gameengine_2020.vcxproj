@@ -34,7 +34,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -146,10 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\batSpawner.h" />
     <ClInclude Include="src\components\destroyOnTouchSolid.h" />
     <ClInclude Include="src\components\lifetime.h" />
+    <ClInclude Include="src\components\skeleton.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\objects\knife.h" />
+    <ClInclude Include="src\objects\skeleton.h" />
+    <ClInclude Include="src\systems\batSpawnerSystem.h" />
     <ClInclude Include="src\systems\gravitySystem.h" />
     <ClInclude Include="src\systems\lifetimeSystem.h" />
     <ClInclude Include="src\objects\bat.h" />
@@ -186,6 +190,7 @@
     <ClInclude Include="src\systems\collisionSystem.h" />
     <ClInclude Include="src\systems\debugSystem.h" />
     <ClInclude Include="src\systems\renderableSystem.h" />
+    <ClInclude Include="src\systems\skeletonAISystem.h" />
     <ClInclude Include="src\systems\velocitySystem.h" />
     <ClInclude Include="src\texture.h" />
     <ClInclude Include="src\tilemap.h" />

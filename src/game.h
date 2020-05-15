@@ -1,14 +1,12 @@
 #pragma once
+#include <math.h>
 #include "SDL.h"
+#include "globals.h"
 #include "window.h"
 #include "inputHandler.h"
 #include "sceneManager.h"
 #include "scene.h"
 #include "demoScene.h"
-
-const int WINDOW_WIDTH  = 512 * 2;
-const int WINDOW_HEIGHT = 352 * 2;
-const int WINDOW_FPS    = 60;
 
 class Game
 {
@@ -32,7 +30,8 @@ public: Game() {
     while (!window.isClosed()) {
       LAST = NOW;
       NOW = SDL_GetPerformanceCounter();
-      deltaTime = (double)((NOW - LAST)*1000 / SDL_GetPerformanceFrequency() );
+      
+      deltaTime = std::min<double>((double)((NOW - LAST)*1000 / SDL_GetPerformanceFrequency() ), MAX_DELTA_TIME);
 
       window.clear();
 
@@ -45,11 +44,11 @@ public: Game() {
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
 
-      if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
+      //if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
         //Sleep the remaining frame time
         // comment out for now since we're using VSYNC
-        // SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
-      }
+        //SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
+      //}
 
     }
   }
@@ -62,5 +61,4 @@ private:
   Uint64 NOW = SDL_GetPerformanceCounter();
   Uint64 LAST = 0;
   double deltaTime = 0;
-
 };

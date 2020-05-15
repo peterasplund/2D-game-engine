@@ -32,12 +32,14 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry* regis
       c.direction = "left";
       v.x = -c.runSpeed;
       r.textureFlip = SDL_FLIP_NONE;
-    }
-
-    if (inputHandler->isHeld(BUTTON::RIGHT)) {
+      c.state = S_RUN;
+    } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
       c.direction = "right";
       v.x = c.runSpeed;
       r.textureFlip = SDL_FLIP_HORIZONTAL;
+      c.state = S_RUN;
+    } else {
+      c.state = S_IDLE;
     }
 
     if (inputHandler->isHeld(BUTTON::ATTACK) && c.attackTimer.elapsed() > c.attackDelay) {
@@ -67,7 +69,7 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry* regis
         AnimationHelpers::reset(&a);
         AnimationHelpers::setAnimation(&a, "jump");
       }
-    } else if (v.x != 0 && g.onFloor) {
+    } else if (c.state == S_RUN && g.onFloor) {
       if (a._currentAnimation != "run") {
         AnimationHelpers::setAnimation(&a, "run");
       }

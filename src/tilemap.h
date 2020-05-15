@@ -2,6 +2,7 @@
 
 #include "SDL.h"
 #include "../lib/entt/entt.hpp"
+#include <optional>
 #include <vector>
 #include "animation.h"
 #include <math.h>
@@ -13,9 +14,22 @@
 #include "assetManager.h"
 #include "components/camera.h"
 #include "components/collidable.h"
+#include "components/solid.h"
 #include "components/renderable.h"
 #include "../lib/pugixml-1.10/src/pugixml.hpp"
 #include "../lib/pugixml-1.10/src/pugixml.cpp"
+
+struct TiledObject {
+  std::string name;
+  v2 position;
+
+  std::optional<float> width = NULL;
+  std::optional<float> height = NULL;
+
+  std::map<std::string, int> propertiesInt;
+  std::map<std::string, float> propertiesFloat;
+  std::map<std::string, std::string> propertiesString;
+};
 
 enum TileType {
   NORMAL,
@@ -62,11 +76,11 @@ class Tilemap
       SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("maps/" + image);
       _texture = texture;
       
-      int tileMapWidth, tileMapHeight;
-      SDL_QueryTexture(texture, NULL, NULL, &tileMapWidth, &tileMapHeight);
+      int textureWidth, textureHeight;
+      SDL_QueryTexture(texture, NULL, NULL, &textureWidth, &textureHeight);
 
-      int tileMapTilesWidth = floor(tileMapWidth / TILE_SIZE);
-      int tileMapTilesHeight = floor(tileMapHeight / TILE_SIZE);
+      _tilesInTextureX = floor(textureWidth / TILE_SIZE);
+      _tilesInTextureY = floor(textureHeight / TILE_SIZE);
 
       // get object positions
       for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
@@ -74,10 +88,45 @@ class Tilemap
         if (group.attribute("name").as_string() == OBJECT_POSITIONS_NAME) {
           for (pugi::xml_node object = group.first_child(); object; object = object.next_sibling()) {
             printf("\tobject: %s\n", object.attribute("name").as_string());
-            std::string name = object.attribute("name").as_string();
-            v2 pos = { object.attribute("x").as_float(), object.attribute("y").as_float() };
 
-            _objects.push_back(std::pair<std::string, v2>(name, pos));
+            TiledObject t;
+
+            t.position = { object.attribute("x").as_float(), object.attribute("y").as_float() };
+            t.name = object.attribute("name").as_string();
+
+            if (!object.attribute("width").empty()) {
+              t.width = object.attribute("width").as_float();
+            }
+
+            if (!object.attribute("height").empty()) {
+              t.height = object.attribute("height").as_float();
+            }
+
+            for (pugi::xml_node p : object.child("properties").children("property")) {
+              std::string type = p.attribute("type").as_string();
+              if (type == "int") {
+                t.propertiesInt.emplace(
+                  p.attribute("name").as_string(),
+                  p.attribute("value").as_int()
+                );
+              }
+              
+              if (type == "float") {
+                t.propertiesFloat.emplace(
+                  p.attribute("name").as_string(),
+                  p.attribute("value").as_float()
+                );
+              }
+              
+              if (type == "string") {
+                t.propertiesString.emplace(
+                  p.attribute("name").as_string(),
+                  p.attribute("value").as_string()
+                );
+              }
+            }
+
+            _objects.push_back(t);
           }
         }
       }
@@ -89,9 +138,12 @@ class Tilemap
         std::stringstream  dataStream(data);
         std::stringstream lineStream;
 
-        int y = 0, x = 0, numTilesX;
+        int y = -1;
+        int x = 0;
+
         std::string line;
         std::string cell;
+
         while(std::getline(dataStream, line)) {
           x = 0;
 
@@ -102,21 +154,15 @@ class Tilemap
             if (cell == "0") { x ++; continue; }
 
             int tileX = (float)(x * TILE_SIZE);
-            int tileY = (float)((y - 1) * TILE_SIZE);
+            int tileY = (float)(y * TILE_SIZE);
 
             int cellVal = stoi(cell);
-            int tileAtX = ((cellVal - 1) % tileMapTilesWidth);
-            int tileAtY = ceil(cellVal / tileMapTilesWidth);
-
-            //printf("cellVal: %d\n", cellVal);
-            if (cellVal == 34) {
-              printf("x: %d y: %d\n", tileAtX, tileAtY);
-              printf("width: %d\n", tileMapTilesWidth);
-            }
+            int tileAtX = ((cellVal - 1) % _tilesInTextureX);
+            int tileAtY = ceil(cellVal / _tilesInTextureX);
 
             _tiles.push_back({
               (x * TILE_SIZE),                                                    // x position
-              ((y - 1) * TILE_SIZE),                                              // y position (should not be "y - 1" here. Just "y")
+              ((y) * TILE_SIZE),                                                  // y position
               { tileAtX * TILE_SIZE, tileAtY * TILE_SIZE, TILE_SIZE, TILE_SIZE }, // Texture rect
               name == "solid",                                                    // Solid?
             });
@@ -126,10 +172,21 @@ class Tilemap
 
           y ++;
         }
+
+        _tilesWide = x;
+        _tilesTall = y;
       }
     }
 
     ~Tilemap() {
+    }
+
+    int getWidthInPixels() {
+      return _tilesWide * TILE_SIZE;
+    }
+
+    int getHeightInPixels() {
+      return _tilesTall * TILE_SIZE;
     }
 
     void addTilesToRegistry(entt::registry* registry) {
@@ -141,7 +198,8 @@ class Tilemap
         registry->emplace<renderable>(entity, _texture, t.textureRect);
 
         if (t.solid) {
-          registry->emplace<collidable>(entity, collisionR, true);
+          registry->emplace<collidable>(entity, collisionR);
+          registry->emplace<solid>(entity, true);
         }
       }
     }
@@ -150,12 +208,17 @@ class Tilemap
       return &_tiles;
     }
 
-    std::vector<std::pair<std::string, v2>> getObjects() {
+    std::vector<TiledObject> getObjects() {
       return _objects;
     }
 
   private:
     std::vector<Tile> _tiles;
-    std::vector<std::pair<std::string, v2>> _objects;
+    int _tilesWide;
+    int _tilesTall;
+    int _tilesInTextureX;
+    int _tilesInTextureY;
+
+    std::vector<TiledObject> _objects;
     SDL_Texture* _texture;
 };
