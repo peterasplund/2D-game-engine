@@ -24,6 +24,19 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry* regis
     auto &co = view.get<collidable>(entity);
     // printf("onFloor: %d\n", g.onFloor);
 
+    // die and respawn when falling of level
+    if (p.y > 370.0f) {
+      p.y = -(float)r.textureRect.h;
+    }
+
+    if (c.state == S_HURT && c.hurtTimer.elapsed() > 700) {
+      c.state = S_IDLE;
+    }
+
+    if (c.state == S_HURT) {
+      continue;
+    }
+
     if (inputHandler->isHeld(BUTTON::JUMP) && g.onFloor) {
       v.y = -c.jumpPower;
     }
@@ -77,14 +90,6 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry* regis
       if (a._currentAnimation != "idle") {
         AnimationHelpers::setAnimation(&a, "idle");
       }
-    }
-
-
-
-
-    if (p.y > 370.0f) {
-      // die and respawn
-      p.y = -(float)r.textureRect.h;
     }
   }
 }

@@ -8,6 +8,7 @@
 #include "../systems/animationSystem.h"
 
 void skeletonAISystem( entt::registry* registry) {
+  /*
   auto view = registry->view<skeleton, velocity, animator>();
 
   for (auto entity : view) {
@@ -20,7 +21,6 @@ void skeletonAISystem( entt::registry* registry) {
     case skeleton::WALK_FORWARD:
       AnimationHelpers::setAnimation(&a, "walk");
       v.x = -s.speed;
-      /* code */
       break;
 
     case skeleton::JUMP:
@@ -42,5 +42,6 @@ void skeletonAISystem( entt::registry* registry) {
     }
 
   }
+  */
 }
 

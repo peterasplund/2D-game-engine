@@ -10,6 +10,7 @@
 #include "../components/characterController.h"
 #include "../components/gravity.h"
 #include "../components/collidable.h"
+#include "../components/hurtable.h"
 
 entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition, v2 initVelocity) {
 
@@ -38,6 +39,7 @@ entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 init
   registry->emplace<velocity>(entity, initVelocity.x, initVelocity.y, 0.0f);
   registry->emplace<animator>(entity, animations, "fly");
   registry->emplace<collidable>(entity, collisionBox);
+  registry->emplace<hurtable>(entity);
   registry->emplace<renderable>(entity, texture, collisionBox, SDL_FLIP_HORIZONTAL);
 
   return entity;

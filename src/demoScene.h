@@ -54,6 +54,7 @@ public:
   void init() {
     // bind events
     destroyOnTouchSolidBind(&dispatcher);
+    hurtOnTouchHurtableBind(&dispatcher);
 
     //state = new GameState();
     //hud = new Hud(_renderer, state);
