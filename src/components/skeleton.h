@@ -4,13 +4,14 @@
 #include "../objects/bat.h"
 
 struct skeleton {
-public:
     enum AIState {
         IDLE,
         WALK_FORWARD,
         JUMP,
         SHOOT,
     };
+
+    AIState actions[7] = {WALK_FORWARD, IDLE, JUMP, IDLE, WALK_FORWARD, IDLE, SHOOT};
 
     skeleton() {
        this->timer = Timer(); 
@@ -25,7 +26,6 @@ public:
         }
     }
 
-    AIState actions[7] = {WALK_FORWARD, IDLE, JUMP, IDLE, WALK_FORWARD, IDLE, SHOOT};
     Timer timer;
     int state;
     float speed = 0.1f;

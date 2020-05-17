@@ -15,21 +15,21 @@ void skeletonAISystem( entt::registry* registry) {
     auto &v = view.get<velocity>(entity);
     auto &a = view.get<animator>(entity);
 
-    switch (s.state)
+    switch (s.actions[s.state])
     {
-    case s.WALK_FORWARD:
+    case skeleton::WALK_FORWARD:
       AnimationHelpers::setAnimation(&a, "walk");
       v.x = -s.speed;
       /* code */
       break;
 
-    case s.JUMP:
+    case skeleton::JUMP:
       AnimationHelpers::setAnimation(&a, "jump");
       v.y = -s.jumpHeight;
 
       s.incrementState();
       break;
-    case s.IDLE:
+    case skeleton::IDLE:
       AnimationHelpers::setAnimation(&a, "idle");
     
     default:

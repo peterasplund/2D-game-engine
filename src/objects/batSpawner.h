@@ -2,8 +2,8 @@
 #pragma once
 
 #include "../../lib/entt/entt.hpp"
-#include "../tilemap.h";
-#include "../math.h";
+#include "../tilemap.h"
+#include "../math.h"
 #include "../components/position.h"
 #include "../components/batSpawner.h"
 

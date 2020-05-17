@@ -25,7 +25,7 @@ void batSystem(entt::registry* registry) {
     // p.y = b.yPos - sin((p.x / 1));
 
     // Destroy when one and a half cameera away
-    SDL_Rect batR = { p.x, p.y, r.textureRect.w, r.textureRect.h };
+    SDL_Rect batR = { (int)p.x, (int)p.y, r.textureRect.w, r.textureRect.h };
     SDL_Rect cameraR = Camera::getRect(c);
     cameraR.x -= cameraR.w / 2;
     cameraR.w += cameraR.w;

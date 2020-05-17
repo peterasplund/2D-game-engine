@@ -1,8 +1,8 @@
 #pragma once
 #include "../../lib/entt/entt.hpp"
-#include "../assetManager.h";
-#include "../math.h";
-#include "../tilemap.h";
+#include "../assetManager.h"
+#include "../math.h"
+#include "../tilemap.h"
 #include "../components/position.h"
 #include "../components/velocity.h"
 #include "../components/renderable.h"

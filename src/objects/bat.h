@@ -1,7 +1,7 @@
 #pragma once
 #include "../../lib/entt/entt.hpp"
-#include "../assetManager.h";
-#include "../math.h";
+#include "../assetManager.h"
+#include "../math.h"
 #include "../components/bat.h"
 #include "../components/position.h"
 #include "../components/velocity.h"

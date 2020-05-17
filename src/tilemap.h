@@ -42,12 +42,11 @@ struct Tile {
   TileType type = TileType::NORMAL;
 };
 
-const int TILE_SIZE = 16;
-
 class Tilemap
 {
   const std::string OBJECT_POSITIONS_NAME = "objects";
-    
+  int tileWidth, tileHeight;
+
   pugi::xml_document doc;
 
   std::vector<std::pair<std::string, std::string>> getLayers(pugi::xml_parse_result result) {
@@ -72,6 +71,8 @@ class Tilemap
       std::vector<std::pair<std::string, std::string>> layers = getLayers(result);
 
       std::string image = doc.child("map").child("tileset").child("image").attribute("source").as_string();
+      tileWidth = doc.child("map").child("tileset").attribute("tilewidth").as_int();
+      tileHeight = doc.child("map").child("tileset").attribute("tileheight").as_int();
 
       SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("maps/" + image);
       _texture = texture;
@@ -79,8 +80,8 @@ class Tilemap
       int textureWidth, textureHeight;
       SDL_QueryTexture(texture, NULL, NULL, &textureWidth, &textureHeight);
 
-      _tilesInTextureX = floor(textureWidth / TILE_SIZE);
-      _tilesInTextureY = floor(textureHeight / TILE_SIZE);
+      _tilesInTextureX = floor(textureWidth / tileWidth);
+      _tilesInTextureY = floor(textureHeight / tileHeight);
 
       // get object positions
       for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
@@ -153,18 +154,18 @@ class Tilemap
           while(std::getline(lineStream, cell, ',')) {
             if (cell == "0") { x ++; continue; }
 
-            int tileX = (float)(x * TILE_SIZE);
-            int tileY = (float)(y * TILE_SIZE);
+            int tileX = (float)(x * tileWidth);
+            int tileY = (float)(y * tileHeight);
 
             int cellVal = stoi(cell);
             int tileAtX = ((cellVal - 1) % _tilesInTextureX);
             int tileAtY = ceil(cellVal / _tilesInTextureX);
 
             _tiles.push_back({
-              (x * TILE_SIZE),                                                    // x position
-              ((y) * TILE_SIZE),                                                  // y position
-              { tileAtX * TILE_SIZE, tileAtY * TILE_SIZE, TILE_SIZE, TILE_SIZE }, // Texture rect
-              name == "solid",                                                    // Solid?
+              (x * tileWidth),                                                      // x position
+              ((y) * tileHeight),                                                   // y position
+              { tileAtX * tileWidth, tileAtY * tileHeight, tileWidth, tileHeight }, // Texture rect
+              name == "solid",                                                      // Solid?
             });
 
             x ++;
@@ -182,16 +183,16 @@ class Tilemap
     }
 
     int getWidthInPixels() {
-      return _tilesWide * TILE_SIZE;
+      return _tilesWide * tileWidth;
     }
 
     int getHeightInPixels() {
-      return _tilesTall * TILE_SIZE;
+      return _tilesTall * tileHeight;
     }
 
     void addTilesToRegistry(entt::registry* registry) {
       for (Tile t : _tiles) {
-        SDL_Rect r = { t.x, t.y, TILE_SIZE, TILE_SIZE };
+        SDL_Rect r = { t.x, t.y, tileWidth, tileHeight };
         SDL_Rect collisionR = { 0, 0, r.w, r.h };
         auto entity = registry->create();
         registry->emplace<position>(entity, (float)t.x, (float)t.y);

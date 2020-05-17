@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/entt/entt.hpp"
+#include "../../lib/entt/entt.hpp"
 #include "../events.h"
 
 struct destroyOnTouchSolid {

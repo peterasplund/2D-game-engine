@@ -19,7 +19,7 @@ void batSpawnerSystem(SDL_Renderer* renderer, entt::registry* registry) {
       auto cameraView = registry->view<camera>();
       camera* c = nullptr;
       for (auto entity : cameraView) { c = &cameraView.get<camera>(entity); }
-      SDL_Rect cameraR = { c->pos.x, c->pos.y, c->viewport.x, c->viewport.y };
+      SDL_Rect cameraR = { (int)c->pos.x, (int)c->pos.y, (int)c->viewport.x, (int)c->viewport.y };
 
       if (SDL_HasIntersection(&cameraR, &c->bounds)) {
         if (c != nullptr) {
