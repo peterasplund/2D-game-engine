@@ -38,7 +38,6 @@ class DemoScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
-  entt::dispatcher dispatcher{};
   //Hud* hud;
   //GameState* state;
 
@@ -51,8 +50,8 @@ public:
 
   void init() {
     // bind events
-    destroyOnTouchSolidBind(&dispatcher);
-    hurtOnTouchHurtableBind(&dispatcher);
+    destroyOnTouchSolidBind();
+    hurtOnTouchHurtableBind();
 
     //state = new GameState();
     //hud = new Hud(_renderer, state);
@@ -111,7 +110,7 @@ public:
     skeletonAISystem();
 
     // Run collisions last
-    collisionSystem(&dispatcher);
+    collisionSystem();
   }
 
   void draw(SDL_Renderer* renderer) {

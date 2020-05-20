@@ -8,3 +8,4 @@
 #include "../lib/pugixml-1.10/src/pugixml.cpp"
 
 inline entt::registry registry{};
+inline entt::dispatcher dispatcher{};

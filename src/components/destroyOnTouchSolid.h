@@ -6,7 +6,7 @@ struct destroyOnTouchSolid {
 };
 
 
-void destroyOnTouchSolidBind(entt::dispatcher* dispatcher) {
+void destroyOnTouchSolidBind() {
   struct collisionListener {
     void receive(const collisionEvent &e) {
       if (!registry.valid(e.self) || !registry.valid(e.other)) {
@@ -22,5 +22,5 @@ void destroyOnTouchSolidBind(entt::dispatcher* dispatcher) {
   };
 
     collisionListener listener;
-    dispatcher->sink<collisionEvent>().connect<&collisionListener::receive>(listener);
+    dispatcher.sink<collisionEvent>().connect<&collisionListener::receive>(listener);
 }

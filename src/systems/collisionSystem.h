@@ -8,13 +8,13 @@
 #include "../components/solid.h"
 #include "../events.h"
 
-void collisionSystem(entt::dispatcher* dispatcher) {
+void collisionSystem() {
   auto entities = registry.group<position, velocity>(entt::get<collidable>);
 
-  entities.each([dispatcher](entt::entity entity, auto& p, auto& v, const auto& c) {
+  entities.each([](entt::entity entity, auto& p, auto& v, const auto& c) {
   //for (auto entity : entities) {
     //auto [c, p, v] = entities.get<collidable, position, velocity>(entity);
-  //registry.group<collidable, position, velocity>().each([dispatcher](auto entity, const auto &c, auto &p, auto &v) {
+  //registry.group<collidable, position, velocity>().each([](auto entity, const auto &c, auto &p, auto &v) {
     auto collidables = registry.view<collidable, position>();
     int calculations = 0;
     int outerCalculations = 0;
@@ -68,20 +68,20 @@ void collisionSystem(entt::dispatcher* dispatcher) {
             if (r1r >= r2l && r1or <= r2ol) {
               //printf("right\n");
               if (os != nullptr) {
-                dispatcher->trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::right });
+                dispatcher.trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::right });
                 p.x = r2.x - c.rect.w - c.rect.x;
                 v.x = 0.0f;
               }
             } else if (r1l <= r2r && r1ol >= r2or) {
               //printf("left\n");
               if (os != nullptr) {
-                dispatcher->trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::left });
+                dispatcher.trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::left });
                 p.x = r2r - c.rect.x;
                 v.x = 0.0f;
               }
             } else if (r1b >= r2t && r1ob <= r2ot) {
               //printf("landing\n");
-              dispatcher->trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::bottom });
+              dispatcher.trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::bottom });
               if (os != nullptr) {
                 p.y = r2t - c.rect.h - c.rect.y;
                 if (g != nullptr) {
@@ -91,7 +91,7 @@ void collisionSystem(entt::dispatcher* dispatcher) {
               }
             } else if (r1t <= r2b) {
               //printf("top\n");
-              dispatcher->trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::top });
+              dispatcher.trigger<collisionSideEvent>({ entity, otherEntity, CollisionDirection::top });
               if (os != nullptr) {
                 p.y = r2b - c.rect.y;
                 v.y = 0.0f;
@@ -101,7 +101,7 @@ void collisionSystem(entt::dispatcher* dispatcher) {
         //}
 
         if (!hasCollided && registry.valid(otherEntity)) {
-          dispatcher->trigger<collisionEvent>({ entity, otherEntity });
+          dispatcher.trigger<collisionEvent>({ entity, otherEntity });
         }
 
         hasCollided = true;
