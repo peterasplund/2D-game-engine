@@ -1,7 +1,6 @@
 #pragma once
-#include "SDL.h"
+#include "../stdafx.h"
 #include "math.h"
-#include "../../lib/entt/entt.hpp"
 #include "../components/camera.h"
 #include "../components/batSpawner.h"
 #include "../components/renderable.h"

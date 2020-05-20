@@ -121,6 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -153,6 +154,7 @@
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\objects\knife.h" />
     <ClInclude Include="src\objects\skeleton.h" />
+    <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\systems\batSpawnerSystem.h" />
     <ClInclude Include="src\systems\gravitySystem.h" />
     <ClInclude Include="src\systems\lifetimeSystem.h" />

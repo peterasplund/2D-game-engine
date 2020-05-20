@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include "../stdafx.h"
 #include "../globals.h"
 #include "position.h"
 #include "../math.h"

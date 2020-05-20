@@ -1,5 +1,5 @@
 #pragma once
-#include "../../lib/entt/entt.hpp"
+#include "../stdafx.h"
 #include "../tilemap.h"
 #include "../components/position.h"
 #include "../components/velocity.h"

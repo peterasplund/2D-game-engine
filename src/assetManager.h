@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL.h"
+#include "stdafx.h"
 #include <map>
 
 class AssetManager

@@ -1,6 +1,5 @@
 #pragma once
-#include "SDL.h"
-#include "../../lib/entt/entt.hpp"
+#include "../stdafx.h"
 #include "../components/position.h"
 #include "../components/renderable.h"
 #include "../components/velocity.h"

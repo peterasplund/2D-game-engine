@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include "stdafx.h"
 #include <vector>
 #include "animation.h"
 #include <map>

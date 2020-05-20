@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL.h"
+#include "../stdafx.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -36,6 +36,10 @@ struct characterController {
 void hurtOnTouchHurtableBind(entt::dispatcher* dispatcher) {
   struct collisionListener {
     void receive(const collisionEvent &e) {
+      if (!e.registry->valid(e.self) || !e.registry->valid(e.other)) {
+        return;
+      }
+      
       if (e.registry->has<hurtable>(e.other)) {
         auto &c = e.registry->get<characterController>(e.self);
         auto &v = e.registry->get<velocity>(e.self);

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "SDL.h"
-#include "../lib/entt/entt.hpp"
+#include "stdafx.h"
 #include <optional>
 #include <vector>
 #include "animation.h"
@@ -16,8 +15,6 @@
 #include "components/collidable.h"
 #include "components/solid.h"
 #include "components/renderable.h"
-#include "../lib/pugixml-1.10/src/pugixml.hpp"
-#include "../lib/pugixml-1.10/src/pugixml.cpp"
 
 struct TiledObject {
   std::string name;

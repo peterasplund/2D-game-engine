@@ -1,6 +1,6 @@
 #pragma once
+#include "stdafx.h"
 #include <stdio.h>
-#include "SDL.h"
 #include <string>
 #include <iostream>
 #include "globals.h"

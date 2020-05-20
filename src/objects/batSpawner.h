@@ -1,7 +1,5 @@
-
 #pragma once
-
-#include "../../lib/entt/entt.hpp"
+#include "../stdafx.h"
 #include "../tilemap.h"
 #include "../math.h"
 #include "../components/position.h"

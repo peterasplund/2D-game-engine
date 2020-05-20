@@ -1,5 +1,5 @@
 #pragma once
-#include "../../lib/entt/entt.hpp"
+#include "../stdafx.h"
 #include "../components/position.h"
 #include "../components/velocity.h"
 #include "../components/renderable.h"
@@ -15,8 +15,11 @@ void createKnife(entt::registry* registry, SDL_Renderer* renderer, v2 initPositi
 
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/knife.png");
 
-  // @TODO: get size from texture
-  SDL_Rect size = { (int)0.0f, (int)0.0f, (int)6.0f, (int)2.0f };
+  int w, h;
+
+  SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+
+  SDL_Rect size = { 0, 0, w, h };
 
   auto entity = registry->create();
   registry->emplace<position>(entity, initPosition.x - size.w, initPosition.y - size.h);

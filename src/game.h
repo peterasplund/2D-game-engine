@@ -1,6 +1,6 @@
 #pragma once
+#include "stdafx.h"
 #include <math.h>
-#include "SDL.h"
 #include "globals.h"
 #include "window.h"
 #include "inputHandler.h"

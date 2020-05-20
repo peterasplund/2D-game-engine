@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/entt/entt.hpp"
+#include "stdafx.h"
 
 struct collisionEvent {
   entt::registry* registry;

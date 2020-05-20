@@ -1,12 +1,11 @@
 #pragma once
-#include "SDL.h"
+#include "stdafx.h"
 #include <vector>
 #include "scene.h"
 #include "tilemap.h"
 #include "bg.h"
 #include "game/hud.h"
 #include "game/gameState.h"
-#include "../lib/entt/entt.hpp"
 
 #include "components/position.h"
 #include "components/velocity.h"
@@ -115,9 +114,6 @@ public:
 
     // Run collisions last
     collisionSystem(&registry, &dispatcher);
-
-    dispatcher.update<collisionEvent>();
-    dispatcher.update<collisionSideEvent>();
   }
 
   void draw(SDL_Renderer* renderer) {

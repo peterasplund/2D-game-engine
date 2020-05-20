@@ -174,6 +174,9 @@
     <ClInclude Include="src\components\batSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cc">

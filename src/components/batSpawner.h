@@ -1,6 +1,6 @@
 #pragma once
-#include "SDL.h"
-#include "SDL_timer.h"
+#include "../stdafx.h"
+#include "../timer.h"
 #include "../objects/bat.h"
 
 struct batSpawner {

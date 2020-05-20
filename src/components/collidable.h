@@ -1,6 +1,6 @@
 
 #pragma once
-#include "SDL.h"
+#include "../stdafx.h"
 
 struct collidable {
   SDL_Rect rect = { 0, 0, 32, 32 };
