@@ -4,14 +4,14 @@
 #include "../components/renderable.h"
 #include "../components/position.h"
 
-void renderableSystem(SDL_Renderer* renderer, entt::registry* registry) {
-  auto view = registry->view<renderable, position>();
+void renderableSystem(SDL_Renderer* renderer) {
+  auto view = registry.view<renderable, position>();
 
   for (auto entity : view) {
     auto &r = view.get<renderable>(entity);
     auto &p = view.get<position>(entity);
 
-    auto cameraView = registry->view<camera>();
+    auto cameraView = registry.view<camera>();
     for (auto entity : cameraView) {
       camera &c = cameraView.get<camera>(entity);
 

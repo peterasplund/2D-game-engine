@@ -14,7 +14,7 @@
 #include "../components/skeleton.h"
 #include "../components/hurtable.h"
 
-entt::entity createSkeleton(entt::registry* registry, SDL_Renderer* renderer, TiledObject o) {
+entt::entity createSkeleton(SDL_Renderer* renderer, TiledObject o) {
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/castlevania_monsters.png");
 
   int tw = 16;
@@ -35,16 +35,16 @@ entt::entity createSkeleton(entt::registry* registry, SDL_Renderer* renderer, Ti
 
   SDL_Rect collisionBox = { (int)0.0f, (int)0.0f, (int)16.0f, (int)32.0f };
 
-  auto entity = registry->create();
-  registry->emplace<position>(entity, o.position.x - collisionBox.w, o.position.y - collisionBox.h);
-  registry->emplace<velocity>(entity);
-  //registry->emplace<gravity>(entity);
-  registry->emplace<animator>(entity, animations, "walk");
-  registry->emplace<collidable>(entity, collisionBox);
-  registry->emplace<renderable>(entity, texture, collisionBox);
-  //registry->emplace<solid>(entity, true);
-  registry->emplace<skeleton>(entity);
-  registry->emplace<hurtable>(entity);
+  auto entity = registry.create();
+  registry.emplace<position>(entity, o.position.x - collisionBox.w, o.position.y - collisionBox.h);
+  registry.emplace<velocity>(entity);
+  //regist.->emplace<gravity>(entity);
+  registry.emplace<animator>(entity, animations, "walk");
+  registry.emplace<collidable>(entity, collisionBox);
+  registry.emplace<renderable>(entity, texture, collisionBox);
+  //regist.->emplace<solid>(entity, true);
+  registry.emplace<skeleton>(entity);
+  registry.emplace<hurtable>(entity);
 
   return entity;
 }

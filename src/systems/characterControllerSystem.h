@@ -10,8 +10,8 @@
 #include "../components/collidable.h"
 #include "../objects/knife.h"
 
-void characterControllerSystem(InputHandler* inputHandler, entt::registry* registry, SDL_Renderer* renderer) {
-  auto view = registry->view<characterController, position, velocity, renderable, collidable, animator, gravity>();
+void characterControllerSystem(InputHandler* inputHandler, SDL_Renderer* renderer) {
+  auto view = registry.view<characterController, position, velocity, renderable, collidable, animator, gravity>();
 
   for (auto entity : view) {
     auto &p = view.get<position>(entity);
@@ -55,7 +55,7 @@ void characterControllerSystem(InputHandler* inputHandler, entt::registry* regis
     }
 
     if (inputHandler->isHeld(BUTTON::ATTACK) && c.attackTimer.elapsed() > c.attackDelay) {
-      createKnife(registry, renderer, {
+      createKnife(renderer, {
         p.x + co.rect.w / 2 + 10.0f,
         p.y + co.rect.h / 2
         }, {

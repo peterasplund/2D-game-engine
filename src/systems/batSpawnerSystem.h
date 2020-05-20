@@ -8,14 +8,14 @@
 #include "../components/bat.h"
 #include "../objects/bat.h"
 
-void batSpawnerSystem(SDL_Renderer* renderer, entt::registry* registry) {
-  auto view = registry->view<batSpawner>();
+void batSpawnerSystem(SDL_Renderer* renderer) {
+  auto view = registry.view<batSpawner>();
 
   for (auto entity : view) {
     auto &e = view.get<batSpawner>(entity);
 
     if (e.timer.elapsed() > e.frequency) {
-      auto cameraView = registry->view<camera>();
+      auto cameraView = registry.view<camera>();
       camera* c = nullptr;
       for (auto entity : cameraView) { c = &cameraView.get<camera>(entity); }
       SDL_Rect cameraR = { (int)c->pos.x, (int)c->pos.y, (int)c->viewport.x, (int)c->viewport.y };
@@ -28,11 +28,11 @@ void batSpawnerSystem(SDL_Renderer* renderer, entt::registry* registry) {
           v2 velocity = { 0.0f, 0.0f };
           velocity.x = e.direction == e.rightToLeft ? -speed : speed;
 
-          auto b = createBat(registry, renderer, { 0.0f, 0.0f }, velocity );
+          auto b = createBat(renderer, { 0.0f, 0.0f }, velocity );
 
-          auto bb = registry->get<bat>(b);
-          auto br = registry->get<renderable>(b);
-          auto& bp = registry->get<position>(b);
+          auto bb = registry.get<bat>(b);
+          auto br = registry.get<renderable>(b);
+          auto& bp = registry.get<position>(b);
 
           bp.y = rand() % cameraR.h + cameraR.y;
           bb.yPos = bp.y;

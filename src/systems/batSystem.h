@@ -7,10 +7,10 @@
 #include "../components/velocity.h"
 #include "../components/renderable.h"
 
-void batSystem(entt::registry* registry) {
-  auto view = registry->view<bat, position, velocity, renderable>();
+void batSystem() {
+  auto view = registry.view<bat, position, velocity, renderable>();
 
-  auto cameraView = registry->view<camera>();
+  auto cameraView = registry.view<camera>();
   camera* c = nullptr;
   for (auto entity : cameraView) { c = &cameraView.get<camera>(entity); }
 
@@ -31,7 +31,7 @@ void batSystem(entt::registry* registry) {
     cameraR.y -= cameraR.h / 2;
     cameraR.h += cameraR.h;
     if (!SDL_HasIntersection(&batR, &cameraR)) {
-      registry->destroy(entity);
+      registry.destroy(entity);
     }
   }
 }

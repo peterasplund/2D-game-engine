@@ -5,9 +5,9 @@
 #include "../components/position.h"
 #include "../components/batSpawner.h"
 
-entt::entity createBatSpawner(entt::registry* registry, SDL_Renderer* renderer, TiledObject o) {
-  auto entity = registry->create();
-  auto &bs = registry->emplace<batSpawner>(entity);
+entt::entity createBatSpawner(SDL_Renderer* renderer, TiledObject o) {
+  auto entity = registry.create();
+  auto &bs = registry.emplace<batSpawner>(entity);
 
   if (o.propertiesInt.find("frequency") != o.propertiesInt.end()) {
     // printf("freq %d\n", o.propertiesInt.at("frequency"));

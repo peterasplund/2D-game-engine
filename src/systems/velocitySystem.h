@@ -3,8 +3,8 @@
 #include "../components/position.h"
 #include "../components/velocity.h"
 
-void velocitySystem(float dt, entt::registry* registry) {
-  auto view = registry->view<position, velocity>();
+void velocitySystem(float dt) {
+  auto view = registry.view<position, velocity>();
 
   for (auto entity : view) {
     auto &v = view.get<velocity>(entity);

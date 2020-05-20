@@ -12,7 +12,7 @@
 #include "../components/collidable.h"
 #include "../components/hurtable.h"
 
-entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 initPosition, v2 initVelocity) {
+entt::entity createBat(SDL_Renderer* renderer, v2 initPosition, v2 initVelocity) {
 
   SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/bat.png");
 
@@ -33,14 +33,14 @@ entt::entity createBat(entt::registry* registry, SDL_Renderer* renderer, v2 init
 
   SDL_Rect collisionBox = { (int)2.0f, (int)1.0f, (int)13.0f, (int)8.0f };
 
-  auto entity = registry->create();
-  registry->emplace<bat>(entity);
-  registry->emplace<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
-  registry->emplace<velocity>(entity, initVelocity.x, initVelocity.y, 0.0f);
-  registry->emplace<animator>(entity, animations, "fly");
-  registry->emplace<collidable>(entity, collisionBox);
-  registry->emplace<hurtable>(entity);
-  registry->emplace<renderable>(entity, texture, collisionBox, SDL_FLIP_HORIZONTAL);
+  auto entity = registry.create();
+  registry.emplace<bat>(entity);
+  registry.emplace<position>(entity, initPosition.x - collisionBox.w, initPosition.y - collisionBox.h);
+  registry.emplace<velocity>(entity, initVelocity.x, initVelocity.y, 0.0f);
+  registry.emplace<animator>(entity, animations, "fly");
+  registry.emplace<collidable>(entity, collisionBox);
+  registry.emplace<hurtable>(entity);
+  registry.emplace<renderable>(entity, texture, collisionBox, SDL_FLIP_HORIZONTAL);
 
   return entity;
 }

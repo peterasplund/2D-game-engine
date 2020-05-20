@@ -2,8 +2,8 @@
 #include "../stdafx.h"
 #include "../components/lifetime.h"
 
-void lifetimeSystem(float dt, entt::registry* registry) {
-  auto view = registry->view<lifetime>();
+void lifetimeSystem(float dt) {
+  auto view = registry.view<lifetime>();
 
   for (auto entity : view) {
     auto &l = view.get<lifetime>(entity);
@@ -11,7 +11,7 @@ void lifetimeSystem(float dt, entt::registry* registry) {
     l.timer += dt;
 
     if (l.timer > l.time) {
-      registry->destroy(entity);
+      registry.destroy(entity);
     }
   }
 }

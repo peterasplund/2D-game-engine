@@ -6,9 +6,9 @@
 #include "../components/animator.h"
 #include "../systems/animationSystem.h"
 
-void skeletonAISystem( entt::registry* registry) {
+void skeletonAISystem() {
   /*
-  auto view = registry->view<skeleton, velocity, animator>();
+  auto view = registry.view<skeleton, velocity, animator>();
 
   for (auto entity : view) {
     auto &s = view.get<skeleton>(entity);

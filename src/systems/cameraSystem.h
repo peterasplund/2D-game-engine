@@ -4,15 +4,15 @@
 #include "../components/camera.h"
 #include "../components/renderable.h"
 
-void cameraSystem(entt::registry* registry) {
-  auto view = registry->view<camera>();
+void cameraSystem() {
+  auto view = registry.view<camera>();
 
   for (auto entity : view) {
     auto &c = view.get<camera>(entity);
 
     // follow player with camera
     float px, py, pw, ph;
-    auto playerView = registry->view<characterController, position, renderable>();
+    auto playerView = registry.view<characterController, position, renderable>();
     for (auto entity : playerView) {
       position &playerPosition = playerView.get<position>(entity);
       renderable &playerRenderable = playerView.get<renderable>(entity);

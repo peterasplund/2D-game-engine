@@ -31,14 +31,13 @@
 #include "objects/skeleton.h"
 #include "objects/batSpawner.h"
 
-typedef entt::entity(*CreateFunction)(entt::registry*, SDL_Renderer*, TiledObject);
+typedef entt::entity(*CreateFunction)(SDL_Renderer*, TiledObject);
 typedef std::unordered_map<std::string, CreateFunction> PrefabMap;
 
 class DemoScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
-  entt::registry registry;
   entt::dispatcher dispatcher{};
   //Hud* hud;
   //GameState* state;
@@ -60,7 +59,7 @@ public:
     Tilemap* tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
-    tilemap->addTilesToRegistry(&registry);
+    tilemap->addTilesToRegistry();
 
     PrefabMap prefabs = {
       { "player", &createPlayer },
@@ -72,7 +71,6 @@ public:
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
 
-    registry.create();
 
     std::vector<TiledObject> objects = tilemap->getObjects();
     for (TiledObject o : objects) {
@@ -83,37 +81,37 @@ public:
       CreateFunction fn = prefabs.at(o.name);
 
       if (fn != nullptr) {
-        fn(&registry, _renderer, o);
+        fn(_renderer, o);
       }
     }
 
-    createMovingPlatform(&registry, _renderer, { 64, 192 }, { .5f, 0 });
+    createMovingPlatform(_renderer, { 64, 192 }, { .5f, 0 });
 
-    createCamera(&registry, tilemap);
+    createCamera(tilemap);
 
     // Lag bats
-    // for (int i = 0; i < 2000; i++) { createBat(&registry, _renderer, { 0, 0 }); }
+    // for (int i = 0; i < 2000; i++) { createBat(_renderer, { 0, 0 }); }
 
     // @TODO: set prevRect to rect in collidable constructor instead.
-    initCollisionSystem(&registry);
+    initCollisionSystem();
   }
 
   void update(float dt) {
-    animationSystem(dt, &registry);
-    cameraSystem(&registry);
+    animationSystem(dt);
+    cameraSystem();
 
-    characterControllerSystem(InputHandler::Instance(), &registry, _renderer);
-    gravitySystem(dt, &registry);
-    setCollisionSystemPrevCollisionBox(&registry);
-    velocitySystem(dt, &registry);
-    lifetimeSystem(dt, &registry);
-    batSystem(&registry);
+    characterControllerSystem(InputHandler::Instance(), _renderer);
+    gravitySystem(dt);
+    setCollisionSystemPrevCollisionBox();
+    velocitySystem(dt);
+    lifetimeSystem(dt);
+    batSystem();
 
-    batSpawnerSystem(_renderer, &registry);
-    skeletonAISystem(&registry);
+    batSpawnerSystem(_renderer);
+    skeletonAISystem();
 
     // Run collisions last
-    collisionSystem(&registry, &dispatcher);
+    collisionSystem(&dispatcher);
   }
 
   void draw(SDL_Renderer* renderer) {
@@ -128,7 +126,7 @@ public:
 
     bg1->draw(renderer, -cr.x * 0.04);
     bg2->draw(renderer, -cr.x * 0.2);
-    renderableSystem(renderer, &registry);
+    renderableSystem(renderer);
     //debugSystem(_renderer, &registry);
 
     //hud->draw(renderer);

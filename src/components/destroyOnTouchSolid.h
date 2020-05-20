@@ -9,13 +9,13 @@ struct destroyOnTouchSolid {
 void destroyOnTouchSolidBind(entt::dispatcher* dispatcher) {
   struct collisionListener {
     void receive(const collisionEvent &e) {
-      if (!e.registry->valid(e.self) || !e.registry->valid(e.other)) {
+      if (!registry.valid(e.self) || !registry.valid(e.other)) {
         return;
       }
 
-      if (e.registry->has<destroyOnTouchSolid>(e.self)) {
-        if (e.registry->has<solid>(e.other)) {
-          e.registry->destroy(e.self);
+      if (registry.has<destroyOnTouchSolid>(e.self)) {
+        if (registry.has<solid>(e.other)) {
+          registry.destroy(e.self);
         }
       }
     }

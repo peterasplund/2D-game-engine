@@ -4,8 +4,8 @@
 #include "../components/position.h"
 #include "../components/velocity.h"
 
-void gravitySystem(float dt, entt::registry* registry) {
-  auto view = registry->view<gravity, position, velocity>();
+void gravitySystem(float dt) {
+  auto view = registry.view<gravity, position, velocity>();
 
   for (auto entity : view) {
     auto &v = view.get<velocity>(entity);

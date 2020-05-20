@@ -3,7 +3,6 @@
 #include "stdafx.h"
 
 struct collisionEvent {
-  entt::registry* registry;
   entt::entity self;
   entt::entity other;
 };
@@ -16,7 +15,6 @@ enum CollisionDirection {
 };
 
 struct collisionSideEvent {
-  entt::registry* registry;
   entt::entity self;
   entt::entity other;
   CollisionDirection direction;

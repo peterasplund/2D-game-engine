@@ -36,14 +36,14 @@ struct characterController {
 void hurtOnTouchHurtableBind(entt::dispatcher* dispatcher) {
   struct collisionListener {
     void receive(const collisionEvent &e) {
-      if (!e.registry->valid(e.self) || !e.registry->valid(e.other)) {
+      if (!registry.valid(e.self) || !registry.valid(e.other)) {
         return;
       }
       
-      if (e.registry->has<hurtable>(e.other)) {
-        auto &c = e.registry->get<characterController>(e.self);
-        auto &v = e.registry->get<velocity>(e.self);
-        auto &a = e.registry->get<animator>(e.self);
+      if (registry.has<hurtable>(e.other)) {
+        auto &c = registry.get<characterController>(e.self);
+        auto &v = registry.get<velocity>(e.self);
+        auto &a = registry.get<animator>(e.self);
 
 
         if (c.state == S_HURT) {
@@ -71,8 +71,8 @@ void hurtOnTouchHurtableBind(entt::dispatcher* dispatcher) {
         return;
       }
 
-      if (e.registry->has<solid>(e.other)) {
-        auto c = e.registry->try_get<characterController>(e.self);
+      if (registry.has<solid>(e.other)) {
+        auto c = registry.try_get<characterController>(e.self);
 
         if (c != nullptr && c->state == S_HURT) {
           c->state = S_IDLE;

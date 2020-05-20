@@ -187,17 +187,17 @@ class Tilemap
       return _tilesTall * tileHeight;
     }
 
-    void addTilesToRegistry(entt::registry* registry) {
+    void addTilesToRegistry() {
       for (Tile t : _tiles) {
         SDL_Rect r = { t.x, t.y, tileWidth, tileHeight };
         SDL_Rect collisionR = { 0, 0, r.w, r.h };
-        auto entity = registry->create();
-        registry->emplace<position>(entity, (float)t.x, (float)t.y);
-        registry->emplace<renderable>(entity, _texture, t.textureRect);
+        auto entity = registry.create();
+        registry.emplace<position>(entity, (float)t.x, (float)t.y);
+        registry.emplace<renderable>(entity, _texture, t.textureRect);
 
         if (t.solid) {
-          registry->emplace<collidable>(entity, collisionR);
-          registry->emplace<solid>(entity, true);
+          registry.emplace<collidable>(entity, collisionR);
+          registry.emplace<solid>(entity, true);
         }
       }
     }

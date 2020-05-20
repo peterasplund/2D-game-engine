@@ -6,17 +6,17 @@
 #include "../components/solid.h"
 #include "../components/camera.h"
 
-void debugSystem(SDL_Renderer* renderer, entt::registry* registry) {
-  auto view = registry->view<renderable, position, collidable>();
+void debugSystem(SDL_Renderer* renderer) {
+  auto view = registry.view<renderable, position, collidable>();
 
   for (auto entity : view) {
     auto &r = view.get<renderable>(entity);
     auto &p = view.get<position>(entity);
     auto &co = view.get<collidable>(entity);
-    auto s = registry->try_get<solid>(entity);
+    auto s = registry.try_get<solid>(entity);
     auto &cr = co.rect;
 
-    auto cameraView = registry->view<camera>();
+    auto cameraView = registry.view<camera>();
     for (auto entity : cameraView) {
       camera &c = cameraView.get<camera>(entity);
 
