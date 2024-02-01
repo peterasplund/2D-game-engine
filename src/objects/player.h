@@ -22,6 +22,7 @@ entt::entity createPlayer( SDL_Renderer* renderer, TiledObject o) {
   Animation* animJump = new Animation(texture, false);
   Animation* animFall = new Animation(texture, false);
   Animation* animBackDash = new Animation(texture, false);
+  Animation* animSlide = new Animation(texture, false);
 
   animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
   animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
@@ -46,6 +47,8 @@ entt::entity createPlayer( SDL_Renderer* renderer, TiledObject o) {
 
   animBackDash->addFrame({ tw * 1, th * 4, tw, th }, 100);
 
+  animSlide->addFrame({ tw * 6, th * 4, tw, th }, 100);
+
   std::map <std::string, Animation*> animations {
     std::make_pair("idle", animIdle),
     std::make_pair("run", animRun),
@@ -53,6 +56,7 @@ entt::entity createPlayer( SDL_Renderer* renderer, TiledObject o) {
     std::make_pair("jump", animJump),
     std::make_pair("fall", animFall),
     std::make_pair("backDash", animBackDash),
+    std::make_pair("slide", animSlide),
   };
 
   SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };

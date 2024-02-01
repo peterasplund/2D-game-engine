@@ -30,7 +30,7 @@ void batSystem() {
     cameraR.w += cameraR.w;
     cameraR.y -= cameraR.h / 2;
     cameraR.h += cameraR.h;
-    if (!SDL_HasIntersection(&batR, &cameraR)) {
+    if (!SDL_HasIntersection(&batR, &cameraR) && registry.valid(entity)) {
       registry.destroy(entity);
     }
   }

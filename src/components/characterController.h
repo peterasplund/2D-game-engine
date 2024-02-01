@@ -7,7 +7,7 @@
 #include "./solid.h"
 #include "./animator.h"
 #include "../inputHandler.h"
-#include "./animator.h"
+#include "./velocity.h"
 #include "../timer.h"
 #include "../events.h"
 #include "../systems/animationSystem.h"
@@ -18,15 +18,17 @@ enum State {
   S_JUMP,
   S_ATTACK,
   S_HURT,
+  S_SLIDE,
 };
 
 struct characterController {
   float jumpPower = 7.5f;
   float backDashSpeed = 1.5f;
   float attackSpeed = 3.0f;
-  float attackDelay = 5.0f;
+  //float attackDelay = 5.0f;
+  float attackDelay = 450.0f;
   bool isBackDashing = false;
-  float runSpeed = 2.0f;
+  float runSpeed = 1.4f;
   std::string direction = "right";
   State state = State::S_IDLE;
   Timer attackTimer;

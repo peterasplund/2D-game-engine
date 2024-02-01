@@ -33,7 +33,7 @@
   </object>
  </objectgroup>
  <objectgroup id="4" name="test">
-  <object id="3" name="foo" x="97" y="195">
+  <object id="3" name="foo" x="97" y="200">
    <point/>
   </object>
  </objectgroup>
