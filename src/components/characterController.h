@@ -22,17 +22,22 @@ enum State {
 };
 
 struct characterController {
-  float jumpPower = 7.5f;
+  float jumpPower = 6.0f;
   float backDashSpeed = 1.5f;
   float attackSpeed = 3.0f;
   //float attackDelay = 5.0f;
   float attackDelay = 450.0f;
+  float slideDelay = 200.0f;
   bool isBackDashing = false;
   float runSpeed = 1.4f;
   std::string direction = "right";
   State state = State::S_IDLE;
   Timer attackTimer;
+  Timer slideTimer;
   Timer hurtTimer;
+
+  SDL_Rect hurtBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
+  SDL_Rect hurtBoxSliding = { (int)14.0f, (int)15 + 26, (int)22.0f, (int)5.0f };
 };
 
 void hurtOnTouchHurtableBind() {
@@ -61,13 +66,13 @@ void hurtOnTouchHurtableBind() {
         AnimationHelpers::setAnimation(&a, "fall");
         
         if (c.direction == "left") {
-          v.y =- 4.0f;
+          v.y = -4.0f;
           v.x = 6.0f;
         }
 
         if (c.direction == "right") {
-          v.y =- 4.0f;
-          v.x =- 6.0f;
+          v.y = -4.0f;
+          v.x = -6.0f;
         }
 
         return;

@@ -179,12 +179,24 @@ class Tilemap
     ~Tilemap() {
     }
 
+    int getTileWidth() {
+      return tileWidth;
+    }
+
+    int getTileHeight() {
+      return tileHeight;
+    }
+
     int getWidthInPixels() {
       return _tilesWide * tileWidth;
     }
 
     int getHeightInPixels() {
       return _tilesTall * tileHeight;
+    }
+
+    SDL_Texture* getTexture() {
+      return _texture;
     }
 
     void addTilesToRegistry() {

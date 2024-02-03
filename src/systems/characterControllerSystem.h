@@ -21,7 +21,14 @@ void characterControllerSystem(InputHandler* inputHandler, SDL_Renderer* rendere
     auto &a = view.get<animator>(entity);
     auto &g = view.get<gravity>(entity);
     auto &co = view.get<collidable>(entity);
-    // printf("onFloor: %d\n", g.onFloor);
+    printf("state: %d\n", c.state);
+
+    if (c.state == S_SLIDE) {
+      co.rect = c.hurtBoxSliding;
+    }
+    else {
+      co.rect = c.hurtBox;
+    }
 
     // die and respawn when falling of level
     if (p.y > 370.0f) {
@@ -44,33 +51,43 @@ void characterControllerSystem(InputHandler* inputHandler, SDL_Renderer* rendere
       if (a._currentAnimation != "slide") {
         AnimationHelpers::reset(&a);
         AnimationHelpers::setAnimation(&a, "slide");
-        v.x = c.direction == "left" ? -6 : 6;
+        v.x += c.direction == "left" ? -6 : 6;
       }
-      continue;
     }
 
     if (c.state != S_ATTACK) {
-      if (inputHandler->isHeld(BUTTON::JUMP) && g.onFloor) {
+      if (c.state != S_JUMP && inputHandler->isHeld(BUTTON::JUMP) && (g.onFloor || c.state == S_SLIDE)) {
+        printf("jump\n");
+        c.state = S_JUMP;
         v.y = -c.jumpPower;
       }
 
-      if (inputHandler->isHeld(BUTTON::LEFT)) {
-        c.direction = "left";
-        v.x = -c.runSpeed;
-        r.textureFlip = SDL_FLIP_NONE;
-        c.state = S_RUN;
-      } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-        c.direction = "right";
-        v.x = c.runSpeed;
-        r.textureFlip = SDL_FLIP_HORIZONTAL;
-        c.state = S_RUN;
-      } else {
-        c.state = S_IDLE;
+      if (c.state != S_SLIDE) {
+        if (inputHandler->isHeld(BUTTON::LEFT)) {
+          c.direction = "left";
+          v.x = -c.runSpeed;
+          r.textureFlip = SDL_FLIP_NONE;
+          c.state = S_RUN;
+        } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+          c.direction = "right";
+          v.x = c.runSpeed;
+          r.textureFlip = SDL_FLIP_HORIZONTAL;
+          c.state = S_RUN;
+        } else if (c.state != S_SLIDE) {
+          c.state = S_IDLE;
+        }
       }
     }
 
     // End ttack
     if (c.attackTimer.elapsed() > c.attackDelay && c.state == S_ATTACK) {
+      c.state = S_IDLE;
+      AnimationHelpers::reset(&a);
+      AnimationHelpers::setAnimation(&a, "idle");
+    }
+
+    // End slide
+    if (c.slideTimer.elapsed() > c.slideDelay && c.state == S_SLIDE) {
       c.state = S_IDLE;
       AnimationHelpers::reset(&a);
       AnimationHelpers::setAnimation(&a, "idle");
@@ -84,9 +101,10 @@ void characterControllerSystem(InputHandler* inputHandler, SDL_Renderer* rendere
       c.attackTimer.reset();
     }
 
-    if (inputHandler->isHeld(BUTTON::DOWN) && c.attackTimer.elapsed() > c.attackDelay && g.onFloor) {
+    // Slide
+    if (inputHandler->isHeld(BUTTON::DOWN) && g.onFloor) {
       c.state = S_SLIDE;
-      c.attackTimer.reset();
+      c.slideTimer.reset();
     }
 
       /*
@@ -104,7 +122,7 @@ void characterControllerSystem(InputHandler* inputHandler, SDL_Renderer* rendere
     }
     */
 
-    if (c.state != S_ATTACK) {
+    if (c.state != S_ATTACK && c.state != S_SLIDE) {
       if (v.x == 0.0f) {
         AnimationHelpers::setAnimation(&a, "idle");
       }

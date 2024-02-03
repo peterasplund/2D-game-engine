@@ -7,6 +7,7 @@
 #include "sceneManager.h"
 #include "scene.h"
 #include "demoScene.h"
+#include "timer.h"
 
 class Game
 {
