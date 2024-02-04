@@ -10,11 +10,19 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include "assetManager.h"
 #include "components/camera.h"
 #include "components/collidable.h"
 #include "components/solid.h"
 #include "components/renderable.h"
+
+#define TILE_MAX_LIMIT 1024
+
+struct TilePosition {
+  int x;
+  int y;
+};
 
 struct TiledObject {
   std::string name;
@@ -43,6 +51,8 @@ class Tilemap
 {
   const std::string OBJECT_POSITIONS_NAME = "objects";
   int tileWidth, tileHeight;
+
+  std::vector<std::vector<bool>> _solidTiles;
 
   pugi::xml_document doc;
 
@@ -79,6 +89,12 @@ class Tilemap
 
       _tilesInTextureX = floor(textureWidth / tileWidth);
       _tilesInTextureY = floor(textureHeight / tileHeight);
+
+      _solidTiles.resize(TILE_MAX_LIMIT);
+
+      for (int i = 0; i < TILE_MAX_LIMIT; i++) {
+        _solidTiles[i].resize(TILE_MAX_LIMIT);
+      }
 
       // get object positions
       for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
@@ -151,8 +167,11 @@ class Tilemap
           while(std::getline(lineStream, cell, ',')) {
             if (cell == "0") { x ++; continue; }
 
+            //std::vector<bool> row(x, y);
+
             int tileX = (float)(x * tileWidth);
             int tileY = (float)(y * tileHeight);
+            _solidTiles[y][x] = name == "solid";
 
             int cellVal = stoi(cell);
             int tileAtX = ((cellVal - 1) % _tilesInTextureX);
@@ -199,7 +218,12 @@ class Tilemap
       return _texture;
     }
 
+    std::vector<std::vector<bool>> getSolidTiles() {
+      return _solidTiles;
+    }
+
     void addTilesToRegistry() {
+      /*
       for (Tile t : _tiles) {
         SDL_Rect r = { t.x, t.y, tileWidth, tileHeight };
         SDL_Rect collisionR = { 0, 0, r.w, r.h };
@@ -212,6 +236,7 @@ class Tilemap
           registry.emplace<solid>(entity, true);
         }
       }
+      */
     }
 
     std::vector<Tile>* getTiles() {

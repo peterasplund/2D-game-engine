@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include "stdafx.h"
 #include <stdio.h>
 #include <string>
@@ -45,3 +46,4 @@ public:
     SDL_RenderCopy(this->renderer, this->texture, NULL, &this->rectangle);
   }
 };
+*/

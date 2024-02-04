@@ -20,7 +20,9 @@ class Player : public AbstractGameObject {
     virtual ~Player() {
     }
 
-    void init(SDL_Renderer* renderer) {
+    void init(SDL_Renderer* renderer) override {
+      setListenForCollisions();
+
       SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
 
       int tw = 48;
@@ -73,12 +75,14 @@ class Player : public AbstractGameObject {
       SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
 
       this->_renderable.texture = texture;
-      this->_position = {0,0};
+      this->_position = {128,128};
 
       AbstractGameObject::init(renderer);
     }
 
-    void update(float dt) {
+    void update(float dt) override {
+      // temp
+      _velocity.y = 0.0f;
       InputHandler* inputHandler = InputHandler::Instance();
       _renderable.textureRect = _animator.getFrame();
       _renderable.texture = _animator.getTexture();
@@ -95,6 +99,14 @@ class Player : public AbstractGameObject {
         if (state != S_JUMP && inputHandler->isHeld(BUTTON::JUMP) && (/*g.onFloor || */state == S_SLIDE)) {
           state = S_JUMP;
           _velocity.y = -jumpPower;
+        }
+
+        // temp move up/down
+        if (inputHandler->isHeld(BUTTON::UP)) {
+          _velocity.y = -runSpeed;
+        }
+        else if (inputHandler->isHeld(BUTTON::DOWN)) {
+          _velocity.y = runSpeed;
         }
 
         if (state != S_SLIDE) {
@@ -137,16 +149,24 @@ class Player : public AbstractGameObject {
       }
 
       // Slide
-      if (inputHandler->isHeld(BUTTON::DOWN)/* && g.onFloor*/) {
+      /*
+      if (inputHandler->isHeld(BUTTON::DOWN)*//* && g.onFloor*//*) {
         state = S_SLIDE;
         slideTimer.reset();
       }
+      */
 
       AbstractGameObject::update(dt);
     }
 
-    void draw(SDL_Renderer* renderer, v2 cameraPos) {
-      AbstractGameObject::draw(renderer, cameraPos);
+    void draw(SDL_Renderer* renderer, v2 offset) override {
+      AbstractGameObject::draw(renderer, offset);
+    }
+
+    void onSolidCollision(SDL_Rect other, v2i cornerCollisions[4]) override {
+      // @TODO: run collision resolve function. 
+      // That function will be placed somewhere neat.
+      printf("Collision!\n");
     }
 
   protected:

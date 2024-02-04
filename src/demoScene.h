@@ -6,6 +6,8 @@
 #include "scene.h"
 #include "tilemap.h"
 #include "bg.h"
+#include "systems/collisionSystem.h"
+
 /*
 #include "game/hud.h"
 #include "game/gameState.h"
@@ -20,7 +22,6 @@
 #include "systems/animationSystem.h"
 #include "systems/characterControllerSystem.h"
 #include "systems/cameraSystem.h"
-#include "systems/collisionSystem.h"
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
 #include "systems/lifetimeSystem.h"
@@ -39,12 +40,15 @@ class DemoScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
+  CollisionHandler* _collisionHandler;
   //Hud* hud;
   //GameState* state;
+  camera _camera;
   std::vector<AbstractGameObject*> _gameObjects;
   Bg* bg1;
   Bg* bg2;
   Tilemap* tilemap;
+  std::vector<std::vector<bool>> solidTiles;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
     _renderer = renderer;
@@ -58,9 +62,11 @@ public:
     //state = new GameState();
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    //_collisionHandler = new CollisionHandler();
+    solidTiles = tilemap->getSolidTiles();
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
-    tilemap->addTilesToRegistry();
+    // tilemap->addTilesToRegistry();
 
     /*
     PrefabMap prefabs = {
@@ -74,6 +80,8 @@ public:
     Player* player = new Player();
     player->init(_renderer);
     _gameObjects.push_back(player);
+
+    Camera::follow(&_camera, player->getRectPointer());
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
@@ -102,20 +110,26 @@ public:
     // for (int i = 0; i < 2000; i++) { createBat(_renderer, { 0, 0 }, { 0, 10.0f }); }
 
     // @TODO: set prevRect to rect in collidable constructor instead.
-    //initCollisionSystem();
+    // initCollisionSystem();
+    _collisionHandler->init(&_gameObjects);
   }
 
   void update(float dt) {
+    _collisionHandler->beforeUpdate(&_gameObjects, &solidTiles);
+
     for (int i = 0; i < _gameObjects.size(); i ++) {
       _gameObjects[i]->update(dt);
     }
+    _camera.update();
     /*
     animationSystem(dt);
     cameraSystem();
 
     characterControllerSystem(InputHandler::Instance(), _renderer);
     gravitySystem(dt);
-    setCollisionSystemPrevCollisionBox();
+    */
+    _collisionHandler->afterUpdate(&_gameObjects);
+    /*
     velocitySystem(dt);
     lifetimeSystem(dt);
     batSystem();
@@ -139,23 +153,33 @@ public:
       cr = Camera::getRect(&c);
     }
     */
-    float cameraX = 0.0f;
+    //SDL_Rect camera = { 50, 50, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
+    SDL_Rect pRect = _gameObjects[0]->getRect();
+    SDL_Rect camera = Camera::getRect(&_camera);
 
-    bg1->draw(renderer, -cameraX * 0.04);
-    bg2->draw(renderer, -cameraX * 0.2);
+    bg1->draw(renderer, -camera.x * 0.04);
+    bg2->draw(renderer, -camera.x * 0.2);
 
+    //printf("x: %d\ty: %d\tw: %d\th: %d\n", camera.x, camera.y, camera.w, camera.h);
     std::vector<Tile>* tiles = tilemap->getTiles();
     for (int i = 0; i < tiles->size(); i ++) {
       Tile t = tiles->at(i);
       SDL_Rect r = { t.x, t.y, tilemap->getTileWidth(), tilemap->getTileHeight() };
       SDL_Rect sr = t.textureRect;
-      SDL_Rect dr = { t.x, t.y, sr.w, sr.h };
+      //printf("x: %d\ty: %d\tw: %d\th: %d\n", dr.x, dr.y, dr.w, dr.h);
 
-      SDL_RenderCopyEx(renderer, tilemap->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
+      SDL_Rect tileRect = { t.x, t.y, sr.w, sr.h };
+      if (SDL_HasIntersection(&camera, &tileRect)) {
+        SDL_Rect dr = { t.x - camera.x, t.y - camera.y, sr.w, sr.h };
+        SDL_RenderCopyEx(renderer, tilemap->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
+      }
     }
 
     for (int i = 0; i < _gameObjects.size(); i ++) {
-      _gameObjects[i]->draw(renderer, { cameraX, 0.0f });
+      SDL_Rect objRect = _gameObjects[i]->getRect();
+      if (SDL_HasIntersection(&camera, &objRect)) {
+        _gameObjects[i]->draw(renderer, { (float)camera.x, (float)camera.y });
+      }
     }
 
     //renderableSystem(renderer);

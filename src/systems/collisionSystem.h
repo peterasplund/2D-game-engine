@@ -7,6 +7,8 @@
 #include "../components/gravity.h"
 #include "../components/solid.h"
 #include "../events.h"
+#include "../abstractGameobject.h"
+#include <map>
 
 void collisionSystem() {
   auto entities = registry.group<position, velocity>(entt::get<collidable>);
@@ -127,6 +129,7 @@ void collisionSystem() {
   //printf("collision outer calculations: %d\n", outerCalculations);
 }
 
+/*
 void setCollisionSystemPrevCollisionBox() {
   auto view = registry.view<collidable, position, velocity>();
 
@@ -146,4 +149,75 @@ void initCollisionSystem() {
     c.prevRect = { (int)p.x + c.rect.x, (int)p.y + c.rect.y, c.rect.w, c.rect.h };
   }
 }
+*/
 
+class CollisionHandler {
+  public:
+    void init(std::vector<AbstractGameObject*>* objects) {
+      // set prev rect for each object
+      for(AbstractGameObject* o : *objects) {
+        v2 p = o->getPosition();
+        SDL_Rect* r = o->getRectPointer();
+        o->_collidable.prevRect = { (int)p.x + r->x, (int)p.y + r->y, r->w, r->h };
+      }
+    }
+
+    void beforeUpdate(std::vector<AbstractGameObject*>* objects, std::vector<std::vector<bool>>* solidTiles) {
+      // Check for collisions and trigger events if so
+      for(AbstractGameObject* o : *objects) {
+        if (!o->getListensForCollisions()) {
+          continue;
+        }
+
+        SDL_Rect* r = o->getRectPointer();
+        v2i corners[4] = { 
+          { r->x,        r->y },        // Top left
+          { r->x + r->w, r->y },        // Top right
+          { r->x,        r->y + r->h }, // Bottom left
+          { r->x + r->w, r->y + r->h }  // Bottom right
+        };
+        v2i cornerCollisions[4];
+        bool gotCollision = false;
+
+        // Run for each of the four corners
+        for (int corner = 0; corner < 4; corner++) {
+          v2i c = corners[corner];
+          int x = floor(c.x / 16);
+          // @TODO: use constant for tile_size here instead of 16
+          int y = floor((c.y + 1) / 16);
+
+          if (y <= solidTiles->size()) {
+            if (x <= solidTiles[y].size()) {
+              if (solidTiles->at(y).at(x) == true) {
+                // We have an collision
+                cornerCollisions[corner] = { x, y};
+                gotCollision = true;
+              }
+              else {
+                cornerCollisions[corner] = { -1, -1 };
+                printf("-\n");
+              }
+            }
+          }
+
+          if (gotCollision) {
+            o->onSolidCollision({ x * 16, y * 16, 16, 16}, cornerCollisions);
+          }
+        }
+
+
+        // @TODO: loop through all objects again, check SDL_HasIntersection and 
+        // trigger events based on collision side, collision response etc.
+
+      }
+    }
+
+    void afterUpdate(std::vector<AbstractGameObject*>* objects) {
+      // set prev rect for each object
+      for(AbstractGameObject* o : *objects) {
+        v2 p = o->getPosition();
+        SDL_Rect* r = o->getRectPointer();
+        o->_collidable.prevRect = { (int)p.x + r->x, (int)p.y + r->y, r->w, r->h };
+      }
+    }
+};
