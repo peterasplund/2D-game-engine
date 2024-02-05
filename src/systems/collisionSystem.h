@@ -162,7 +162,7 @@ class CollisionHandler {
       }
     }
 
-    void beforeUpdate(std::vector<AbstractGameObject*>* objects, std::vector<std::vector<bool>>* solidTiles) {
+    void beforeUpdate(std::vector<AbstractGameObject*>* objects, std::vector<std::vector<bool>>* solidTiles, SDL_Renderer* renderer) {
       // Check for collisions and trigger events if so
       for(AbstractGameObject* o : *objects) {
         if (!o->getListensForCollisions()) {
@@ -176,15 +176,26 @@ class CollisionHandler {
           { r->x,        r->y + r->h }, // Bottom left
           { r->x + r->w, r->y + r->h }  // Bottom right
         };
+
+        SDL_Rect c1 { corners[0].x, corners[0].y, 4, 4 };
+        SDL_RenderDrawRect(renderer, &c1);
+        SDL_Rect c2 { corners[1].x -4, corners[1].y, 4, 4 };
+        SDL_RenderDrawRect(renderer, &c2);
+        SDL_Rect c3 { corners[2].x, corners[2].y -4, 4, 4 };
+        SDL_RenderDrawRect(renderer, &c3);
+        SDL_Rect c4 { corners[3].x -4, corners[3].y -4, 4, 4 };
+        SDL_RenderDrawRect(renderer, &c4);
+
         v2i cornerCollisions[4];
         bool gotCollision = false;
+        SDL_Rect other;
 
         // Run for each of the four corners
         for (int corner = 0; corner < 4; corner++) {
           v2i c = corners[corner];
-          int x = floor(c.x / 16);
           // @TODO: use constant for tile_size here instead of 16
-          int y = floor((c.y + 1) / 16);
+          int x = floor(c.x / 16);
+          int y = floor(c.y / 16);
 
           if (y <= solidTiles->size()) {
             if (x <= solidTiles[y].size()) {
@@ -192,17 +203,20 @@ class CollisionHandler {
                 // We have an collision
                 cornerCollisions[corner] = { x, y};
                 gotCollision = true;
+                other = { x * 16, y * 16, 16, 16};
               }
               else {
                 cornerCollisions[corner] = { -1, -1 };
-                printf("-\n");
               }
             }
           }
+        }
 
-          if (gotCollision) {
-            o->onSolidCollision({ x * 16, y * 16, 16, 16}, cornerCollisions);
-          }
+        if (gotCollision) {
+          o->onSolidCollision(other, cornerCollisions);
+        }
+        else {
+          printf("-\n");
         }
 
 

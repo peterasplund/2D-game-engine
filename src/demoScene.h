@@ -115,7 +115,7 @@ public:
   }
 
   void update(float dt) {
-    _collisionHandler->beforeUpdate(&_gameObjects, &solidTiles);
+    //_collisionHandler->beforeUpdate(&_gameObjects, &solidTiles, _renderer);
 
     for (int i = 0; i < _gameObjects.size(); i ++) {
       _gameObjects[i]->update(dt);
@@ -181,6 +181,8 @@ public:
         _gameObjects[i]->draw(renderer, { (float)camera.x, (float)camera.y });
       }
     }
+    SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
+    _collisionHandler->beforeUpdate(&_gameObjects, &solidTiles, _renderer);
 
     //renderableSystem(renderer);
     //debugSystem(_renderer);

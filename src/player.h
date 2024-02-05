@@ -73,6 +73,7 @@ class Player : public AbstractGameObject {
       _animator.setAnimation("run");
 
       SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
+      this->_collidable.rect = collisionBox;
 
       this->_renderable.texture = texture;
       this->_position = {128,128};

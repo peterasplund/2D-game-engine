@@ -31,11 +31,11 @@ class AbstractGameObject {
       } else {
         v.x = 0;
       }
-      _collidable.rect.w = _collidable.rect.w; // not really correct but wth
-      _collidable.rect.h = _collidable.rect.h; // not really correct but wth
+      //_collidable.rect.w = _collidable.rect.w; // not really correct but wth
+      //_collidable.rect.h = _collidable.rect.h; // not really correct but wth
 
-      _collidable.rect.x = _position.x;
-      _collidable.rect.y = _position.y;
+      //_collidable.rect.x = _position.x;
+      //_collidable.rect.y = _position.y;
     }
 
     // @TODO: only call this for stuff inside the camera rect
