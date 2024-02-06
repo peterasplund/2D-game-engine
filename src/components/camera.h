@@ -29,19 +29,22 @@ struct camera {
     if (pos.y < bounds.y) { pos.y = bounds.y; }
     if (pos.y + viewport.y > bounds.h) { pos.y = bounds.h - viewport.y; }
   }
-};
 
-namespace Camera {
-  void follow(camera *camera, SDL_Rect* subject) {
-    camera->following = subject;
+  void setBounds(v2i bounds) {
+    this->bounds.w = bounds.x;
+    this->bounds.h = bounds.y;
   }
 
-    SDL_Rect getRect(camera *camera) {
-      return {
-        (int)camera->pos.x,
-        (int)camera->pos.y,
-        (int)camera->viewport.x,
-        (int)camera->viewport.y
-      };
-    }
-}
+  void follow(SDL_Rect* subject) {
+    following = subject;
+  }
+
+  SDL_Rect getRect() {
+    return {
+      (int)pos.x,
+      (int)pos.y,
+      (int)viewport.x,
+      (int)viewport.y
+    };
+  }
+};

@@ -23,7 +23,6 @@
 #include "systems/velocitySystem.h"
 #include "systems/animationSystem.h"
 #include "systems/characterControllerSystem.h"
-#include "systems/cameraSystem.h"
 #include "systems/gravitySystem.h"
 #include "systems/debugSystem.h"
 #include "systems/lifetimeSystem.h"
@@ -64,7 +63,7 @@ public:
     //state = new GameState();
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
-    EntityManager::Instance()->setSolidTiles(tilemap->getSolidTiles());
+    EntityManager::Instance()->setTileMap(tilemap);
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
     // tilemap->addTilesToRegistry();
@@ -82,7 +81,8 @@ public:
     player->init(_renderer);
     _gameObjects.push_back(player);
 
-    Camera::follow(&_camera, player->getRectPointer());
+    _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+    _camera.follow(player->getRectPointer());
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
@@ -121,10 +121,9 @@ public:
     for (int i = 0; i < _gameObjects.size(); i ++) {
       _gameObjects[i]->update(dt);
     }
-    //_camera.update();
+    _camera.update();
     /*
     animationSystem(dt);
-    cameraSystem();
 
     characterControllerSystem(InputHandler::Instance(), _renderer);
     gravitySystem(dt);
@@ -155,9 +154,8 @@ public:
       cr = Camera::getRect(&c);
     }
     */
-    //SDL_Rect camera = { 50, 50, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
     SDL_Rect pRect = _gameObjects[0]->getRect();
-    SDL_Rect camera = Camera::getRect(&_camera);
+    SDL_Rect camera = _camera.getRect();
 
     bg1->draw(renderer, -camera.x * 0.04);
     bg2->draw(renderer, -camera.x * 0.2);
@@ -184,7 +182,7 @@ public:
       }
     }
     SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-    _collisionHandler->beforeUpdate(&_gameObjects, EntityManager::Instance()->getSolidTiles(), _renderer);
+    //_collisionHandler->beforeUpdate(&_gameObjects, EntityManager::Instance()->getSolidTiles(), _renderer);
 
     //renderableSystem(renderer);
     //debugSystem(_renderer);

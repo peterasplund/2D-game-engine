@@ -7,6 +7,7 @@
 #include "../components/camera.h"
 
 void debugSystem(SDL_Renderer* renderer) {
+  /*
   auto view = registry.view<renderable, position, collidable>();
 
   for (auto entity : view) {
@@ -32,6 +33,5 @@ void debugSystem(SDL_Renderer* renderer) {
       SDL_RenderDrawRect(renderer, &dr);
     }
   }
+  */
 }
-
-

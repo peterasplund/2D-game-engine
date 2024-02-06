@@ -25,25 +25,24 @@ class AbstractGameObject {
     }
 
     bool collideAt(v2 p, SDL_Rect* outRect) {
-      std::vector<std::vector<bool>>* tiles = EntityManager::Instance()->getSolidTiles();
+      Tilemap* t = EntityManager::Instance()->getTilemap();
+      auto solidTiles = t->getSolidTiles();
       SDL_Rect r = _collidable.addBoundingBox(p);
-      return checkCollision(&r, tiles, outRect);
+      return checkCollision(&r, &solidTiles, outRect);
     }
 
     virtual void update(float dt) {
       auto &v = this->_velocity;
       auto &p = this->_position;
 
-      /*
-      p.x += (v.x / 10) * dt;
-      p.y += (v.y / 10) * dt;
-      */
+      // Collision handling
       if (v.x != 0) {
         SDL_Rect collidedWith;
         float nx = round(p.x + ((v.x / 10) * dt));
         if (collideAt({nx, p.y}, &collidedWith)) {
-          printf("collided with:\n");
-          debugRect(collidedWith);
+          // printf("collided with:\n"); debugRect(collidedWith);
+
+          // One pixel from solid
           p.x = nx > p.x 
             ? collidedWith.x - _collidable.boundingBox.x - _collidable.boundingBox.w - 1
             : collidedWith.x + collidedWith.w - _collidable.boundingBox.x;
@@ -58,8 +57,9 @@ class AbstractGameObject {
         SDL_Rect collidedWith;
         float ny = round(p.y + ((v.y / 10) * dt));
         if (collideAt({p.x, ny}, &collidedWith)) {
-          printf("collided with:\n");
-          debugRect(collidedWith);
+          // printf("collided with:\n"); debugRect(collidedWith);
+
+          // One pixel from solid
           p.y = ny > p.y 
             ? collidedWith.y - _collidable.boundingBox.y - _collidable.boundingBox.h - 1
             : collidedWith.y + collidedWith.h - _collidable.boundingBox.y;
@@ -70,6 +70,7 @@ class AbstractGameObject {
         }
       }
 
+      // Friction
       if (v.x > 0.2) {
         v.x -= v.friction;
       } else if (v.x < -0.2) {

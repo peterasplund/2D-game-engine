@@ -1,13 +1,14 @@
 #pragma once
 
 #include "abstractGameobject.h"
+#include "tilemap.h"
 #include <vector>
 
 class EntityManager {
   static EntityManager* _instance;
   public:
     //std::vector<AbstractGameObject> _entities;
-    std::vector<std::vector<bool>> _solidTiles;
+    Tilemap* _tilemap;
 
     static EntityManager* Instance() {
     if (_instance == NULL) {
@@ -27,8 +28,8 @@ class EntityManager {
     }
     */
 
-    void setSolidTiles(std::vector<std::vector<bool>> x) {
-      _solidTiles = x;
+    void setTileMap(Tilemap* x) {
+      _tilemap = x;
     }
 
     /*
@@ -37,8 +38,8 @@ class EntityManager {
     }
     */
 
-    std::vector<std::vector<bool>>* getSolidTiles() {
-      return &_solidTiles;
+    Tilemap* getTilemap() {
+      return _tilemap;
     }
 
     static void release() {
