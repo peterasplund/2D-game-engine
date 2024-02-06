@@ -1,4 +1,5 @@
 #pragma once
+
 #include "abstractGameobject.h"
 #include "player.h"
 #include "stdafx.h"
@@ -7,6 +8,7 @@
 #include "tilemap.h"
 #include "bg.h"
 #include "systems/collisionSystem.h"
+#include "entityManager.h"
 
 /*
 #include "game/hud.h"
@@ -36,6 +38,7 @@
 #include "objects/batSpawner.h"
 */
 
+
 class DemoScene : public Scene
 {
 private:
@@ -48,7 +51,6 @@ private:
   Bg* bg1;
   Bg* bg2;
   Tilemap* tilemap;
-  std::vector<std::vector<bool>> solidTiles;
 public:
   DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
     _renderer = renderer;
@@ -62,8 +64,7 @@ public:
     //state = new GameState();
     //hud = new Hud(_renderer, state);
     tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
-    //_collisionHandler = new CollisionHandler();
-    solidTiles = tilemap->getSolidTiles();
+    EntityManager::Instance()->setSolidTiles(tilemap->getSolidTiles());
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
     // tilemap->addTilesToRegistry();
@@ -109,18 +110,18 @@ public:
     // Lag bats
     // for (int i = 0; i < 2000; i++) { createBat(_renderer, { 0, 0 }, { 0, 10.0f }); }
 
-    // @TODO: set prevRect to rect in collidable constructor instead.
     // initCollisionSystem();
     _collisionHandler->init(&_gameObjects);
   }
 
   void update(float dt) {
+    _collisionHandler->afterUpdate(&_gameObjects);
     //_collisionHandler->beforeUpdate(&_gameObjects, &solidTiles, _renderer);
 
     for (int i = 0; i < _gameObjects.size(); i ++) {
       _gameObjects[i]->update(dt);
     }
-    _camera.update();
+    //_camera.update();
     /*
     animationSystem(dt);
     cameraSystem();
@@ -128,7 +129,6 @@ public:
     characterControllerSystem(InputHandler::Instance(), _renderer);
     gravitySystem(dt);
     */
-    _collisionHandler->afterUpdate(&_gameObjects);
     /*
     velocitySystem(dt);
     lifetimeSystem(dt);
@@ -140,9 +140,11 @@ public:
     // Run collisions last
     collisionSystem();
     */
+    // _collisionHandler->afterUpdate(&_gameObjects);
   }
 
   void draw(SDL_Renderer* renderer) {
+    
     /*
     auto view = registry.view<camera>();
     camera c;
@@ -182,7 +184,7 @@ public:
       }
     }
     SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-    _collisionHandler->beforeUpdate(&_gameObjects, &solidTiles, _renderer);
+    _collisionHandler->beforeUpdate(&_gameObjects, EntityManager::Instance()->getSolidTiles(), _renderer);
 
     //renderableSystem(renderer);
     //debugSystem(_renderer);

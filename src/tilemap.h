@@ -90,8 +90,8 @@ class Tilemap
       _tilesInTextureX = floor(textureWidth / tileWidth);
       _tilesInTextureY = floor(textureHeight / tileHeight);
 
+      // Prepare _solidTiles 2D vector
       _solidTiles.resize(TILE_MAX_LIMIT);
-
       for (int i = 0; i < TILE_MAX_LIMIT; i++) {
         _solidTiles[i].resize(TILE_MAX_LIMIT);
       }

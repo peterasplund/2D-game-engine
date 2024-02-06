@@ -10,6 +10,8 @@
 #include "../abstractGameobject.h"
 #include <map>
 
+
+/*
 void collisionSystem() {
   auto entities = registry.group<position, velocity>(entt::get<collidable>);
 
@@ -128,6 +130,7 @@ void collisionSystem() {
   //printf("collision calculations: %d\n", calculations);
   //printf("collision outer calculations: %d\n", outerCalculations);
 }
+*/
 
 /*
 void setCollisionSystemPrevCollisionBox() {
@@ -198,12 +201,16 @@ class CollisionHandler {
           int y = floor(c.y / 16);
 
           if (y <= solidTiles->size()) {
-            if (x <= solidTiles[y].size()) {
+            if (x <= solidTiles->at(y).size()) {
+              //if (true) {
               if (solidTiles->at(y).at(x) == true) {
                 // We have an collision
                 cornerCollisions[corner] = { x, y};
                 gotCollision = true;
                 other = { x * 16, y * 16, 16, 16};
+                SDL_Rect c1 { other.x, other.y, other.w, other.h };
+                SDL_RenderDrawRect(renderer, &c1);
+
               }
               else {
                 cornerCollisions[corner] = { -1, -1 };
@@ -216,7 +223,6 @@ class CollisionHandler {
           o->onSolidCollision(other, cornerCollisions);
         }
         else {
-          printf("-\n");
         }
 
 
@@ -227,11 +233,14 @@ class CollisionHandler {
     }
 
     void afterUpdate(std::vector<AbstractGameObject*>* objects) {
+      /*
       // set prev rect for each object
       for(AbstractGameObject* o : *objects) {
+        // o->getRectPointer()->x = o->getPositionPointer()->x; o->getRectPointer()->y = o->getPositionPointer()->y;
         v2 p = o->getPosition();
         SDL_Rect* r = o->getRectPointer();
         o->_collidable.prevRect = { (int)p.x + r->x, (int)p.y + r->y, r->w, r->h };
       }
+      */
     }
 };

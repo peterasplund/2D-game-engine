@@ -21,6 +21,11 @@ class Player : public AbstractGameObject {
     }
 
     void init(SDL_Renderer* renderer) override {
+      AbstractGameObject::init(renderer);
+
+      SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
+      this->_collidable.boundingBox = collisionBox;
+
       setListenForCollisions();
 
       SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
@@ -72,13 +77,8 @@ class Player : public AbstractGameObject {
       
       _animator.setAnimation("run");
 
-      SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
-      this->_collidable.rect = collisionBox;
-
       this->_renderable.texture = texture;
       this->_position = {128,128};
-
-      AbstractGameObject::init(renderer);
     }
 
     void update(float dt) override {
@@ -164,11 +164,15 @@ class Player : public AbstractGameObject {
       AbstractGameObject::draw(renderer, offset);
     }
 
+    /*
     void onSolidCollision(SDL_Rect other, v2i cornerCollisions[4]) override {
+      AbstractGameObject::onSolidCollision(other, cornerCollisions);
+
       // @TODO: run collision resolve function. 
       // That function will be placed somewhere neat.
       printf("Collision!\n");
     }
+    */
 
   protected:
     Animator _animator;
