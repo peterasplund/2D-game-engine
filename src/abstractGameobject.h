@@ -26,13 +26,21 @@ class AbstractGameObject {
 
 
   virtual void update(float dt) {
-    _collidable.moveAndSlideX(&_position, &_velocity, dt);
-    COLLISION_SIDE side = _collidable.moveAndSlideY(&_position, &_velocity, dt);
+    CollisionResponse collisionResponse = _collidable.moveAndSlide(&_position, &_velocity, dt);
     _gravity.update(&_position, &_velocity, dt);
     _collidable.update(_position);
 
     auto &v = _velocity;
     auto &p = _position;
+
+    if (collisionResponse.hasCollision()) {
+      printf("collision: (top: %b, right: %b, bottom: %b, left: %b)\n", 
+        collisionResponse.top, 
+        collisionResponse.right, 
+        collisionResponse.bottom, 
+        collisionResponse.left 
+      );
+    }
 
     // Friction
     if (v.x > 0.2) {
@@ -56,10 +64,10 @@ class AbstractGameObject {
 
     //printf("vel: %f\n", _velocity.y);
     if (_gravity.entityGravity != 0.0f) {
-      if (side == COLLISION_SIDE::BOTTOM) {
+      if (collisionResponse.bottom) {
         _velocity.y = 0;
       }
-      if (side == COLLISION_SIDE::TOP) {
+      if (collisionResponse.top) {
         //printf("on floor\n");
         _gravity.onFloor = true;
         _velocity.y = 0;

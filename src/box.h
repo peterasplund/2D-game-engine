@@ -25,7 +25,7 @@ class Box : public AbstractGameObject {
       this->_renderable.texture = texture;
       this->_renderable.textureRect = this->_collidable.boundingBox;
       this->_position = {64,64};
-      this->_velocity.friction = 5.0f;
+      // this->_velocity.friction = 5.0f;
     }
 
     void update(float dt) override {
@@ -45,6 +45,9 @@ class Box : public AbstractGameObject {
       }
 
       AbstractGameObject::update(dt);
+
+      _velocity.x = 0;
+      _velocity.y = 0;
     }
 
     void draw(SDL_Renderer* renderer, v2 offset) override {
