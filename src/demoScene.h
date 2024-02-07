@@ -2,12 +2,11 @@
 
 #include "abstractGameobject.h"
 #include "player.h"
+#include "box.h"
 #include "stdafx.h"
-#include <vector>
 #include "scene.h"
 #include "tilemap.h"
 #include "bg.h"
-#include "systems/collisionSystem.h"
 #include "entityManager.h"
 
 /*
@@ -42,7 +41,6 @@ class DemoScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
-  CollisionHandler* _collisionHandler;
   //Hud* hud;
   //GameState* state;
   camera _camera;
@@ -62,7 +60,8 @@ public:
 
     //state = new GameState();
     //hud = new Hud(_renderer, state);
-    tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    tilemap = new Tilemap("assets/maps/collision_test.tmx", _renderer);
     EntityManager::Instance()->setTileMap(tilemap);
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
 
@@ -79,10 +78,16 @@ public:
     
     Player* player = new Player();
     player->init(_renderer);
-    _gameObjects.push_back(player);
+
+    Box* box = new Box();
+    box->init(_renderer);
+
+    //_gameObjects.push_back(player);
+    _gameObjects.push_back(box);
 
     _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
-    _camera.follow(player->getRectPointer());
+    // _camera.follow(player->getRectPointer());
+    _camera.follow(box->getRectPointer());
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
@@ -109,15 +114,9 @@ public:
 
     // Lag bats
     // for (int i = 0; i < 2000; i++) { createBat(_renderer, { 0, 0 }, { 0, 10.0f }); }
-
-    // initCollisionSystem();
-    _collisionHandler->init(&_gameObjects);
   }
 
   void update(float dt) {
-    _collisionHandler->afterUpdate(&_gameObjects);
-    //_collisionHandler->beforeUpdate(&_gameObjects, &solidTiles, _renderer);
-
     for (int i = 0; i < _gameObjects.size(); i ++) {
       _gameObjects[i]->update(dt);
     }
@@ -135,11 +134,7 @@ public:
 
     batSpawnerSystem(_renderer);
     skeletonAISystem();
-
-    // Run collisions last
-    collisionSystem();
     */
-    // _collisionHandler->afterUpdate(&_gameObjects);
   }
 
   void draw(SDL_Renderer* renderer) {
@@ -157,8 +152,8 @@ public:
     SDL_Rect pRect = _gameObjects[0]->getRect();
     SDL_Rect camera = _camera.getRect();
 
-    bg1->draw(renderer, -camera.x * 0.04);
-    bg2->draw(renderer, -camera.x * 0.2);
+    //bg1->draw(renderer, -camera.x * 0.04);
+    //bg2->draw(renderer, -camera.x * 0.2);
 
     //printf("x: %d\ty: %d\tw: %d\th: %d\n", camera.x, camera.y, camera.w, camera.h);
     std::vector<Tile>* tiles = tilemap->getTiles();
@@ -182,8 +177,6 @@ public:
       }
     }
     SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-    //_collisionHandler->beforeUpdate(&_gameObjects, EntityManager::Instance()->getSolidTiles(), _renderer);
-
     //renderableSystem(renderer);
     //debugSystem(_renderer);
 

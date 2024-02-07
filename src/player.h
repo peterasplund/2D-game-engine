@@ -23,8 +23,10 @@ class Player : public AbstractGameObject {
     void init(SDL_Renderer* renderer) override {
       AbstractGameObject::init(renderer);
 
-      SDL_Rect collisionBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
-      this->_collidable.boundingBox = collisionBox;
+      this->_collidable.boundingBox = { 
+        14, 15, 
+        22, 31 
+      };
 
       setListenForCollisions();
 
@@ -82,8 +84,6 @@ class Player : public AbstractGameObject {
     }
 
     void update(float dt) override {
-      // temp
-      _velocity.y = 0.0f;
       InputHandler* inputHandler = InputHandler::Instance();
       _renderable.textureRect = _animator.getFrame();
       _renderable.texture = _animator.getTexture();
@@ -97,18 +97,20 @@ class Player : public AbstractGameObject {
       }
 
       if (state != S_ATTACK) {
-        if (state != S_JUMP && inputHandler->isHeld(BUTTON::JUMP) && (/*g.onFloor || */state == S_SLIDE)) {
+        if (state != S_JUMP && inputHandler->isHeld(BUTTON::JUMP) && (_gravity.onFloor || state == S_SLIDE)) {
           state = S_JUMP;
           _velocity.y = -jumpPower;
         }
 
         // temp move up/down
+        /*
         if (inputHandler->isHeld(BUTTON::UP)) {
           _velocity.y = -runSpeed;
         }
         else if (inputHandler->isHeld(BUTTON::DOWN)) {
           _velocity.y = runSpeed;
         }
+        */
 
         if (state != S_SLIDE) {
           if (inputHandler->isHeld(BUTTON::LEFT)) {
@@ -156,6 +158,11 @@ class Player : public AbstractGameObject {
         slideTimer.reset();
       }
       */
+
+      // die and respawn when falling of level
+      if (_position.y > 370.0f) {
+        _position.y = -(float)_renderable.textureRect.h;
+      }
 
       AbstractGameObject::update(dt);
     }
