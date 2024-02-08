@@ -9,6 +9,7 @@
 
 enum class GAME_OBJECT {
   PLAYER,
+  DOOR,
 };
 
 enum class OBJECT_TAG {

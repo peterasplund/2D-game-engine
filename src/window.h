@@ -67,6 +67,9 @@ private:
 
     _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
+
+
     if (_renderer == nullptr) {
       std::cerr << "Failed to create renderer.\n";
       return 0;

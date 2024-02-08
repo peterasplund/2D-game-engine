@@ -8,7 +8,8 @@ enum BUTTON {
   DOWN,
   LEFT,
   JUMP,
-  ATTACK
+  ATTACK,
+  MENU,
 };
 
 class InputHandler

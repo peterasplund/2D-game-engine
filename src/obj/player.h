@@ -81,7 +81,7 @@ namespace obj {
         _animator.setAnimation("idle");
 
         this->_renderable.texture = texture;
-        this->_position = {128,128};
+        //this->_position = {128,128};
       }
 
       void update(float dt) override {

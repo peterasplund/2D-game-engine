@@ -35,4 +35,3 @@ struct v2i
     return { x - a.x, y - a.y };
   }
 };
-

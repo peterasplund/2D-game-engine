@@ -1,84 +1,90 @@
 #pragma once
 
-#include "stdafx.h"
-#include "abstractGameobject.h"
-#include "./obj/player.h"
-#include "box.h"
-#include "scene.h"
-#include "tilemap.h"
-#include "bg.h"
-#include "entityManager.h"
+#include "../stdafx.h"
+#include "../abstractGameobject.h"
+#include "../obj/player.h"
+#include "../obj/door.h"
+#include "../scene.h"
+#include "../tilemap.h"
+#include "../bg.h"
+#include "../entityManager.h"
+#include <string>
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 AbstractGameObject* instantiateGameObject(GAME_OBJECT obj) {
+  AbstractGameObject* o;
   switch (obj) {
     case GAME_OBJECT::PLAYER:
-      obj::Player* p = new obj::Player();
-      return p;
+      o = new obj::Player();
+      break;
+    case GAME_OBJECT::DOOR:
+      o = new obj::Door();
+      break;
   }
-  return nullptr;
-}
 
+  return o;
+}
 
 static std::map<std::string, GAME_OBJECT> gameObjects;
 
-class DemoScene : public Scene
+class GameplayScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
-  //Hud* hud;
-  //GameState* state;
   camera _camera;
   std::vector<AbstractGameObject*> _gameObjects;
   Bg* bg1;
   Bg* bg2;
   Tilemap* tilemap;
+  std::string _level;
 public:
-  DemoScene(SDL_Renderer* renderer) : Scene(renderer) {
+  GameplayScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
     _renderer = renderer;
+    _level = level;
   }
 
   void init() {
     gameObjects = {
       { "player", GAME_OBJECT::PLAYER },
+      { "door", GAME_OBJECT::DOOR },
     };
 
-    //state = new GameState();
-    //hud = new Hud(_renderer, state);
-    tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
+    char levelName[32];
+    sprintf(levelName, "assets/maps/%s.tmx", _level.c_str());
+    tilemap = new Tilemap(levelName, _renderer);
     EntityManager::Instance()->setTileMap(tilemap);
-    //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
-    
-    obj::Player* player = new obj::Player();
-    player->init(_renderer);
-
-    //Box* box = new Box();
-    //box->init(_renderer);
-
-    _gameObjects.push_back(player);
-    //_gameObjects.push_back(box);
 
     _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
-    //_camera.follow(box->getRectPointer());
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
-    bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);
+    bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);;
 
 
     std::vector<TiledObject> objects = tilemap->getObjects();
+    obj::Player* player;
     for (TiledObject o : objects) {
+      if (!gameObjects.count(o.name)) {
+        printf("Warning: Object \"%s\" is not mapped in game engine\n", o.name.c_str());
+        continue;
+      }
+
       GAME_OBJECT objType = gameObjects.find(o.name)->second;
 
-      AbstractGameObject* object = instantiateGameObject(objType);
 
-      /*
+      AbstractGameObject* object = instantiateGameObject(objType);
       if (object != nullptr) {
+        object->_position = o.position;
+        object->init(_renderer);
+
+        if (object->getType() == GAME_OBJECT::PLAYER) {
+          player = (obj::Player*)object;
+        }
+
         _gameObjects.push_back(object);
       }
-      */
     }
 
-     _camera.follow(player->getRectPointer());
+    _camera.follow(player->getRectPointer());
   }
 
   void update(float dt) {
@@ -95,14 +101,6 @@ public:
     bg1->draw(renderer, -camera.x * 0.04);
     bg2->draw(renderer, -camera.x * 0.2);
 
-    // Draw objects
-    for (int i = 0; i < _gameObjects.size(); i ++) {
-      SDL_Rect objRect = _gameObjects[i]->getRect();
-      if (SDL_HasIntersection(&camera, &objRect)) {
-        _gameObjects[i]->draw(renderer, { (float)camera.x, (float)camera.y });
-      }
-    }
-
     // Draw tiles
     for (int i = 0; i < tilemap->getTiles()->size(); i ++) {
       Tile t = tilemap->getTiles()->at(i);
@@ -116,7 +114,13 @@ public:
       }
     }
 
-    SDL_RenderPresent(renderer);
-
+    // @TODO: handle drawing some tiles after objects depending on their z-setting in the tmx-format
+    // Draw objects
+    for (int i = 0; i < _gameObjects.size(); i ++) {
+      SDL_Rect objRect = _gameObjects[i]->getRect();
+      if (SDL_HasIntersection(&camera, &objRect)) {
+        _gameObjects[i]->draw(renderer, { (float)camera.x, (float)camera.y });
+      }
+    }
   }
 };
