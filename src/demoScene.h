@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "abstractGameobject.h"
-#include "player.h"
+#include "./obj/player.h"
 #include "box.h"
 #include "scene.h"
 #include "tilemap.h"
@@ -13,7 +13,7 @@
 AbstractGameObject* instantiateGameObject(GAME_OBJECT obj) {
   switch (obj) {
     case GAME_OBJECT::PLAYER:
-      Player* p = new Player();
+      obj::Player* p = new obj::Player();
       return p;
   }
   return nullptr;
@@ -49,7 +49,7 @@ public:
     EntityManager::Instance()->setTileMap(tilemap);
     //tilemap = new Tilemap("assets/maps/demo3.tmx", _renderer);
     
-    Player* player = new Player();
+    obj::Player* player = new obj::Player();
     player->init(_renderer);
 
     //Box* box = new Box();

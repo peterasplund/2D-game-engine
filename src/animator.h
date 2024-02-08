@@ -61,10 +61,16 @@ class Animator
     }
 
     SDL_Rect getFrame() {
+      if (_currentAnimation.empty()) {
+        printf("Error: No animation available at _currentAnimation\n");
+        return {};
+      }
+
       if (_animations[_currentAnimation] != nullptr) {
         return _animations[_currentAnimation]->getFrame(timer);
       }
 
+      printf("Error: No animation available at _currentAnimation\n");
       return {};
     }
 

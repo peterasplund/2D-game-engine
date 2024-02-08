@@ -26,7 +26,7 @@ class collidable {
     collidable();
     collidable(v2 position, SDL_Rect boundingBox);
     bool checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* solidTiles, SDL_Rect* outRect);
-    bool collideAt(v2 p, SDL_Rect* outRect, v2i subtract);
+    bool collideAt(v2 p, SDL_Rect* outRect);
     SDL_Rect addBoundingBox(v2 p);
     void update(v2 position);
     CollisionResponse moveAndSlide(v2* position, velocity* velocity, float dt);

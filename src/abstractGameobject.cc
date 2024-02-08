@@ -10,21 +10,10 @@ void AbstractGameObject::init(SDL_Renderer* renderer) {
 
 
 void AbstractGameObject::update(float dt) {
-  CollisionResponse collisionResponse = _collidable.moveAndSlide(&_position, &_velocity, dt);
-  _gravity.update(&_position, &_velocity, dt);
   _collidable.update(_position);
 
   auto &v = _velocity;
   auto &p = _position;
-
-  if (collisionResponse.hasCollision()) {
-    printf("collision: (top: %b, right: %b, bottom: %b, left: %b)\n", 
-      collisionResponse.top, 
-      collisionResponse.right, 
-      collisionResponse.bottom, 
-      collisionResponse.left 
-    );
-  }
 
   // Friction
   if (v.x > 0.2) {
@@ -45,26 +34,8 @@ void AbstractGameObject::update(float dt) {
       v.y = 0;
     }
   }
-
-  //printf("vel: %f\n", _velocity.y);
-  if (_gravity.entityGravity != 0.0f) {
-    // Set on floor to false if not ground below
-    if (collisionResponse.bottom) {
-      _velocity.y = 0;
-    }
-    if (collisionResponse.top) {
-      //printf("on floor\n");
-      _gravity.onFloor = true;
-      _velocity.y = 0;
-    }
-    else {
-      _gravity.onFloor = false;
-    }
-  }
-
 }
 
-  // @TODO: only call this for stuff inside the camera rect
 void AbstractGameObject::draw(SDL_Renderer* renderer, v2 offset) {
   // @TODO: add vectors instead
   _renderable.render(renderer, this->_position - offset);
@@ -80,9 +51,6 @@ bool AbstractGameObject::contains(SDL_Rect other) {
 
 bool AbstractGameObject::contains(AbstractGameObject other) {
   return SDL_HasIntersection(&_collidable.rect, &other._collidable.rect);
-}
-
-void AbstractGameObject::onSolidCollision(SDL_Rect other) {
 }
 
 SDL_Rect AbstractGameObject::getRect() {

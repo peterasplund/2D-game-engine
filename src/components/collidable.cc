@@ -31,10 +31,12 @@ bool collidable::checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* sol
     if (y <= solidTiles->size()) {
       if (x <= solidTiles->at(y).size()) {
         if (solidTiles->at(y).at(x) == true) {
-          outRect->x = x * 16;
-          outRect->y = y * 16;
-          outRect->w = 16;
-          outRect->h = 16;
+          if (outRect != nullptr) {
+            outRect->x = x * 16;
+            outRect->y = y * 16;
+            outRect->w = 16;
+            outRect->h = 16;
+          }
 
           return true;
         }
@@ -45,7 +47,7 @@ bool collidable::checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* sol
   return false;
 }
 
-bool collidable::collideAt(v2 p, SDL_Rect* outRect, v2i subtract) {
+bool collidable::collideAt(v2 p, SDL_Rect* outRect) {
   Tilemap* t = EntityManager::Instance()->getTilemap();
   if (t == nullptr) {
     return false;
@@ -89,7 +91,7 @@ CollisionResponse collidable::moveAndSlide(v2* position, velocity* velocity, flo
     while (i < pixelsToMove) {
       float newY = p.y + ((i + 1) * sign);
       i += 1;
-      if (collideAt({round(p.x), newY}, &collidedWith, { 0, -1 })) {
+      if (collideAt({round(p.x), newY}, &collidedWith)) {
         if (newY > p.y) {
           position->y = round(collidedWith.y - boundingBox.y - boundingBox.h);
           respnse.top = true;
@@ -118,7 +120,7 @@ CollisionResponse collidable::moveAndSlide(v2* position, velocity* velocity, flo
     while (i < pixelsToMove) {
       float newX = p.x + ((i + 1) * sign);
       i += 1;
-      if (collideAt({newX, round(p.y)}, &collidedWith, { 0, -1 })) {
+      if (collideAt({newX, round(p.y)}, &collidedWith)) {
         if (newX > p.x) {
           position->x = round(collidedWith.x - boundingBox.x - boundingBox.w);
           respnse.left = true;
