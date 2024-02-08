@@ -1,17 +1,17 @@
 #pragma once
 
-#include "abstractGameobject.h"
+//#include "abstractGameobject.h"
 #include "tilemap.h"
 #include <vector>
 
 class EntityManager {
-  static EntityManager* _instance;
   public:
     //std::vector<AbstractGameObject> _entities;
     Tilemap* _tilemap;
 
     static EntityManager* Instance() {
-    if (_instance == NULL) {
+      static EntityManager* _instance = nullptr;
+      if (_instance == nullptr) {
         _instance = new EntityManager();
       }
 
@@ -43,9 +43,5 @@ class EntityManager {
     }
 
     static void release() {
-      delete _instance;
-      _instance = NULL;
     }
 };
-
-EntityManager* EntityManager::_instance = 0;

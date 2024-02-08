@@ -182,6 +182,7 @@ class Player : public AbstractGameObject {
     */
 
   protected:
+    GAME_OBJECT _type = GAME_OBJECT::PLAYER;
     Animator _animator;
 
     float jumpPower = 6.0f;

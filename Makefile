@@ -7,8 +7,8 @@ BIN=./bin
 
 .PHONY: default all clean
 
-OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(wildcard $(SRC)/*.cc))
-HEADERS = $(wildcard $(SRC)*.h)
+OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(wildcard $(SRC)/*.cc) $(wildcard $(SRC)/**/*.cc) lib/pugixml-1.10/src/pugixml.cpp)
+HEADERS = $(wildcard $(SRC)*.h lib/pugixml-1.0/src/pugixml.hpp)
 
 default: clean $(TARGET) copyassets #run
 all: default
@@ -26,6 +26,7 @@ copyassets: ./assets
 
 clean:
 		-rm -rf $(BIN)/*
+		-mkdir $(BIN)/components
 
 
 #.PHONY: run

@@ -1,11 +1,11 @@
 #pragma once
+
 #include "stdafx.h"
 #include <map>
 
 class AssetManager
 {
 private:
-  static AssetManager* _instance;
   std::map<std::string, SDL_Texture*> _textures;
   SDL_Renderer* _renderer;
 
@@ -46,23 +46,15 @@ private:
 
 public:
   static AssetManager* Instance(SDL_Renderer* renderer) {
-    if (_instance == 0) {
+    static AssetManager* _instance = nullptr;
+    if (_instance == nullptr) {
       _instance = new AssetManager(renderer);
     }
 
     return _instance;
   }
-  static AssetManager* Instance() {
-    if (_instance != 0) {
-      return _instance;
-    }
-
-    return NULL;
-  }
 
   static void release() {
-    delete _instance;
-    _instance = NULL;
   }
 
   SDL_Texture* getTexture(std::string filename) {
@@ -75,5 +67,3 @@ public:
     return _textures[fullPath];
   }
 };
-
-AssetManager* AssetManager::_instance = 0;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../lib/pugixml-1.10/src/pugixml.hpp"
 #include "stdafx.h"
 #include <optional>
 #include <vector>
