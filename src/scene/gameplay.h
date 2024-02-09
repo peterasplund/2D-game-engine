@@ -37,6 +37,7 @@ private:
   Bg* bg2;
   Tilemap* tilemap;
   std::string _level;
+  bool loaded = false;
 public:
   GameplayScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
     _renderer = renderer;
@@ -44,17 +45,27 @@ public:
   }
 
   void init() {
+    if (tilemap != nullptr) {
+      delete tilemap;
+    }
+
+    char levelName[32];
+    sprintf(levelName, "assets/maps/%s.tmx", _level.c_str());
+
+    tilemap = new Tilemap(levelName, _renderer);
+    EntityManager::Instance()->setTileMap(tilemap);
+
+    _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+
+    if (loaded) {
+      return;
+    }
+
     gameObjects = {
       { "player", GAME_OBJECT::PLAYER },
       { "door", GAME_OBJECT::DOOR },
     };
 
-    char levelName[32];
-    sprintf(levelName, "assets/maps/%s.tmx", _level.c_str());
-    tilemap = new Tilemap(levelName, _renderer);
-    EntityManager::Instance()->setTileMap(tilemap);
-
-    _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
 
     bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
     bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);;
@@ -85,6 +96,7 @@ public:
     }
 
     _camera.follow(player->getRectPointer());
+    loaded = true;
   }
 
   void update(float dt) {

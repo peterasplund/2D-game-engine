@@ -4,7 +4,6 @@
 #include "../animator.h"
 #include "../assetManager.h"
 #include "../inputHandler.h"
-#include "../components/animator.h"
 
 namespace obj {
   enum class State {

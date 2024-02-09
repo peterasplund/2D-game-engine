@@ -13,7 +13,7 @@ int max(int a, int b) {
   return a > b ? a : b;
 }
 
-const int FADE_SPEED = 4;
+const int FADE_SPEED = 8;
 
 enum class Transition {
   FADE,
@@ -111,6 +111,13 @@ public:
   bool gotoScene(std::string name, Transition transition) {
     if (_scenes[name] == nullptr) {
       return false;
+    }
+    
+    // Just go to scene directly if it's the first one
+    if (_current.empty()) {
+      _current = name;
+      ((Scene*)_scenes[_current])->init();
+      return true;
     }
 
     switch (transition) {

@@ -2,15 +2,20 @@
 
 #include "../stdafx.h"
 #include "../globals.h"
-#include "position.h"
 #include "../math.h"
 
 struct camera {
-  v2 viewport = { WINDOW_WIDTH / WINDOW_ZOOM, WINDOW_HEIGHT / WINDOW_ZOOM }; // viewport size. In this case same as window size. Make this less tall later when implementing the HUD.
+  v2i viewport; // viewport size. In this case same as window size. Make this less tall later when implementing the HUD.
   SDL_Rect bounds = { 0, 0, 2000, 352 }; // clamping bounds. Limit camera position within
   v2 pos = { 0, 0 }; // viewport size. In this case same as window size. Make this less tall when implementing the HUD.
   SDL_Rect* following; // entity to follow, eg. the player
   float zoom = 1.0f; // camera zoom
+
+  camera() {
+    int x = std::round(WINDOW_WIDTH / WINDOW_ZOOM);
+    int y = std::round(WINDOW_HEIGHT / WINDOW_ZOOM);
+    viewport = { x, y };
+  }
 
   void update() {
     float px, py, pw, ph;
@@ -20,8 +25,8 @@ struct camera {
     px = following->x;
     py = following->y;
 
-    pos.x = px + (pw / 2) - (viewport.x / 2);
-    pos.y = py + (ph / 2) - (viewport.y / 2);
+    pos.x = px + (pw / 2) - std::round(viewport.x / 2);
+    pos.y = py + (ph / 2) - std::round(viewport.y / 2);
 
     // clamp within bounds
     if (pos.x < bounds.x) { pos.x = bounds.x; }
@@ -43,8 +48,8 @@ struct camera {
     return {
       (int)pos.x,
       (int)pos.y,
-      (int)viewport.x,
-      (int)viewport.y
+      viewport.x,
+      viewport.y
     };
   }
 };

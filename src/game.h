@@ -27,18 +27,13 @@ public: Game() {
 
     GameplayScene* _gameplayScene = new GameplayScene(renderer, "demo3");
     GameplayScene* _gameplayScene2 = new GameplayScene(renderer, "demo4");
+
     _sceneManager->addScene("gameplay", _gameplayScene);
     _sceneManager->addScene("gameplay2", _gameplayScene2);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
 
-    int i = 0;
     while (!window.isClosed()) {
-      // tmp test
-      if (i == 120) {
-      }
-
-      i++;
       LAST = NOW;
       NOW = SDL_GetPerformanceCounter();
       

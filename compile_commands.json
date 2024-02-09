@@ -135,11 +135,11 @@
       "-x",
       "c++",
       "-o",
-      "/tmp/pugixml-a1c0e2.o",
+      "/tmp/pugixml-050492.o",
       "lib/pugixml-1.10/src/pugixml.cpp"
     ],
     "directory": "/home/peter/code/sdl-game",
     "file": "/home/peter/code/sdl-game/lib/pugixml-1.10/src/pugixml.cpp",
-    "output": "/tmp/pugixml-a1c0e2.o"
+    "output": "/tmp/pugixml-050492.o"
   }
 ]

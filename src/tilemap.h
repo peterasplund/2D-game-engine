@@ -15,8 +15,6 @@
 #include "assetManager.h"
 #include "components/camera.h"
 #include "components/collidable.h"
-#include "components/solid.h"
-#include "components/renderable.h"
 
 #define TILE_MAX_LIMIT 1024
 

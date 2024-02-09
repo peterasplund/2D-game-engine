@@ -11,7 +11,6 @@ class Renderable {
     void render(SDL_Renderer* renderer, v2 position) {
       SDL_Rect sr = textureRect;
       SDL_Rect dr = { (int)round(position.x), (int)round(position.y), sr.w, sr.h };
-      //SDL_Rect dr = { (int)round(p.x - cameraPos.x), (int)round(p.y - cameraPos.y), sr.w, sr.h };
 
       SDL_RenderCopyEx(renderer, texture, &sr, &dr, 0, 0, textureFlip);
     }
