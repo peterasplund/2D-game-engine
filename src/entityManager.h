@@ -9,14 +9,7 @@ class EntityManager {
     //std::vector<AbstractGameObject> _entities;
     Tilemap* _tilemap;
 
-    static EntityManager* Instance() {
-      static EntityManager* _instance = nullptr;
-      if (_instance == nullptr) {
-        _instance = new EntityManager();
-      }
-
-      return _instance;
-    }
+    static EntityManager* Instance();
 
     /*
     void setEntites(std::vector<AbstractGameObject> x) {
@@ -28,9 +21,7 @@ class EntityManager {
     }
     */
 
-    void setTileMap(Tilemap* x) {
-      _tilemap = x;
-    }
+    void setTileMap(Tilemap* x);
 
     /*
     std::vector<AbstractGameObject>* getEntities() {
@@ -38,10 +29,7 @@ class EntityManager {
     }
     */
 
-    Tilemap* getTilemap() {
-      return _tilemap;
-    }
+    Tilemap* getTilemap();
 
-    static void release() {
-    }
+    static void release();
 };
