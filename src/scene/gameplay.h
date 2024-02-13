@@ -45,9 +45,11 @@ public:
   }
 
   void init() {
+    /*
     if (tilemap != nullptr) {
       delete tilemap;
     }
+    */
 
     char levelName[32];
     sprintf(levelName, "assets/maps/%s.tmx", _level.c_str());

@@ -29,8 +29,8 @@ struct camera {
     px = following->x;
     py = following->y;
 
-    pos.x = px + (pw / 2) - std::round(viewport.x / 2);
-    pos.y = py + (ph / 2) - std::round(viewport.y / 2);
+    pos.x = px + (pw / 2) - round(viewport.x / 2);
+    pos.y = py + (ph / 2) - round(viewport.y / 2);
 
     // clamp within bounds
     if (pos.x < bounds.x) { pos.x = bounds.x; }
