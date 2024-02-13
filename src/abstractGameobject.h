@@ -1,22 +1,13 @@
 #pragma once
 
-#include "stdafx.h"
 #include "components/renderable.h"
 #include "components/velocity.h"
 #include "components/gravity.h"
 #include "components/collidable.h"
+#include "globals.h"
 #include "math.h"
 
-enum class GAME_OBJECT {
-  PLAYER,
-  DOOR,
-};
-
-enum class OBJECT_TAG {
-  SOLID,
-};
-
-void debugRect(SDL_Rect r);
+class collidable;
 
 class AbstractGameObject {
   public:
@@ -32,11 +23,11 @@ class AbstractGameObject {
     }
     virtual void handleEvent(SDL_Event* event) {};
     void setListenForCollisions();
-    virtual bool contains(SDL_Rect other);
+    virtual bool contains(Rect other);
     virtual bool contains(AbstractGameObject other);
     virtual void onCollision(AbstractGameObject* other) {}; // @TODO: connect this
-    SDL_Rect getRect();
-    SDL_Rect* getRectPointer();
+    Rect getRect();
+    Rect* getRectPointer();
     v2 getPosition();
     v2* getPositionPointer();
     bool getListensForCollisions();

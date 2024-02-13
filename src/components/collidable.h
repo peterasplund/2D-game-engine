@@ -20,14 +20,14 @@ struct CollisionResponse {
 
 class collidable {
   public:
-    SDL_Rect boundingBox;
-    SDL_Rect rect;
+    Rect boundingBox;
+    Rect rect;
 
     collidable();
-    collidable(v2 position, SDL_Rect boundingBox);
-    bool checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* solidTiles, SDL_Rect* outRect);
-    bool collideAt(v2 p, SDL_Rect* outRect);
-    SDL_Rect addBoundingBox(v2 p);
+    collidable(v2 position, Rect boundingBox);
+    bool checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTiles, Rect* outRect);
+    bool collideAt(v2 p, Rect* outRect);
+    Rect addBoundingBox(v2 p);
     void update(v2 position);
     CollisionResponse moveAndSlide(v2* position, velocity* velocity, float dt);
 };

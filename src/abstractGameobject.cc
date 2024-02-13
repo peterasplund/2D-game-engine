@@ -1,11 +1,7 @@
 #include "abstractGameobject.h"
 
-void debugRect(SDL_Rect r) {
-  printf("(x: %d\ty: %d\tw: %d\th: %d)\n", r.x, r.y, r.w, r.h);
-}
-
 void AbstractGameObject::init(SDL_Renderer* renderer) {
-  _collidable = collidable(_position, _renderable.textureRect);
+  _collidable = collidable(_position, Rect::from_sdl_rect(_renderable.textureRect));
 }
 
 
@@ -45,15 +41,15 @@ void AbstractGameObject::setListenForCollisions() {
   _listenForCollisions = true;
 }
 
-bool AbstractGameObject::contains(SDL_Rect other) {
-  return SDL_HasIntersection(&_collidable.rect, &other);
+bool AbstractGameObject::contains(Rect other) {
+  return _collidable.rect.hasIntersection(&other);
 }
 
 bool AbstractGameObject::contains(AbstractGameObject other) {
-  return SDL_HasIntersection(&_collidable.rect, &other._collidable.rect);
+  return _collidable.rect.hasIntersection(&other._collidable.rect);
 }
 
-SDL_Rect AbstractGameObject::getRect() {
+Rect AbstractGameObject::getRect() {
   return {
     (int)_position.x,
     (int)_position.y,
@@ -62,7 +58,7 @@ SDL_Rect AbstractGameObject::getRect() {
   };
 }
 
-SDL_Rect* AbstractGameObject::getRectPointer() {
+Rect* AbstractGameObject::getRectPointer() {
   return &this->_collidable.rect;
 }
 

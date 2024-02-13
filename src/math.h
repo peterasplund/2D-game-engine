@@ -35,3 +35,48 @@ struct v2i
     return { x - a.x, y - a.y };
   }
 };
+
+struct Rect {
+  int x;
+  int y;
+  int w;
+  int h;
+
+  int top() { return y; }
+  int bottom() { return y + h; }
+  int left() { return x; }
+  int right() { return x + w; }
+
+  bool hasIntersection(Rect* other) {
+    if (right() >= other->x && x <= other->right()) {
+      if (bottom() >= other->y && y <= other->bottom()) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  static Rect from_sdl_rect(SDL_Rect r) {
+    return Rect {
+      r.x,
+      r.y,
+      r.w,
+      r.h,
+    };
+  }
+
+  SDL_Rect to_sdl_rect() {
+    return SDL_Rect {
+      this->x,
+      this->y,
+      this->w,
+      this->h,
+    };
+  }
+
+  // @TODO: place this behind compiler flag
+  void debug() {
+    printf("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
+  }
+};

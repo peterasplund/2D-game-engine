@@ -8,7 +8,7 @@ struct camera {
   v2i viewport; // viewport size. In this case same as window size. Make this less tall later when implementing the HUD.
   SDL_Rect bounds = { 0, 0, 2000, 352 }; // clamping bounds. Limit camera position within
   v2 pos = { 0, 0 }; // viewport size. In this case same as window size. Make this less tall when implementing the HUD.
-  SDL_Rect* following; // entity to follow, eg. the player
+  Rect* following; // entity to follow, eg. the player
   float zoom = 1.0f; // camera zoom
 
   camera() {
@@ -18,6 +18,10 @@ struct camera {
   }
 
   void update() {
+    if (following == nullptr) {
+      return;
+    }
+
     float px, py, pw, ph;
 
     pw = following->w;
@@ -40,11 +44,11 @@ struct camera {
     this->bounds.h = bounds.y;
   }
 
-  void follow(SDL_Rect* subject) {
+  void follow(Rect* subject) {
     following = subject;
   }
 
-  SDL_Rect getRect() {
+  Rect getRect() {
     return {
       (int)pos.x,
       (int)pos.y,

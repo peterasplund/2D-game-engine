@@ -23,6 +23,8 @@ namespace obj {
       void init(SDL_Renderer* renderer) override {
         AbstractGameObject::init(renderer);
 
+        _tag = OBJECT_TAG::PLAYER;
+
         this->_collidable.boundingBox = { 
           14, 15, 
           22, 31 
@@ -80,7 +82,6 @@ namespace obj {
         _animator.setAnimation("idle");
 
         this->_renderable.texture = texture;
-        //this->_position = {128,128};
       }
 
       void update(float dt) override {
@@ -222,7 +223,7 @@ namespace obj {
       Timer slideTimer;
       Timer hurtTimer;
 
-      SDL_Rect hurtBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
-      SDL_Rect hurtBoxSliding = { (int)14.0f, (int)15 + 26, (int)22.0f, (int)5.0f };
+      //SDL_Rect hurtBox = { (int)14.0f, (int)15.0f, (int)22.0f, (int)31.0f };
+      //SDL_Rect hurtBoxSliding = { (int)14.0f, (int)15 + 26, (int)22.0f, (int)5.0f };
   };
 }

@@ -2,8 +2,9 @@ SDL Game engine
 
 TODO:
 
-- Make collision detection code cleaner.
-- Refactor into separate header files
+- Event system
+- Map manager with transition
+- Read Tiled documentation to come up with a standard way to handle levels
 
 deps:
 - SDL2-2.0.10

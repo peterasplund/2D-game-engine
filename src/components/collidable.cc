@@ -2,11 +2,11 @@
 
 collidable::collidable() { }
 
-collidable::collidable(v2 position, SDL_Rect boundingBox) {
+collidable::collidable(v2 position, Rect boundingBox) {
   this->boundingBox = boundingBox;
 }
 
-bool collidable::checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* solidTiles, SDL_Rect* outRect) {
+bool collidable::checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTiles, Rect* outRect) {
   // Don't bother checking if the rect is completely outside the map
   if (r->y + r->h <= 0 || r->x + r->w <= 0) {
     outRect = nullptr;
@@ -14,10 +14,10 @@ bool collidable::checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* sol
   }
 
   v2i corners[4] = { 
-    { r->x,            r->y },        // Top left
-    { r->x + r->w - 1, r->y },        // Top right
-    { r->x,            r->y + r->h - 1 }, // Bottom left
-    { r->x + r->w - 1, r->y + r->h - 1 }  // Bottom right
+    { r->x,           r->y },        // Top left
+    { r->right() - 1, r->y },        // Top right
+    { r->x,           r->bottom() - 1 }, // Bottom left
+    { r->right() - 1, r->y + r->h - 1 }  // Bottom right
   };
 
 
@@ -47,19 +47,19 @@ bool collidable::checkCollision(SDL_Rect* r, std::vector<std::vector<bool>>* sol
   return false;
 }
 
-bool collidable::collideAt(v2 p, SDL_Rect* outRect) {
+bool collidable::collideAt(v2 p, Rect* outRect) {
   Tilemap* t = EntityManager::Instance()->getTilemap();
   if (t == nullptr) {
     return false;
   }
 
   auto solidTiles = t->getSolidTiles();
-  SDL_Rect r = addBoundingBox(p);
+  Rect r = addBoundingBox(p);
   return checkCollision(&r, &solidTiles, outRect);
 }
 
-SDL_Rect collidable::addBoundingBox(v2 p) {
-  return SDL_Rect {
+Rect collidable::addBoundingBox(v2 p) {
+  return Rect {
     (int)round(p.x) + boundingBox.x,
     (int)round(p.y) + boundingBox.y,
     boundingBox.w,
@@ -79,7 +79,7 @@ void collidable::update(v2 position) {
 /// Moving with collision resolving
 CollisionResponse collidable::moveAndSlide(v2* position, velocity* velocity, float dt) {
   CollisionResponse respnse = { false, false, false, false };
-  SDL_Rect collidedWith;
+  Rect collidedWith;
   v2 p = *position;
 
   if (velocity->y != 0) {
@@ -97,7 +97,7 @@ CollisionResponse collidable::moveAndSlide(v2* position, velocity* velocity, flo
           respnse.top = true;
         }
         else if (newY < p.y) {
-          position->y = round(collidedWith.y + collidedWith.h - boundingBox.y);
+          position->y = round(collidedWith.bottom() - boundingBox.y);
           respnse.bottom = true;
         }
         velocity->y = 0;
@@ -126,7 +126,7 @@ CollisionResponse collidable::moveAndSlide(v2* position, velocity* velocity, flo
           respnse.left = true;
         }
         else if (newX < p.x) {
-          position->x = round(collidedWith.x + collidedWith.w - boundingBox.x);
+          position->x = round(collidedWith.right() - boundingBox.x);
           respnse.right = true;
         }
         velocity->x = 0;
