@@ -8,6 +8,7 @@
 #include "scene.h"
 #include "scene/gameplay.h"
 #include "timer.h"
+#include "imgui_layer.h"
 
 class Game
 {
@@ -45,6 +46,11 @@ public: Game() {
       while (SDL_PollEvent(&event)) {
         window.pollEvent(event);
         InputHandler::Instance()->pollEvent(event);
+        imgui_layer::processEvents(&event);
+
+        if (event.key.keysym.sym == SDLK_LSHIFT && event.key.state == SDL_PRESSED) {
+          imgui_layer::toggleVisible();
+        }
       }
 
       if (!_sceneManager->isUpdating() && InputHandler::Instance()->isHeld(BUTTON::MENU)) {
@@ -58,6 +64,12 @@ public: Game() {
 
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
+
+      imgui_layer::drawBegin();
+      imgui_layer::debugEntities(EntityManager::Instance()->getEntities());
+      // EntityManager::Instance()->imgui();
+      imgui_layer::drawEnd();
+
       SDL_RenderPresent(renderer);
 
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include "globals.h"
+#include "imgui_layer.h"
 
 class Window
 {
@@ -70,6 +71,7 @@ private:
     // For opacity
     SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 
+    imgui_layer::init(_window, _renderer);
 
     if (_renderer == nullptr) {
       std::cerr << "Failed to create renderer.\n";

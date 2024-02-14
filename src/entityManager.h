@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include "globals.h"
+#include "imgui_impl_sdlrenderer2.h"
 
 #define MAX_ENTITIES 1024
 
@@ -31,6 +32,8 @@ class EntityManager {
     AbstractGameObject* getEntityByTag(OBJECT_TAG tag);
 
     Tilemap* getTilemap();
+
+    void imgui();
 
     static void release();
 };

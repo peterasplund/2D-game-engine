@@ -8,6 +8,7 @@
 #include "../tilemap.h"
 #include "../bg.h"
 #include "../entityManager.h"
+#include "../debugPrinter.h"
 #include <string>
 #include <memory>
 
@@ -127,5 +128,7 @@ public:
         obj->draw(renderer, { (float)camera.x, (float)camera.y });
       }
     }
+
+    debugPrinter::drawHitboxes(renderer, camera);
   }
 };

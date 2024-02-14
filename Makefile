@@ -1,13 +1,14 @@
 TARGET = main
 CC = clang++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image
-CFLAGS = -Wwritable-strings -std=c++17 -I/usr/local/include -I/usr/include/SDL2
+CFLAGS = -Wwritable-strings -std=c++17 -I/usr/local/include -I/usr/include/SDL2 -I./lib/imgui/include/
 SRC=./src
+LIB=./lib
 BIN=./bin
 
 .PHONY: default all clean
 
-OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(wildcard $(SRC)/*.cc) $(wildcard $(SRC)/**/*.cc) lib/pugixml-1.10/src/pugixml.cpp)
+OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(wildcard $(SRC)/*.cc) $(wildcard $(SRC)/**/*.cc) $(LIB)/pugixml-1.10/src/pugixml.cpp $(wildcard $(LIB)/imgui/src/*.cpp))
 HEADERS = $(wildcard $(SRC)*.h lib/pugixml-1.0/src/pugixml.hpp)
 
 default: clean $(TARGET) copyassets #run
