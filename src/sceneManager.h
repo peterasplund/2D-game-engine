@@ -3,7 +3,6 @@
 #include "math.h"
 #include "window.h"
 #include "scene.h"
-#include <map>
 
 int min(int a, int b) {
   return a < b ? a : b;

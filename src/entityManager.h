@@ -1,11 +1,8 @@
 #pragma once
 
+#include "stdafx.h"
 #include "tilemap.h"
-#include <vector>
-#include <memory>
-#include <map>
 #include "globals.h"
-#include "imgui_impl_sdlrenderer2.h"
 
 #define MAX_ENTITIES 1024
 

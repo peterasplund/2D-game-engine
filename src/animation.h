@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stdafx.h"
-#include <vector>
 #include "timer.h"
 
 class Animation

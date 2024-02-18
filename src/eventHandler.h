@@ -1,10 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include <iostream>
 #include <functional>
-#include <map>
-#include <vector>
 #include "abstractGameobject.h"
 
 typedef std::function<bool(SDL_Event *)> cbEvent;

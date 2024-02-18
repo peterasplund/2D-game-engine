@@ -9,8 +9,7 @@
 #include "../bg.h"
 #include "../entityManager.h"
 #include "../debugPrinter.h"
-#include <string>
-#include <memory>
+#include "../components/camera.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 std::unique_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT obj) {
@@ -130,5 +129,6 @@ public:
     }
 
     debugPrinter::drawHitboxes(renderer, camera);
+
   }
 };

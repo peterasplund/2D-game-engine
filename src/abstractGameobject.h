@@ -7,7 +7,7 @@
 #include "globals.h"
 #include "math.h"
 
-class collidable;
+// class collidable;
 
 class AbstractGameObject {
   public:

@@ -1,8 +1,6 @@
 #pragma once
+
 #include "stdafx.h"
-#include <stdio.h>
-#include <string>
-#include <iostream>
 #include "globals.h"
 #include "imgui_layer.h"
 

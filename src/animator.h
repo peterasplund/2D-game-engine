@@ -1,10 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include <vector>
 #include "animation.h"
-#include <map>
-#include <string>
 
 class Animator
 {

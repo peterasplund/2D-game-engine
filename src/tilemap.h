@@ -1,20 +1,13 @@
 #pragma once
 
-#include "../lib/pugixml-1.10/src/pugixml.hpp"
 #include "stdafx.h"
 #include <optional>
-#include <vector>
 #include "animation.h"
-#include <math.h>
-#include <map>
-#include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
-#include <string>
 #include "assetManager.h"
-#include "components/camera.h"
-#include "components/collidable.h"
+#include "math.h"
 
 #define TILE_MAX_LIMIT 1024
 
@@ -219,23 +212,6 @@ class Tilemap
 
     std::vector<std::vector<bool>> getSolidTiles() {
       return _solidTiles;
-    }
-
-    void addTilesToRegistry() {
-      /*
-      for (Tile t : _tiles) {
-        SDL_Rect r = { t.x, t.y, tileWidth, tileHeight };
-        SDL_Rect collisionR = { 0, 0, r.w, r.h };
-        auto entity = registry.create();
-        registry.emplace<position>(entity, (float)t.x, (float)t.y);
-        registry.emplace<renderable>(entity, _texture, t.textureRect);
-
-        if (t.solid) {
-          registry.emplace<collidable>(entity, collisionR);
-          registry.emplace<solid>(entity, true);
-        }
-      }
-      */
     }
 
     std::vector<Tile>* getTiles() {
