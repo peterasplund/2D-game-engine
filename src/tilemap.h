@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
 #include <optional>
 #include "animation.h"
 #include <sstream>
@@ -8,6 +7,7 @@
 #include <iostream>
 #include "assetManager.h"
 #include "math.h"
+#include "pugixml.hpp"
 
 #define TILE_MAX_LIMIT 1024
 

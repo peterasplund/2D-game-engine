@@ -1,6 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
+#include <string>
+#include <map>
 #include "animation.h"
 
 class Animator

@@ -1,5 +1,7 @@
 #pragma once
-#include "stdafx.h"
+
+#include <map>
+#include "SDL.h"
 
 enum BUTTON {
   UP,

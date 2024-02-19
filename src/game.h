@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 #include <math.h>
 #include "globals.h"
 #include "window.h"

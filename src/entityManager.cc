@@ -58,14 +58,3 @@ Tilemap* EntityManager::getTilemap() {
 
 void EntityManager::release() {
 }
-
-void EntityManager::imgui() {
-  ImGui::Begin("Test");
-  for(const auto &obj : _entities) {
-    ImGui::Text("- Object ID: 0 -");
-    ImGui::Text("Tag: %d", obj->getTag());
-    ImGui::Text("Type: %d", obj->getType());
-    ImGui::Text("position: (%d\t%d)", (int)obj->getPosition().x, (int)obj->getPosition().y);
-  }
-  ImGui::End();
-}

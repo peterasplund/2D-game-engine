@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
 #include "math.h"
 #include "abstractGameobject.h"
 #include "entityManager.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
+#include "SDL.h"
 
 struct v2
 {

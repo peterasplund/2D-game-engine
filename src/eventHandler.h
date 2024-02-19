@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
 #include <functional>
 #include "abstractGameobject.h"
 

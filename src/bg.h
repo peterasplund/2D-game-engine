@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 #include "window.h"
 #include "math.h"
 #include "assetManager.h"

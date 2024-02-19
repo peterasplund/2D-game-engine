@@ -1,42 +1,57 @@
 TARGET = main
 #CC = clang++
 CC = g++
-LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image
-#CFLAGS = -Wwritable-strings -std=c++17 -I/usr/local/include -I/usr/include/SDL2 -I./lib/imgui/include/
+LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/pugixml/src -L./lib/imgui/include
 OPT=-O0
-INCDIRS=-I/usr/include/SDL2 -I./lib/pugixml-1.10/src/ -I./lib/imgui/include/
-CFLAGS = -Wwrite-strings -std=c++17 -I/usr/local/include $(INCDIRS) -MMD -MP $(OPT)
+INCDIRS=-I/usr/include/SDL2 -I./lib/pugixml/src/ -I./lib/imgui/include/
+#CFLAGS = -Wwrite-strings -std=c++17 -I/usr/local/include $(INCDIRS) -MMD -MP $(OPT)
+CFLAGS = -Wwrite-strings -std=c++17 -MD -I/usr/local/include $(INCDIRS) $(OPT)
 SRC=./src
 LIB=./lib
 BIN=./bin
 
 .PHONY: default all clean
 
-SOURCES = $(wildcard $(SRC)/*.cc)
+CFILES = $(shell find $(SRC) -type f -name '*.cc')
+CFILES_LIBS = $(wildcard $(LIB)/imgui/src/*.cpp)
+CFILES_LIBS += $(wildcard $(LIB)/pugixml/src/*.cpp)
 
-OBJECTS = $(patsubst $(SRC)/%.cc, $(BIN)/%.o, $(SOURCES))
-#$(LIB)/pugixml-1.10/src/pugixml.cpp $(wildcard $(LIB)/imgui/src/*.cpp)
-HEADERS = $(wildcard $(SRC)/**/*.h) $(wildcard $(SRC)/*/*.h) lib/pugixml-1.0/src/pugixml.hpp
+OBJECTS = $(subst ./src/, ./bin/, $(patsubst %.cc, %.o, $(CFILES)))
+OBJECTS += $(subst ./, ./bin/, $(patsubst %.cpp, %.o, $(CFILES_LIBS)))
 
 default: $(TARGET) copyassets #run
 all: default
 
+# Compiling external deps
+$(BIN)/lib/pugixml/src/%.o: $(LIB)/pugixml/src/%.cpp
+		@mkdir -p $(@D)
+		$(CC) -c $< -o $@
+$(BIN)/lib/imgui/src/%.o: $(LIB)/imgui/src/%.cpp
+		@mkdir -p $(@D)
+		$(CC) -I/usr/include/SDL2 -c $< -o $@
+
+# Compiling game
 $(BIN)/%.o: $(SRC)/%.cc
+		$(CC) $(CFLAGS) -c $< -o $@
+$(BIN)/components/%.o: $(SRC)/components/%.cc
+		@mkdir -p $(@D)
 		$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 $(TARGET): $(OBJECTS)
-		#$(CC) $(SRC)/stdafx.h -o $(BIN)/stdafx.h.gch $(OBJECTS) -Wall $(LIBS) -o $(BIN)/$@
 		$(CC) $(OBJECTS) -Wall $(LIBS) -o $(BIN)/$@
 
 copyassets: ./assets
 		-cp -r assets/ $(BIN)/assets
 
 clean:
+		$(info $$OBJECTS is [${OBJECTS}])
 		-rm -rf $(BIN)/*
 
 
 #.PHONY: run
 #run: $(TARGET)
 #		$(BIN)/$(TARGET)
+
+-include $(OBJECTS:.o=.d)

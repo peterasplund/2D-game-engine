@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
 #include "timer.h"
+#include <vector>
 
 class Animation
 {
@@ -78,5 +78,4 @@ class Animation
     unsigned int ellapsedMS = 0;
     int currentFrame = 0;
     SDL_Texture* texture;
-
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
 #include "../math.h"
 #include "../tilemap.h"
 #include "../entityManager.h"

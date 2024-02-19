@@ -1,6 +1,9 @@
 #pragma once
 
-#include "stdafx.h"
+#include <string>
+#include <map>
+#include "SDL.h"
+#include "SDL_image.h"
 
 class AssetManager
 {

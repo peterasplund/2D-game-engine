@@ -1,8 +1,9 @@
 #pragma once
 
-#include "stdafx.h"
+#include <memory>
 #include "tilemap.h"
 #include "globals.h"
+#include "imgui.h"
 
 #define MAX_ENTITIES 1024
 
@@ -29,8 +30,6 @@ class EntityManager {
     AbstractGameObject* getEntityByTag(OBJECT_TAG tag);
 
     Tilemap* getTilemap();
-
-    void imgui();
 
     static void release();
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
 #include "../globals.h"
 #include "../math.h"
 

@@ -1,7 +1,11 @@
 #pragma once
 
-#include "stdafx.h"
+#include <memory>
 #include "abstractGameobject.h"
+
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
 
 bool imguiVisible = false;
 

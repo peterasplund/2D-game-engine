@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../stdafx.h"
+#include <memory>
 #include "../abstractGameobject.h"
 #include "../obj/player.h"
 #include "../obj/door.h"

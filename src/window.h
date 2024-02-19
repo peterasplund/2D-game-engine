@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
 #include "globals.h"
+#include "SDL.h"
 #include "imgui_layer.h"
 
 class Window
