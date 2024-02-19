@@ -3,7 +3,6 @@
 #include <memory>
 #include "tilemap.h"
 #include "globals.h"
-#include "imgui.h"
 
 #define MAX_ENTITIES 1024
 

@@ -7,12 +7,22 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 
-bool imguiVisible = false;
+class ImguiLayer {
+private:
+  bool imguiVisible = false;
+public:
+  static ImguiLayer* Instance() {
+    static ImguiLayer* _instance = nullptr;
+    if (_instance == nullptr) {
+      _instance = new ImguiLayer();
+    }
 
-namespace imgui_layer {
-  void toggleVisible() {
-    imguiVisible = !imguiVisible;
+    return _instance;
   }
+
+  static void release() {
+  }
+
   void init(SDL_Window *window, SDL_Renderer *renderer) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -53,6 +63,10 @@ namespace imgui_layer {
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
   }
 
+  void toggleVisible() {
+    imguiVisible = !imguiVisible;
+  }
+
   void debugEntities(std::vector<std::unique_ptr<AbstractGameObject>>* entities) {
     if (!imguiVisible) {
       return;
@@ -70,4 +84,4 @@ namespace imgui_layer {
 
     ImGui::End();
   }
-}
+};

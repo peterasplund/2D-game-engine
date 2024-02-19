@@ -10,15 +10,9 @@ public:
     _renderer = renderer;
   }
 
-  ~Scene() {
-  }
+  ~Scene() {}
 
-  virtual void init() {
-  }
-
-  virtual void update(float dt) {
-  }
-
-  virtual void draw(SDL_Renderer* renderer) {
-  }
+  virtual void init() {}
+  virtual void update(float dt) {}
+  virtual void draw(SDL_Renderer* renderer) {}
 };

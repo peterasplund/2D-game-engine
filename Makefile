@@ -4,7 +4,6 @@ CC = g++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/pugixml/src -L./lib/imgui/include
 OPT=-O0
 INCDIRS=-I/usr/include/SDL2 -I./lib/pugixml/src/ -I./lib/imgui/include/
-#CFLAGS = -Wwrite-strings -std=c++17 -I/usr/local/include $(INCDIRS) -MMD -MP $(OPT)
 CFLAGS = -Wwrite-strings -std=c++17 -MD -I/usr/local/include $(INCDIRS) $(OPT)
 SRC=./src
 LIB=./lib
@@ -36,6 +35,9 @@ $(BIN)/%.o: $(SRC)/%.cc
 $(BIN)/components/%.o: $(SRC)/components/%.cc
 		@mkdir -p $(@D)
 		$(CC) $(CFLAGS) -c $< -o $@
+$(BIN)/scene/%.o: $(SRC)/scene/%.cc
+		@mkdir -p $(@D)
+		$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
@@ -46,9 +48,7 @@ copyassets: ./assets
 		-cp -r assets/ $(BIN)/assets
 
 clean:
-		$(info $$OBJECTS is [${OBJECTS}])
 		-rm -rf $(BIN)/*
-
 
 #.PHONY: run
 #run: $(TARGET)

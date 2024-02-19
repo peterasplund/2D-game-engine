@@ -33,7 +33,8 @@ private:
 
 public:
   static InputHandler* Instance() {
-  if (_instance == NULL) {
+    static InputHandler* _instance = nullptr;
+    if (_instance == nullptr) {
       _instance = new InputHandler();
     }
 
@@ -76,5 +77,3 @@ public:
     }
   }
 };
-
-InputHandler* InputHandler::_instance = 0;

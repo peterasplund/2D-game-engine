@@ -1,4 +1,5 @@
 #pragma once
+
 #include <math.h>
 #include "globals.h"
 #include "window.h"
@@ -7,7 +8,6 @@
 #include "scene.h"
 #include "scene/gameplay.h"
 #include "timer.h"
-#include "imgui_layer.h"
 
 class Game
 {
@@ -42,13 +42,14 @@ public: Game() {
       window.clear();
 
       SDL_Event event;
+      ImguiLayer* imgui = ImguiLayer::Instance();
       while (SDL_PollEvent(&event)) {
         window.pollEvent(event);
         InputHandler::Instance()->pollEvent(event);
-        imgui_layer::processEvents(&event);
+        imgui->processEvents(&event);
 
         if (event.key.keysym.sym == SDLK_LSHIFT && event.key.state == SDL_PRESSED) {
-          imgui_layer::toggleVisible();
+          imgui->toggleVisible();
         }
       }
 
@@ -64,10 +65,10 @@ public: Game() {
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
 
-      imgui_layer::drawBegin();
-      imgui_layer::debugEntities(EntityManager::Instance()->getEntities());
+      imgui->drawBegin();
+      imgui->debugEntities(EntityManager::Instance()->getEntities());
       // EntityManager::Instance()->imgui();
-      imgui_layer::drawEnd();
+      imgui->drawEnd();
 
       SDL_RenderPresent(renderer);
 

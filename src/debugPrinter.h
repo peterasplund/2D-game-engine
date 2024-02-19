@@ -5,7 +5,7 @@
 #include "entityManager.h"
 
 namespace debugPrinter {
-  void drawHitboxes(SDL_Renderer* renderer, Rect camera) {
+  static void drawHitboxes(SDL_Renderer* renderer, Rect camera) {
     for(const auto &obj : *EntityManager::Instance()->getEntities()) {
       Rect objRect = obj->getRect();
       if (objRect.hasIntersection(&camera)) {
