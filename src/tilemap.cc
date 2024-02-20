@@ -33,11 +33,8 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
   _tilesInTextureX = floor(textureWidth / tileWidth);
   _tilesInTextureY = floor(textureHeight / tileHeight);
 
-  // Prepare _solidTiles 2D vector
-  _solidTiles.resize(TILE_MAX_LIMIT);
-  for (int i = 0; i < TILE_MAX_LIMIT; i++) {
-    _solidTiles[i].resize(TILE_MAX_LIMIT);
-  }
+  // Prepare vector
+  _tiles.resize(TILE_MAX_LIMIT);
 
   // get object positions
   for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
@@ -105,6 +102,7 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
       x = 0;
 
       lineStream.clear();
+      _tilesWide = line.length();
       lineStream.str(line);
 
       while(std::getline(lineStream, cell, ',')) {
@@ -114,18 +112,22 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
 
         int tileX = (float)(x * tileWidth);
         int tileY = (float)(y * tileHeight);
-        _solidTiles[y][x] = name == "solid";
+        // _solidTiles[y][x] = name == "solid";
 
         int cellVal = stoi(cell);
         int tileAtX = ((cellVal - 1) % _tilesInTextureX);
         int tileAtY = ceil(cellVal / _tilesInTextureX);
 
-        _tiles.push_back({
+        int idx = (y * _tilesWide) + x;
+
+        _tiles.at(idx) = {
+          true,
           (x * tileWidth),                                                      // x position
           ((y) * tileHeight),                                                   // y position
           { tileAtX * tileWidth, tileAtY * tileHeight, tileWidth, tileHeight }, // Texture rect
           name == "solid",                                                      // Solid?
-        });
+          TileType::SLOPE_LEFT,
+        };
 
         x ++;
       }

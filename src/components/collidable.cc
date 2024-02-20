@@ -6,7 +6,7 @@ collidable::collidable(v2 position, Rect boundingBox) {
   this->boundingBox = boundingBox;
 }
 
-bool collidable::checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTiles, Rect* outRect) {
+bool collidable::checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect) {
   // Don't bother checking if the rect is completely outside the map
   if (r->y + r->h <= 0 || r->x + r->w <= 0) {
     outRect = nullptr;
@@ -20,6 +20,7 @@ bool collidable::checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTi
     { r->right() - 1, r->y + r->h - 1 }  // Bottom right
   };
 
+  auto tiles = tilemap->getTiles();
 
   // Run for each of the four corners
   for (int corner = 0; corner < 4; corner++) {
@@ -27,20 +28,23 @@ bool collidable::checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTi
     // @TODO: use constant for tile_size here instead of 16
     int x = floor(c.x / 16);
     int y = floor(c.y / 16);
+    int idx = tilemap->getIdxFromPoint(c.x, c.y);
 
-    if (y <= solidTiles->size()) {
-      if (x <= solidTiles->at(y).size()) {
-        if (solidTiles->at(y).at(x) == true) {
-          if (outRect != nullptr) {
-            outRect->x = x * 16;
-            outRect->y = y * 16;
-            outRect->w = 16;
-            outRect->h = 16;
-          }
+    if (idx <= tiles->size()) {
+      auto tile = tiles->at(idx);
 
-          return true;
-        }
+      if (!tile->solid) {
+        return false;
       }
+
+      if (outRect != nullptr) {
+        outRect->x = tile->x;
+        outRect->y = tile->y;
+        outRect->w = tilemap->getTileWidth();
+        outRect->h = tilemap->getTileHeight();
+      }
+
+      return true;
     }
   }
   outRect = nullptr;
@@ -53,9 +57,8 @@ bool collidable::collideAt(v2 p, Rect* outRect) {
     return false;
   }
 
-  auto solidTiles = t->getSolidTiles();
   Rect r = addBoundingBox(p);
-  return checkCollision(&r, &solidTiles, outRect);
+  return checkCollision(&r, t, outRect);
 }
 
 Rect collidable::addBoundingBox(v2 p) {

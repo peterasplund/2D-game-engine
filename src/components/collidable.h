@@ -24,7 +24,7 @@ class collidable {
 
     collidable();
     collidable(v2 position, Rect boundingBox);
-    bool checkCollision(Rect* r, std::vector<std::vector<bool>>* solidTiles, Rect* outRect);
+    bool checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect);
     bool collideAt(v2 p, Rect* outRect);
     Rect addBoundingBox(v2 p);
     void update(v2 position);

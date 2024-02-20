@@ -6,18 +6,11 @@
 #include <fstream>
 #include <iostream>
 #include "assetManager.h"
+#include "tileset.h"
 #include "math.h"
 #include "pugixml.hpp"
 
-#define TILE_MAX_LIMIT 1024
-
-typedef std::pair<std::string, std::string> Layer;
-
-struct TilePosition {
-  int x;
-  int y;
-};
-
+// This will be removed soon
 struct TiledObject {
   std::string name;
   v2 position;
@@ -30,15 +23,9 @@ struct TiledObject {
   std::map<std::string, std::string> propertiesString;
 };
 
-enum TileType {
-  NORMAL,
-};
-
-struct Tile {
-  int x, y;
-  SDL_Rect textureRect;
-  bool solid = false;
-  TileType type = TileType::NORMAL;
+// @TODO: create these in z-order
+struct TileLayer {
+  std::vector<int> tiles;
 };
 
 class Tilemap
@@ -46,10 +33,9 @@ class Tilemap
   const std::string OBJECT_POSITIONS_NAME = "objects";
   int tileWidth, tileHeight;
 
-  std::vector<std::vector<bool>> _solidTiles;
-
   pugi::xml_document doc;
 
+  // @TODO: use LDtk for maps instead so no pugixml
   std::vector<Layer> getLayers(pugi::xml_parse_result result);
 
   public:
@@ -66,20 +52,18 @@ class Tilemap
       return tileHeight;
     }
 
+    // @TODO: is this needed?
     int getWidthInPixels() {
       return _tilesWide * tileWidth;
     }
 
+    // @TODO: is this needed?
     int getHeightInPixels() {
       return _tilesTall * tileHeight;
     }
 
     SDL_Texture* getTexture() {
       return _texture;
-    }
-
-    std::vector<std::vector<bool>> getSolidTiles() {
-      return _solidTiles;
     }
 
     std::vector<Tile>* getTiles() {
@@ -90,13 +74,17 @@ class Tilemap
       return _objects;
     }
 
+    int getIdxFromPoint(int x, int y) {
+        int x_coord = x / tileWidth;
+        int y_coord = y / tileHeight;
+        return (y_coord * _tilesWide) + x_coord;
+    }
+
   private:
-    std::vector<Tile> _tiles;
     int _tilesWide;
     int _tilesTall;
-    int _tilesInTextureX;
-    int _tilesInTextureY;
 
     std::vector<TiledObject> _objects;
-    SDL_Texture* _texture;
+    Tileset _tileset;
+    std::vector<TileLayer> _layers;
 };

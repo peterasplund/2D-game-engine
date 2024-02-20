@@ -5,14 +5,14 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
+// @TODO: use reference counting to destroy when no one uses the texture or wahtererver
 class AssetManager
 {
 private:
   std::map<std::string, SDL_Texture*> _textures;
   SDL_Renderer* _renderer;
 
-  AssetManager(SDL_Renderer* renderer) {
-    this->_renderer = renderer;
+  AssetManager() {
   }
 
   ~AssetManager() {
@@ -23,6 +23,19 @@ private:
     }
 
     _textures.clear();
+  }
+
+  bool freeTexture(std::string filename) {
+    std::string fullPath = SDL_GetBasePath();
+    fullPath.append("assets/" + filename);
+
+    if (_textures[fullPath] == nullptr) {
+      SDL_DestroyTexture(_textures[fullPath]);
+      _textures.erase(fullPath);
+      return true;
+    }
+    
+    return false;
   }
 
   SDL_Texture* loadTexture(std::string path) {
@@ -47,13 +60,22 @@ private:
   }
 
 public:
-  static AssetManager* Instance(SDL_Renderer* renderer) {
+  static AssetManager* Instance() {
     static AssetManager* _instance = nullptr;
     if (_instance == nullptr) {
-      _instance = new AssetManager(renderer);
+      _instance = new AssetManager();
+    }
+    else {
+      if (_instance->_renderer == nullptr) {
+        printf("ERROR: AssetManager is not initialized\n");
+      }
     }
 
     return _instance;
+  }
+
+  void init(SDL_Renderer* renderer) {
+    this->_renderer = renderer;
   }
 
   static void release() {

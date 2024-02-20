@@ -79,13 +79,13 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
 
   // Draw tiles
   for (int i = 0; i < tilemap->getTiles()->size(); i ++) {
-    Tile t = tilemap->getTiles()->at(i);
-    SDL_Rect r = { t.x, t.y, tilemap->getTileWidth(), tilemap->getTileHeight() };
-    SDL_Rect sr = t.textureRect;
+    Tile* t = tilemap->getTiles()->at(i);
+    SDL_Rect r = { t->x, t->y, tilemap->getTileWidth(), tilemap->getTileHeight() };
+    SDL_Rect sr = t->textureRect;
 
-    Rect tileRect = { t.x, t.y, sr.w, sr.h };
+    Rect tileRect = { t->x, t->y, sr.w, sr.h };
     if (camera.hasIntersection(&tileRect)) {
-      SDL_Rect dr = { t.x - camera.x, t.y - camera.y, sr.w, sr.h };
+      SDL_Rect dr = { t->x - camera.x, t->y - camera.y, sr.w, sr.h };
       SDL_RenderCopyEx(renderer, tilemap->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
     }
   }
@@ -99,5 +99,5 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
     }
   }
 
-  debugPrinter::drawHitboxes(renderer, camera);
+  //debugPrinter::drawHitboxes(renderer, camera);
 }
