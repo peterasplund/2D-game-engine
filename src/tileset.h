@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "SDL.h"
 #include "SDL_image.h"
+#include "pugixml.hpp"
 #include "assetManager.h"
 
 enum class TileType {
@@ -12,9 +14,14 @@ enum class TileType {
 };
 
 struct TileData {
-  int x, y;
+  int id;
   bool solid;
   TileType type = TileType::NORMAL;
+
+  // @TODO: try to use enum as index instead of string
+  std::map<std::string, int> propertiesInt;
+  std::map<std::string, float> propertiesFloat;
+  std::map<std::string, std::string> propertiesString;
 };
 
 class Tileset {
@@ -22,14 +29,16 @@ class Tileset {
     Tileset() {
     }
 
-    bool init(char* filename) {
-      _texture = AssetManager::Instance()->getTexture(filename);
+    bool load(std::string filename);
 
-      if (_texture == nullptr) {
-        return false;
-      }
+    SDL_Rect getTileTextureRect(int id);
 
-      return true;
+    SDL_Texture* getTexture() {
+      return _texture;
+    }
+
+    TileData getTileData(int idx) {
+      return _tiles.at(idx);
     }
 
   private:
@@ -37,4 +46,6 @@ class Tileset {
     std::vector<TileData> _tiles;
     int _tileWidth;
     int _tileHeight;
+    int _tileCount;
+    int _columns;
 };

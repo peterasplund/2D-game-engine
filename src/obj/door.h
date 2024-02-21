@@ -8,15 +8,15 @@
 namespace obj {
   class Door : public AbstractGameObject {
     public:
-      void init(SDL_Renderer* renderer) override {
-        AbstractGameObject::init(renderer);
+      void init() override {
+        AbstractGameObject::init();
 
         this->_collidable.boundingBox = { 
           0, 0, 
           16, 32 
         };
 
-        SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/door.png");
+        SDL_Texture* texture = AssetManager::Instance()->getTexture("sprites/door.png");
         this->_renderable.texture = texture;
       }
 

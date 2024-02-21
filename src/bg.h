@@ -9,8 +9,8 @@ protected:
   SDL_Texture* _texture;
   v2 _size;
 public:
-  Bg(std::string path, v2 size, SDL_Renderer* renderer) {
-    _texture = AssetManager::Instance(renderer)->getTexture(path);
+  Bg(std::string path, v2 size) {
+    _texture = AssetManager::Instance()->getTexture(path);
     _size = size;
   }
 

@@ -31,6 +31,7 @@ $(BIN)/lib/imgui/src/%.o: $(LIB)/imgui/src/%.cpp
 
 # Compiling game
 $(BIN)/%.o: $(SRC)/%.cc
+		@mkdir -p $(@D)
 		$(CC) $(CFLAGS) -c $< -o $@
 $(BIN)/components/%.o: $(SRC)/components/%.cc
 		@mkdir -p $(@D)
@@ -45,7 +46,7 @@ $(TARGET): $(OBJECTS)
 		$(CC) $(OBJECTS) -Wall $(LIBS) -o $(BIN)/$@
 
 copyassets: ./assets
-		-cp -r assets/ $(BIN)/assets
+		-cp -r assets $(BIN)/assets
 
 clean:
 		-rm -rf $(BIN)/*

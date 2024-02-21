@@ -16,7 +16,7 @@ class AbstractGameObject {
     velocity _velocity;
     gravity _gravity;
 
-    virtual void init(SDL_Renderer* renderer);
+    virtual void init();
     virtual void update(float dt);
     virtual void draw(SDL_Renderer* renderer, v2 offset);
     virtual ~AbstractGameObject() {

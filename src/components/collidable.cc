@@ -20,31 +20,52 @@ bool collidable::checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect) {
     { r->right() - 1, r->y + r->h - 1 }  // Bottom right
   };
 
-  auto tiles = tilemap->getTiles();
+  auto layers = tilemap->getLayers();
 
   // Run for each of the four corners
   for (int corner = 0; corner < 4; corner++) {
     v2i c = corners[corner];
-    // @TODO: use constant for tile_size here instead of 16
-    int x = floor(c.x / 16);
-    int y = floor(c.y / 16);
+    int x = floor(c.x / tilemap->getTileWidth());
+    int y = floor(c.y / tilemap->getTileHeight());
     int idx = tilemap->getIdxFromPoint(c.x, c.y);
 
-    if (idx <= tiles->size()) {
-      auto tile = tiles->at(idx);
+    if (idx == -1) {
+      continue;
+    }
+    //printf("idx: %d\n", idx);
 
-      if (!tile->solid) {
-        return false;
+    for (int li = 0; li < layers->size(); li++) {
+      auto tiles = layers->at(li).tiles;
+    
+      if (idx < tiles.size()) {
+        int tileId = tiles.at(idx);
+        if (tileId == 0) {
+          continue;
+        }
+        //auto data = tilemap->getTileset()->getTileData(idx);
+        Rect rect = tilemap->getTilePosition(li, idx);
+        // @TODO: get tile from tileId
+
+        /*
+        if (!data.solid) {
+          printf("end if\n");
+          return false;
+        }
+        */
+
+        if (outRect != nullptr) {
+          outRect->x = rect.x;
+          outRect->y = rect.y;
+          outRect->w = rect.w;
+          outRect->h = rect.h;
+          printf("idx: %d\n", idx);
+          printf("tileId: %d\n", tileId);
+          outRect->debug();
+        }
+
+        //printf("end if\n");
+        return true;
       }
-
-      if (outRect != nullptr) {
-        outRect->x = tile->x;
-        outRect->y = tile->y;
-        outRect->w = tilemap->getTileWidth();
-        outRect->h = tilemap->getTileHeight();
-      }
-
-      return true;
     }
   }
   outRect = nullptr;

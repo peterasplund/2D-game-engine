@@ -1,6 +1,6 @@
 #include "abstractGameobject.h"
 
-void AbstractGameObject::init(SDL_Renderer* renderer) {
+void AbstractGameObject::init() {
   _collidable = collidable(_position, Rect::from_sdl_rect(_renderable.textureRect));
 }
 

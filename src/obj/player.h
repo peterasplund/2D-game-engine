@@ -20,8 +20,8 @@ namespace obj {
       virtual ~Player() {
       }
 
-      void init(SDL_Renderer* renderer) override {
-        AbstractGameObject::init(renderer);
+      void init() override {
+        AbstractGameObject::init();
 
         _tag = OBJECT_TAG::PLAYER;
 
@@ -32,7 +32,7 @@ namespace obj {
 
         setListenForCollisions();
 
-        SDL_Texture* texture = AssetManager::Instance(renderer)->getTexture("sprites/LightBandit_Spritesheet.png");
+        SDL_Texture* texture = AssetManager::Instance()->getTexture("assets/sprites/LightBandit_Spritesheet.png");
 
         int tw = 48;
         int th = 48;

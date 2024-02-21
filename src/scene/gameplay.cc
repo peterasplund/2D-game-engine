@@ -23,7 +23,7 @@ void GameplayScene::init() {
   */
 
   char levelName[32];
-  sprintf(levelName, "assets/maps/%s.tmx", _level.c_str());
+  sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
 
   tilemap = new Tilemap(levelName, _renderer);
   EntityManager::Instance()->setTileMap(tilemap);
@@ -40,8 +40,8 @@ void GameplayScene::init() {
   };
 
 
-  bg1 = new Bg("bgs/clouds.png", { 512.0f, 352.0f }, _renderer);
-  bg2 = new Bg("bgs/town.png", { 512.0f, 352.0f }, _renderer);;
+  bg1 = new Bg("assets/bgs/clouds.png", { 512.0f, 352.0f });
+  bg2 = new Bg("assets/bgs/town.png", { 512.0f, 352.0f });;
 
   std::vector<TiledObject> objects = tilemap->getObjects();
   for (TiledObject o : objects) {
@@ -54,7 +54,7 @@ void GameplayScene::init() {
 
     auto object = instantiateGameObject(objType);
     object->_position = o.position;
-    object->init(_renderer);
+    object->init();
     EntityManager::Instance()->addEntity(std::move(object));
   }
 
@@ -77,17 +77,30 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
   bg1->draw(renderer, -camera.x * 0.04);
   bg2->draw(renderer, -camera.x * 0.2);
 
+  std::vector<TileLayer>* layers = tilemap->getLayers();
   // Draw tiles
-  for (int i = 0; i < tilemap->getTiles()->size(); i ++) {
-    Tile* t = tilemap->getTiles()->at(i);
-    SDL_Rect r = { t->x, t->y, tilemap->getTileWidth(), tilemap->getTileHeight() };
-    SDL_Rect sr = t->textureRect;
+  int layerIdx = 0;
+  for (TileLayer layer : *layers) {
+    int i = 0;
+    for (int tile : layer.tiles) {
+      if (tile == 0) {
+        i ++;
+        continue;
+      }
 
-    Rect tileRect = { t->x, t->y, sr.w, sr.h };
-    if (camera.hasIntersection(&tileRect)) {
-      SDL_Rect dr = { t->x - camera.x, t->y - camera.y, sr.w, sr.h };
-      SDL_RenderCopyEx(renderer, tilemap->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
+      Rect tileRect = tilemap->getTilePosition(layerIdx, i);
+
+      Tileset* tileset = tilemap->getTileset();
+      SDL_Rect sr = tileset->getTileTextureRect(tile);
+
+      if (camera.hasIntersection(&tileRect)) {
+        SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
+        SDL_RenderCopyEx(renderer, tileset->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
+      }
+
+      i ++;
     }
+    layerIdx ++;
   }
 
   // @TODO: handle drawing some tiles after objects depending on their z-setting in the tmx-format

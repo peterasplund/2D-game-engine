@@ -34,7 +34,7 @@ AbstractGameObject* EntityManager::getEntityByTag(OBJECT_TAG tag) {
     }
   }
 
-  printf("ERROR: Tried getting an entity by a tag that doesn't exist\n");
+  printf("ERROR: Tried getting an entity by a tag that doesn't exist. Tag: %d\n", tag);
   return nullptr;
 }
 

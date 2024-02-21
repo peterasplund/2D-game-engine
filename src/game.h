@@ -22,14 +22,14 @@ public: Game() {
 
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* renderer = window.getRenderer();
+
+    AssetManager::Instance()->init(renderer);
+
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, "demo3");
-    GameplayScene* _gameplayScene2 = new GameplayScene(renderer, "demo4");
-
+    GameplayScene* _gameplayScene = new GameplayScene(renderer, "new_test_map");
     _sceneManager->addScene("gameplay", _gameplayScene);
-    _sceneManager->addScene("gameplay2", _gameplayScene2);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
 
@@ -53,6 +53,8 @@ public: Game() {
         }
       }
 
+      // Old testing code to try out scene transition
+      /*
       if (!_sceneManager->isUpdating() && InputHandler::Instance()->isHeld(BUTTON::MENU)) {
         if (_sceneManager->currentScene() == "gameplay") {
           _sceneManager->gotoScene("gameplay2", Transition::FADE);
@@ -61,6 +63,7 @@ public: Game() {
           _sceneManager->gotoScene("gameplay", Transition::FADE);
         }
       }
+      */
 
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
