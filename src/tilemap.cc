@@ -20,7 +20,7 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
       for (pugi::xml_node object = group.first_child(); object; object = object.next_sibling()) {
         TiledObject o;
 
-        o.position = { object.attribute("x").as_float(), object.attribute("y").as_float() };
+        o.position = { object.attribute("x").as_int(), object.attribute("y").as_int() };
         o.name = object.attribute("name").as_string();
 
         if (!object.attribute("width").empty()) {
@@ -104,4 +104,58 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
 
     _layers.push_back(l);
   }
+}
+
+Rect Tilemap::getTilePosition(int layerIdx, int idx) {
+  int x = 0;
+  int y = 0;
+
+  if (idx > 0) {
+    x = (idx % _tilesWide) * tileWidth;
+    y = (idx / _tilesWide) * tileHeight;
+  }
+
+  return { x, y, tileWidth, tileHeight };
+}
+
+int Tilemap::getIdxFromPoint(int x, int y, int layer) {
+    int x_coord = x / tileWidth;
+    int y_coord = y / tileHeight;
+
+    if (x_coord > _tilesWide) {
+      return -1;
+    }
+
+    if (y_coord > _tilesTall) {
+      return -1;
+    }
+
+    int idx = (y_coord * _tilesWide) + x_coord;
+    if (idx >= _layers.at(layer).tiles.size()) {
+      return -1;
+    }
+
+    if (!_layers.at(layer).tiles.at(idx)) {
+      return -1;
+    }
+
+    return idx;
+}
+
+// @TODO: This is kinda naive right now. I We just sample corners and one point between each corner.
+// We wanna use this method:
+// https://youtu.be/8JJ-4JgR7Dg?list=PLag3Nl349Trp27qK-PXWsn8T5BA_SVITt&t=3223
+std::vector<int> Tilemap::getIndicesWithinRect(Rect r, int layer) {
+  std::vector<int> indices;
+
+  for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
+    for (int x = floor((r.left() - 1) / tileWidth) * tileWidth; x <= ceil(r.right() / tileWidth) * tileWidth; x += tileWidth) {
+      int idx = getIdxFromPoint(x, y, layer);
+      if (idx != -1) {
+        indices.push_back(idx);
+      }
+    }
+  }
+
+  return indices;
 }

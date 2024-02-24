@@ -79,7 +79,7 @@ public:
       ImGui::Text("- Object ID: 0 -");
       ImGui::Text("Tag: %d", obj->getTag());
       ImGui::Text("Type: %d", obj->getType());
-      ImGui::Text("position: (%d\t%d)", (int)obj->getPosition().x, (int)obj->getPosition().y);
+      ImGui::Text("position: (%f\t%f)", obj->getPosition().x, obj->getPosition().y);
     }
 
     ImGui::End();

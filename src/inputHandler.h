@@ -2,6 +2,7 @@
 
 #include <map>
 #include "SDL.h"
+#include "math.h"
 
 enum BUTTON {
   UP,
@@ -19,6 +20,7 @@ private:
   static InputHandler* _instance;
   std::map<int, BUTTON> _buttons;
   std::map<BUTTON, bool> _buttonsHold;
+  v2i _mousePos;
 
   InputHandler() {
     for (int i = UP; i != ATTACK; i++) {
@@ -47,6 +49,12 @@ public:
 
   bool isHeld(BUTTON button) {
     return _buttonsHold[button];
+  }
+
+  v2i getMousePosition() {
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    return { x, y };
   }
 
   static void release() {

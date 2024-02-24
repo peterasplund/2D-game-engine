@@ -27,7 +27,9 @@ namespace obj {
 
         this->_collidable.boundingBox = { 
           14, 15, 
-          22, 31 
+          //22, 31 
+          //22, 32 // Debug with two tiles tall 
+          16, 16 
         };
 
         setListenForCollisions();
@@ -86,120 +88,32 @@ namespace obj {
 
       void update(float dt) override {
         AbstractGameObject::update(dt);
-        CollisionResponse collisionResponse = _collidable.moveAndSlide(&_position, &_velocity, dt);
         InputHandler* inputHandler = InputHandler::Instance();
 
-        _gravity.update(&_position, &_velocity, dt);
+        if (inputHandler->isHeld(BUTTON::UP)) {
+          _velocity.v.y = -runSpeed;
+        } else if (inputHandler->isHeld(BUTTON::DOWN)) {
+          _velocity.v.y = runSpeed;
+        }
+        if (inputHandler->isHeld(BUTTON::LEFT)) {
+          _velocity.v.x = -runSpeed;
+        } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+          _velocity.v.x = runSpeed;
+        }
+        
+        _collidable.moveAndSlide2(_position, &_velocity.v, dt);
 
-        // Stop Velocity if bonking
-        if (collisionResponse.bottom || collisionResponse.top) {
-          _velocity.y = 0;
-        }
+        _position.x += _velocity.v.x * dt;
+        _position.y += _velocity.v.y * dt;
 
-        // If floor below
-        if (_collidable.collideAt({_position.x, _position.y + 1 }, nullptr)) {
-          _velocity.y = 0;
-          _gravity.onFloor = true;
-        }
-        else {
-          _gravity.onFloor = false;
-        }
+        _position.x = round(_position.x);
+        _position.y = round(_position.y);
 
         auto &v = _velocity;
         auto &p = _position;
-
-        if (state == State::SLIDE) {
-          if (_animator.getCurrent() != "slide") {
-            _animator.reset();
-            _animator.setAnimation("slide");
-            _velocity.x += direction == "left" ? -6 : 6;
-          }
-        }
-
-        if (state != State::ATTACK) {
-          if (state != State::JUMP && inputHandler->isHeld(BUTTON::JUMP) && (_gravity.onFloor || state == State::SLIDE)) {
-            state = State::JUMP;
-            _velocity.y = -jumpPower;
-          }
-
-          if (state != State::SLIDE) {
-            if (inputHandler->isHeld(BUTTON::LEFT)) {
-              direction = "left";
-              _velocity.x = -runSpeed;
-              _renderable.textureFlip = SDL_FLIP_NONE;
-              if (_gravity.onFloor) {
-                state = State::RUN;
-              }
-            } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-              direction = "right";
-              _velocity.x = runSpeed;
-              _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
-              if (_gravity.onFloor) {
-                state = State::RUN;
-              }
-            } else if (state != State::SLIDE) {
-              state = State::IDLE;
-            }
-          }
-        }
-
-        // End ttack
-        if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
-          state = State::IDLE;
-          _animator.reset();
-        }
-
-        // End slide
-        if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
-          state = State::IDLE;
-          _animator.reset();
-        }
-
-        // Attack
-        if (inputHandler->isHeld(BUTTON::ATTACK) && attackTimer.elapsed() > attackDelay/* && g.onFloor*/) {
-          state = State::ATTACK;
-          _animator.reset();
-          _animator.setAnimation("attack");
-          attackTimer.reset();
-        }
-
-        if (!_gravity.onFloor) {
-          state = State::JUMP;
-        }
-
-
-        switch (state) {
-          case State::IDLE:
-            _animator.setAnimation("idle");
-            break;
-          case State::RUN:
-            _animator.setAnimation("run");
-            break;
-          case State::HURT:
-          case State::JUMP:
-            _animator.setAnimation("jump");
-            break;
-          case State::ATTACK:
-            _animator.setAnimation("attack");
-            break;
-          case State::SLIDE:
-            _animator.setAnimation("slide");
-            break;
-        }
-
-        // Slide
-        if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
-          state = State::SLIDE;
-          slideTimer.reset();
-        }
-
-        // die and respawn when falling of level
-        if (_position.y > 370.0f) {
-          _position.y = -(float)_renderable.textureRect.h;
-        }
       }
 
-      void draw(SDL_Renderer* renderer, v2 offset) override {
+      void draw(SDL_Renderer* renderer, v2f offset) override {
         _renderable.textureRect = _animator.getFrame();
         _renderable.texture = _animator.getTexture();
 
@@ -216,7 +130,7 @@ namespace obj {
       float attackDelay = 450.0f;
       float slideDelay = 200.0f;
       bool isBackDashing = false;
-      float runSpeed = 1.4f;
+      float runSpeed = 0.2f;
       std::string direction = "right";
       State state = State::IDLE;
       Timer attackTimer;

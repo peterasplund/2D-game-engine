@@ -24,7 +24,7 @@ namespace obj {
         // AbstractGameObject::update(dt);
       }
 
-      void draw(SDL_Renderer* renderer, v2 offset) override {
+      void draw(SDL_Renderer* renderer, v2f offset) override {
         AbstractGameObject::draw(renderer, offset);
       }
 
@@ -32,6 +32,6 @@ namespace obj {
       GAME_OBJECT _type = GAME_OBJECT::DOOR;
 
       std::string toLevel;
-      v2 toLevelPlayerPosition;
+      v2f toLevelPlayerPosition;
   };
 }

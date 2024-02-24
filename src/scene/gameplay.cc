@@ -1,5 +1,8 @@
 #include "gameplay.h"
 
+bool rayVsRect(v2f& ray_origin, v2f& ray_dir, Rect* target, v2f& contact_point, v2f& contact_normal, float& t_hit_near);
+bool DynamicRectVsRect(Rect* r_dynamic, v2f inVelocity, Rect& r_static, v2f& contact_point, v2f& contact_normal, float& contact_time, float dt);
+
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 std::unique_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
   std::unique_ptr<AbstractGameObject> o;
@@ -28,7 +31,7 @@ void GameplayScene::init() {
   tilemap = new Tilemap(levelName, _renderer);
   EntityManager::Instance()->setTileMap(tilemap);
 
-  _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+  //_camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
 
   if (loaded) {
     return;
@@ -40,8 +43,8 @@ void GameplayScene::init() {
   };
 
 
-  bg1 = new Bg("assets/bgs/clouds.png", { 512.0f, 352.0f });
-  bg2 = new Bg("assets/bgs/town.png", { 512.0f, 352.0f });;
+  bg1 = new Bg("assets/bgs/clouds.png", { 512, 352 });
+  bg2 = new Bg("assets/bgs/town.png", { 512, 352 });
 
   std::vector<TiledObject> objects = tilemap->getObjects();
   for (TiledObject o : objects) {
@@ -53,13 +56,13 @@ void GameplayScene::init() {
     GAME_OBJECT objType = gameObjects.find(o.name)->second;
 
     auto object = instantiateGameObject(objType);
-    object->_position = o.position;
+    object->_position = { (float)o.position.x, (float)o.position.y };
     object->init();
     EntityManager::Instance()->addEntity(std::move(object));
   }
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
-  _camera.follow(player->getRectPointer());
+  // _camera.follow(player->getRectPointer());
   loaded = true;
 }
 
@@ -68,14 +71,14 @@ void GameplayScene::update(float dt) {
     obj->update(dt);
   }
 
-  _camera.update();
+  // _camera.update();
 }
 
 void GameplayScene::draw(SDL_Renderer* renderer) {
   Rect camera = _camera.getRect();
 
-  bg1->draw(renderer, -camera.x * 0.04);
-  bg2->draw(renderer, -camera.x * 0.2);
+  //bg1->draw(renderer, -camera.x * 0.04);
+  //bg2->draw(renderer, -camera.x * 0.2);
 
   std::vector<TileLayer>* layers = tilemap->getLayers();
   // Draw tiles
@@ -94,7 +97,8 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
       SDL_Rect sr = tileset->getTileTextureRect(tile);
 
       if (camera.hasIntersection(&tileRect)) {
-        SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
+        //SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
+        SDL_Rect dr = { tileRect.x, tileRect.y, tileRect.w, tileRect.h };
         SDL_RenderCopyEx(renderer, tileset->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
       }
 
@@ -107,10 +111,13 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
   // Draw objects
   for(const auto &obj : *EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
-    if (objRect.hasIntersection(&camera)) {
-      obj->draw(renderer, { (float)camera.x, (float)camera.y });
-    }
+    //if (objRect.hasIntersection(&camera)) {
+      //obj->draw(renderer, { (float)camera.x, (float)camera.y });
+      obj->draw(renderer, { 0.0, 0.0 });
+    //}
   }
-
-  //debugPrinter::drawHitboxes(renderer, camera);
+  
+  DebugPrinter::Instance()->drawHitboxes(renderer, camera);
+  DebugPrinter::Instance()->draw(renderer);
+  SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 }

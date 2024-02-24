@@ -12,13 +12,13 @@
 class AbstractGameObject {
   public:
     collidable _collidable;
-    v2 _position;
+    v2f _position;
     velocity _velocity;
     gravity _gravity;
 
     virtual void init();
     virtual void update(float dt);
-    virtual void draw(SDL_Renderer* renderer, v2 offset);
+    virtual void draw(SDL_Renderer* renderer, v2f offset);
     virtual ~AbstractGameObject() {
     }
     virtual void handleEvent(SDL_Event* event) {};
@@ -27,9 +27,10 @@ class AbstractGameObject {
     virtual bool contains(AbstractGameObject other);
     virtual void onCollision(AbstractGameObject* other) {}; // @TODO: connect this
     Rect getRect();
-    Rect* getRectPointer();
-    v2 getPosition();
-    v2* getPositionPointer();
+    RectF getRectFloat();
+    RectF* getRectPointer();
+    v2f getPosition();
+    v2f* getPositionPointer();
     bool getListensForCollisions();
     GAME_OBJECT getType();
     OBJECT_TAG getTag();

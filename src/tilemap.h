@@ -15,7 +15,7 @@ typedef std::map<std::string, std::string> TiledLayer;
 // This will be removed soon
 struct TiledObject {
   std::string name;
-  v2 position;
+  v2i position;
 
   std::optional<float> width = NULL;
   std::optional<float> height = NULL;
@@ -65,32 +65,19 @@ class Tilemap
       return _objects;
     }
 
-    /// Returns -1 if outside the map
-    int getIdxFromPoint(int x, int y) {
-        int x_coord = x / tileWidth;
-        int y_coord = y / tileHeight;
-
-        // Return -1 if outide the map
-        if (x_coord < 0 || y_coord < 0 ||
-            x_coord > _tilesWide || y_coord > _tilesTall
-            ) {
-          return -1;
-        }
-
-        return (y_coord * _tilesWide) + x_coord;
+    bool isOutsideMap(int x, int y) {
+      return (
+        x < 0 || y < 0 ||
+        x > _tilesWide * tileWidth || y > _tilesTall * tileHeight
+      );
     }
 
-    Rect getTilePosition(int layerIdx, int idx) {
-      int x = 0;
-      int y = 0;
+    std::vector<int> getIndicesWithinRect(Rect r, int layer);
 
-      if (idx > 0) {
-        x = (idx % _tilesWide) * tileWidth;
-        y = (idx / _tilesWide) * tileHeight;
-      }
+    /// Returns -1 if empty tile
+    int getIdxFromPoint(int x, int y, int layer);
 
-      return { x, y, tileWidth, tileHeight };
-    }
+    Rect getTilePosition(int layerIdx, int idx);
 
     std::vector<TileLayer>* getLayers() {
       return &_layers;

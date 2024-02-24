@@ -4,6 +4,7 @@
 #include "../tilemap.h"
 #include "../entityManager.h"
 #include "velocity.h"
+#include <algorithm>
 
 // @TODO: use bitfield instead?
 struct CollisionResponse {
@@ -20,13 +21,14 @@ struct CollisionResponse {
 class collidable {
   public:
     Rect boundingBox;
-    Rect rect;
+    RectF rect;
 
     collidable();
-    collidable(v2 position, Rect boundingBox);
+    collidable(v2f position, Rect boundingBox);
     bool checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect);
-    bool collideAt(v2 p, Rect* outRect);
-    Rect addBoundingBox(v2 p);
-    void update(v2 position);
-    CollisionResponse moveAndSlide(v2* position, velocity* velocity, float dt);
+    bool collideAt(v2f p, Rect* outRect);
+    RectF addBoundingBox(v2f p);
+    void update(v2f position);
+    CollisionResponse moveAndSlide(v2f* position, velocity* velocity, float dt);
+    void moveAndSlide2(v2f position, v2f* velocity, float dt);
 };
