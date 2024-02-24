@@ -2,7 +2,7 @@
 #include "abstractGameobject.h"
 
 EntityManager::EntityManager() {
-  _entities = std::vector<std::unique_ptr<AbstractGameObject>>();
+  _entities = std::vector<std::shared_ptr<AbstractGameObject>>();
 }
 
 EntityManager* EntityManager::Instance() {
@@ -14,7 +14,7 @@ EntityManager* EntityManager::Instance() {
   return _instance;
 }
 
-void EntityManager::addEntity(std::unique_ptr<AbstractGameObject> x) {
+void EntityManager::addEntity(std::shared_ptr<AbstractGameObject> x) {
   _entities.push_back(std::move(x));
 }
 
@@ -22,7 +22,7 @@ void EntityManager::setTileMap(Tilemap* x) {
 _tilemap = x;
 }
 
-std::vector<std::unique_ptr<AbstractGameObject>>* EntityManager::getEntities() {
+std::vector<std::shared_ptr<AbstractGameObject>>* EntityManager::getEntities() {
   return &_entities;
 }
 
@@ -39,8 +39,8 @@ AbstractGameObject* EntityManager::getEntityByTag(OBJECT_TAG tag) {
 }
 
 /*
-std::vector<std::unique_ptr<AbstractGameObject>> EntityManager::getEntitiesByTag(OBJECT_TAG tag) {
-  std::vector<std::unique_ptr<AbstractGameObject>> filtered;
+std::vector<std::shared_ptr<AbstractGameObject>> EntityManager::getEntitiesByTag(OBJECT_TAG tag) {
+  std::vector<std::shared_ptr<AbstractGameObject>> filtered;
 
   for(const auto &obj : _entities) {
     if (obj->getTag() == tag) {

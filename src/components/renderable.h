@@ -13,7 +13,7 @@ class Renderable {
       int y = round(position.y);
       SDL_Rect dr = { x, y, sr.w, sr.h };
 
-      //SDL_RenderCopyEx(renderer, texture, &sr, &dr, 0, 0, textureFlip);
+      SDL_RenderCopyEx(renderer, texture, &sr, &dr, 0, 0, textureFlip);
     }
 };
 

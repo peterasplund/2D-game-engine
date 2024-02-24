@@ -67,7 +67,7 @@ public:
     imguiVisible = !imguiVisible;
   }
 
-  void debugEntities(std::vector<std::unique_ptr<AbstractGameObject>>* entities) {
+  void debugEntities(std::vector<std::shared_ptr<AbstractGameObject>>* entities) {
     if (!imguiVisible) {
       return;
     }

@@ -23,7 +23,7 @@ class AbstractGameObject {
     }
     virtual void handleEvent(SDL_Event* event) {};
     void setListenForCollisions();
-    virtual bool contains(Rect other);
+    virtual bool contains(RectF other);
     virtual bool contains(AbstractGameObject other);
     virtual void onCollision(AbstractGameObject* other) {}; // @TODO: connect this
     Rect getRect();

@@ -44,7 +44,7 @@ void AbstractGameObject::setListenForCollisions() {
   _listenForCollisions = true;
 }
 
-bool AbstractGameObject::contains(Rect other) {
+bool AbstractGameObject::contains(RectF other) {
   return _collidable.rect.hasIntersection(&other);
 }
 

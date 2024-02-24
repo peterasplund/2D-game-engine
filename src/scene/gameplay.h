@@ -23,7 +23,7 @@ private:
   Tilemap* tilemap;
   std::string _level;
   bool loaded = false;
-  std::unique_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
+  std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
 public:
   GameplayScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
     _renderer = renderer;

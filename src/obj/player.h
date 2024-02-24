@@ -27,9 +27,7 @@ namespace obj {
 
         this->_collidable.boundingBox = { 
           14, 15, 
-          //22, 31 
-          //22, 32 // Debug with two tiles tall 
-          16, 16 
+          22, 31 
         };
 
         setListenForCollisions();
@@ -101,13 +99,14 @@ namespace obj {
           _velocity.v.x = runSpeed;
         }
         
-        _collidable.moveAndSlide2(_position, &_velocity.v, dt);
+        auto resp = _collidable.moveAndSlide(_position, &_velocity.v, dt);
+        
+        if (resp.hasCollision()) {
+          resp.print();
+        }
 
         _position.x += _velocity.v.x * dt;
         _position.y += _velocity.v.y * dt;
-
-        _position.x = round(_position.x);
-        _position.y = round(_position.y);
 
         auto &v = _velocity;
         auto &p = _position;
@@ -130,7 +129,7 @@ namespace obj {
       float attackDelay = 450.0f;
       float slideDelay = 200.0f;
       bool isBackDashing = false;
-      float runSpeed = 0.2f;
+      float runSpeed = 0.25f;
       std::string direction = "right";
       State state = State::IDLE;
       Timer attackTimer;

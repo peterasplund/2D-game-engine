@@ -235,7 +235,7 @@ struct RectF {
     h = v.y;
   }
 
-  bool hasIntersection(Rect* other) {
+  bool hasIntersection(RectF* other) {
     if (right() > other->x && x < other->right()) {
       if (bottom() > other->y && y < other->bottom()) {
         return true;

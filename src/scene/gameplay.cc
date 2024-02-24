@@ -4,14 +4,14 @@ bool rayVsRect(v2f& ray_origin, v2f& ray_dir, Rect* target, v2f& contact_point, 
 bool DynamicRectVsRect(Rect* r_dynamic, v2f inVelocity, Rect& r_static, v2f& contact_point, v2f& contact_normal, float& contact_time, float dt);
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
-std::unique_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
-  std::unique_ptr<AbstractGameObject> o;
+std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
+  std::shared_ptr<AbstractGameObject> o;
   switch (obj) {
     case GAME_OBJECT::PLAYER:
-      o = std::make_unique<obj::Player>();
+      o = std::make_shared<obj::Player>();
       break;
     case GAME_OBJECT::DOOR:
-      o = std::make_unique<obj::Door>();
+      o = std::make_shared<obj::Door>();
       break;
   }
 

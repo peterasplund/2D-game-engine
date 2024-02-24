@@ -7,15 +7,26 @@
 #include <algorithm>
 
 // @TODO: use bitfield instead?
+/// Each direction corresponds to the ID of the tile it collided with. -1 means no collision.
 struct CollisionResponse {
-  bool top;
-  bool bottom;
-  bool left;
-  bool right;
+  int top = -1;
+  int bottom = -1;
+  int left = -1;
+  int right = -1;
 
   bool hasCollision() {
-    return top || bottom || left || right;
+    return top != -1 || bottom != -1 || left != -1 || right != -1;
   }
+
+
+  void print() {
+    printf("top: %d\t right: %d\t bottom: %d\tleft: %d\n", top, right, bottom, left);
+  }
+};
+
+struct TileExistsAtResponse {
+  int layer;
+  int tileId;
 };
 
 class collidable {
@@ -26,9 +37,9 @@ class collidable {
     collidable();
     collidable(v2f position, Rect boundingBox);
     bool checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect);
-    bool collideAt(v2f p, Rect* outRect);
+    std::vector<TileExistsAtResponse> tileExistsAt(Rect rect);
+    std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(Rect rect);
     RectF addBoundingBox(v2f p);
     void update(v2f position);
-    CollisionResponse moveAndSlide(v2f* position, velocity* velocity, float dt);
-    void moveAndSlide2(v2f position, v2f* velocity, float dt);
+    CollisionResponse moveAndSlide(v2f position, v2f* velocity, float dt);
 };

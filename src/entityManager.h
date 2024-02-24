@@ -13,18 +13,18 @@ class AbstractGameObject;
  */
 class EntityManager {
   public:
-    std::vector<std::unique_ptr<AbstractGameObject>> _entities;
+    std::vector<std::shared_ptr<AbstractGameObject>> _entities;
     Tilemap* _tilemap;
     EntityManager();
 
     static EntityManager* Instance();
 
-    void addEntity(std::unique_ptr<AbstractGameObject> x);
+    void addEntity(std::shared_ptr<AbstractGameObject> x);
 
     void setTileMap(Tilemap* x);
 
-    std::vector<std::unique_ptr<AbstractGameObject>>* getEntities();
-    //std::vector<std::unique_ptr<AbstractGameObject>> getEntitiesByTag(OBJECT_TAG tag);
+    std::vector<std::shared_ptr<AbstractGameObject>>* getEntities();
+    //std::vector<std::shared_ptr<AbstractGameObject>> getEntitiesByTag(OBJECT_TAG tag);
     /// Gets the first object it finds by tag
     AbstractGameObject* getEntityByTag(OBJECT_TAG tag);
 
