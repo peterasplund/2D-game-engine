@@ -10,7 +10,8 @@
 class ImguiLayer {
 private:
   bool imguiVisible = false;
-  bool debugRectangles = false;
+  bool debugRectangles = true;
+  //bool debugRectangles = false;
 public:
   static ImguiLayer* Instance() {
     static ImguiLayer* _instance = nullptr;
@@ -77,16 +78,27 @@ public:
       return;
     }
 
+
     ImGui::Begin("Test");
     ImGui::SetWindowFontScale(0.5);
 
     ImGui::Checkbox("Collision rectangles", &debugRectangles);
 
-    for(const auto &obj : *entities) {
-      ImGui::Text("- Object ID: 0 -");
-      ImGui::Text("Tag: %d", obj->getTag());
-      ImGui::Text("Type: %d", obj->getType());
-      ImGui::Text("position: (%f\t%f)", obj->getPosition().x, obj->getPosition().y);
+    if (ImGui::TreeNode("Entities")) {
+      int i = 0;
+      char nodeName[1024];
+      for(const auto &obj : *entities) {
+        sprintf(nodeName, "- Object ID: %d -", i);
+        if (ImGui::TreeNode(nodeName)) {
+          ImGui::Text("Tag: %d", obj->getTag());
+          ImGui::Text("Type: %d", obj->getType());
+          ImGui::Text("position: (%f\t%f)", obj->getPosition().x, obj->getPosition().y);
+          ImGui::TreePop();
+        }
+        i ++;
+      }
+
+      ImGui::TreePop();
     }
 
     ImGui::End();

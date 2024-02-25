@@ -72,7 +72,7 @@ class Tilemap
       );
     }
 
-    std::vector<int> getIndicesWithinRect(Rect r, int layer);
+    std::vector<int> getIndicesWithinRect(RectF r, int layer);
 
     /// Returns -1 if empty tile
     int getIdxFromPoint(int x, int y, int layer);
@@ -83,7 +83,7 @@ class Tilemap
       return &_layers;
     }
 
-    TileData getTileData(int idx) {
+    TileData* getTileData(int idx) {
       return _tileset.getTileData(idx);
     }
 

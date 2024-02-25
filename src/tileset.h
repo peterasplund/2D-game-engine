@@ -38,8 +38,8 @@ class Tileset {
       return _texture;
     }
 
-    TileData getTileData(int idx) {
-      return _tiles.at(idx);
+    TileData* getTileData(int idx) {
+      return &_tiles.at(idx);
     }
 
   private:

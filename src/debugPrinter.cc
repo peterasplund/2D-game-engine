@@ -34,10 +34,11 @@ void DebugPrinter::drawHitboxes(SDL_Renderer* renderer, Rect camera) {
   for(const auto &obj : *EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
     if (objRect.hasIntersection(&camera)) {
-      SDL_Rect hitbox = obj->_collidable.boundingBox.to_sdl_rect();
+      RectF r = obj->_collidable.addBoundingBox(obj->_position);
+      SDL_Rect hitbox = r.to_sdl_rect();
       SDL_Rect rect = { 
-        (int)round(obj->_position.x) + hitbox.x - camera.x,
-        (int)round(obj->_position.y) + hitbox.y - camera.y,
+        hitbox.x - camera.x,
+        hitbox.y - camera.y,
         hitbox.w,
         hitbox.h,
       };

@@ -37,9 +37,9 @@ class collidable {
     collidable();
     collidable(v2f position, Rect boundingBox);
     bool checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect);
-    std::vector<TileExistsAtResponse> tileExistsAt(Rect rect);
+    std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
     std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(Rect rect);
     RectF addBoundingBox(v2f p);
     void update(v2f position);
-    CollisionResponse moveAndSlide(v2f position, v2f* velocity, float dt);
+    CollisionResponse moveAndSlide(v2f* position, velocity* velocity, float dt);
 };

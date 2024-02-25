@@ -41,6 +41,10 @@ class Animation
       currentFrame = 0;
     }
 
+    bool hasPlayedThrough() {
+      return currentFrame >= frames.size() && !looping;
+    }
+
     SDL_Rect getFrame(Timer* timer) {
       ellapsedMS  = timer->elapsed();
 

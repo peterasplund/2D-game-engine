@@ -143,7 +143,7 @@ int Tilemap::getIdxFromPoint(int x, int y, int layer) {
     return idx;
 }
 
-std::vector<int> Tilemap::getIndicesWithinRect(Rect r, int layer) {
+std::vector<int> Tilemap::getIndicesWithinRect(RectF r, int layer) {
   std::vector<int> indices;
 
   for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {

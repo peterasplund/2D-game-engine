@@ -50,6 +50,14 @@ class Animator
       }
     }
 
+    bool hasPlayedThrough() {
+      if (_animations[_currentAnimation] == nullptr) {
+        return true;
+      }
+
+      return _animations[_currentAnimation]->hasPlayedThrough();
+    }
+
     std::string getCurrent() {
       return _currentAnimation;
     }

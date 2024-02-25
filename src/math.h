@@ -14,6 +14,12 @@ struct v2
   inline constexpr v2() = default;
   inline constexpr v2(T _x, T _y) : x(_x), y(_y) {}
 
+// Copy constructor
+  inline constexpr v2(const v2& v) = default;
+
+  // Assignment operator
+  inline constexpr v2& operator=(const v2& v) = default;
+
   inline auto magnitude() {
     return sqrt((x * x) + (y * y));
   }
@@ -30,6 +36,16 @@ struct v2
       float dx = x - vec.x;
       float dy = y - vec.y;
       return sqrt(dx*dx + dy*dy);
+  }
+
+// Compare if this vector is numerically equal to another
+  inline constexpr bool operator == (const v2& rhs) const {
+    return (this->x == rhs.x && this->y == rhs.y);
+  }
+
+  // Compare if this vector is not numerically equal to another
+  inline constexpr bool operator != (const v2& rhs) const {
+    return (this->x != rhs.x || this->y != rhs.y);
   }
 
   // Allow casting from any v2 type
@@ -106,13 +122,15 @@ inline constexpr auto operator + (const v2<TL>& lhs, const v2<TR>& rhs) {
 }
 
 template<class TL, class TR>
-inline constexpr auto operator += (const v2<TL>& lhs, const TR& rhs) {
+inline constexpr auto operator += (v2<TL>& lhs, const TR& rhs)
+{
   lhs = lhs + rhs;
   return lhs;
 }
 
 template<class TL, class TR>
-inline constexpr auto operator += (const v2<TL>& lhs, const v2<TR>& rhs) {
+inline constexpr auto operator += (v2<TL>& lhs, const v2<TR>& rhs)
+{
   lhs = lhs + rhs;
   return lhs;
 }
@@ -169,7 +187,17 @@ struct Rectangle {
     h = v.y;
   }
 
-  bool hasIntersection(Rectangle* other) {
+  bool hasIntersection(Rectangle<int, int>* other) {
+    if (right() > other->x && x < other->right()) {
+      if (bottom() > other->y && y < other->bottom()) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool hasIntersection(Rectangle<float, float>* other) {
     if (right() > other->x && x < other->right()) {
       if (bottom() > other->y && y < other->bottom()) {
         return true;
