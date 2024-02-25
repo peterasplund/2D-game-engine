@@ -244,7 +244,6 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
         if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
           collidedWith = otherRect;
           collided = true;
-          break;
         }
       }
     }
@@ -296,7 +295,6 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
         if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
           collidedWith = otherRect;
           collided = true;
-          break;
         }
       }
     }
@@ -304,12 +302,13 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
     if (collided) {
       if (velocity->v.x > 0.0f) {
         newPos.x = floor(collidedWith.x - boundingBox.x - boundingBox.w);
-        respnse.top = true;
+        respnse.right = true;
       }
       else {
         newPos.x = floor(collidedWith.right() - boundingBox.x);
-        respnse.bottom = true;
+        respnse.left = true;
       }
+      velocity->v.x = 0.0f;
     }
   }
 

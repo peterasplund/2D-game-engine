@@ -26,12 +26,6 @@ namespace obj {
 
         _tag = OBJECT_TAG::PLAYER;
 
-        /*
-        this->_collidable.boundingBox = { 
-          0, 0, 
-          18, 28 
-        };
-        */
         this->_collidable.boundingBox = { 
           18, 15, 
           18, 28 
@@ -119,7 +113,7 @@ namespace obj {
         if (_animator.getCurrent() != "slide") {
           _animator.reset();
           _animator.setAnimation("slide");
-          _velocity.v.x += direction == "left" ? -6 : 6;
+          _velocity.v.x += direction == "left" ? -0.6 : 0.6;
         }
       }
 
@@ -167,24 +161,26 @@ namespace obj {
         }
       }
 
-      if (state == State::ATTACK) {
-          _animator.setAnimation("attack");
-      }
-      else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
-          _animator.setAnimation("jump");
-          if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
-            _animator.setAnimation("upToFall");
-          }
-      }
-      else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
-          _animator.setAnimation("fall");
-      }
-      else {
-        if (state == State::RUN) {
-          _animator.setAnimation("run");
+      if (state != State::SLIDE) {
+        if (state == State::ATTACK) {
+            _animator.setAnimation("attack");
+        }
+        else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
+            _animator.setAnimation("jump");
+            if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
+              _animator.setAnimation("upToFall");
+            }
+        }
+        else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
+            _animator.setAnimation("fall");
         }
         else {
-          _animator.setAnimation("idle");
+          if (state == State::RUN) {
+            _animator.setAnimation("run");
+          }
+          else {
+            _animator.setAnimation("idle");
+          }
         }
       }
 
@@ -196,13 +192,11 @@ namespace obj {
       }
 
       // End slide
-      /*
       if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
         state = State::IDLE;
         _animator.reset();
         _animator.setAnimation("idle");
       }
-      */
 
       // Attack
       if (inputHandler->isHeld(BUTTON::ATTACK) && attackTimer.elapsed() > attackDelay/* && g.onFloor*/) {
@@ -213,12 +207,10 @@ namespace obj {
       }
 
       // Slide
-      /*
-      if (inputHandler->isHeld(BUTTON::DOWN)*//* && g.onFloor*//*) {
-        state = S_SLIDE;
+      if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
+        state = State::SLIDE;
         slideTimer.reset();
       }
-      */
 
         // die and respawn when falling of level
         if (_position.y > 370.0f) {
@@ -230,14 +222,6 @@ namespace obj {
         if (resp.hasCollision()) {
           // resp.print();
         }
-
-        /*
-        _position.x += _velocity.v.x * dt;
-        _position.y += _velocity.v.y * dt;
-        */
-        //_position.x = (int)floor(_position.x);
-        //_position.y = (int)floor(_position.y);
-
 
         auto collisionBelow = _collidable.tileExistsAt({
           round(_collidable.rect.x),
@@ -274,7 +258,7 @@ namespace obj {
       GAME_OBJECT _type = GAME_OBJECT::PLAYER;
       Animator _animator;
 
-      float jumpPower = 0.65f;
+      float jumpPower = 0.55f;
       float backDashSpeed = 1.5f;
       float attackSpeed = 3.0f;
       float attackDelay = 450.0f;
