@@ -88,17 +88,99 @@ namespace obj {
         AbstractGameObject::update(dt);
         InputHandler* inputHandler = InputHandler::Instance();
 
+      if (state == State::SLIDE) {
+        if (_animator.getCurrent() != "slide") {
+          _animator.reset();
+          _animator.setAnimation("slide");
+          _velocity.v.x += direction == "left" ? -6 : 6;
+        }
+      }
+
+      if (state != State::ATTACK) {
+        if (state != State::JUMP && inputHandler->isHeld(BUTTON::JUMP) && (_gravity.onFloor || state == State::SLIDE)) {
+          state = State::JUMP;
+          _velocity.v.y = -jumpPower;
+        }
+
+        // temp move up/down
+        /*
         if (inputHandler->isHeld(BUTTON::UP)) {
-          _velocity.v.y = -runSpeed;
-        } else if (inputHandler->isHeld(BUTTON::DOWN)) {
-          _velocity.v.y = runSpeed;
+          _velocity.y = -runSpeed;
         }
-        if (inputHandler->isHeld(BUTTON::LEFT)) {
-          _velocity.v.x = -runSpeed;
-        } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-          _velocity.v.x = runSpeed;
+        else if (inputHandler->isHeld(BUTTON::DOWN)) {
+          _velocity.y = runSpeed;
         }
-        
+        */
+
+        if (state != State::SLIDE) {
+          if (inputHandler->isHeld(BUTTON::LEFT)) {
+            direction = "left";
+            _velocity.v.x = -runSpeed;
+            _renderable.textureFlip = SDL_FLIP_NONE;
+            state = State::RUN;
+          } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+            direction = "right";
+            _velocity.v.x = runSpeed;
+            _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
+            state = State::RUN;
+          } else if (state != State::SLIDE) {
+            state = State::IDLE;
+          }
+        }
+      }
+
+      if (state == State::ATTACK) {
+          _animator.setAnimation("attack");
+      }
+      else if (!_gravity.onFloor) {
+          _animator.setAnimation("fall");
+      }
+      else {
+        if (state == State::RUN) {
+          _animator.setAnimation("run");
+        }
+        else {
+          _animator.setAnimation("idle");
+        }
+      }
+
+      // End ttack
+      if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
+        state = State::IDLE;
+        _animator.reset();
+        _animator.setAnimation("idle");
+      }
+
+      // End slide
+      /*
+      if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
+        state = State::IDLE;
+        _animator.reset();
+        _animator.setAnimation("idle");
+      }
+      */
+
+      // Attack
+      if (inputHandler->isHeld(BUTTON::ATTACK) && attackTimer.elapsed() > attackDelay/* && g.onFloor*/) {
+        state = State::ATTACK;
+        _animator.reset();
+        _animator.setAnimation("attack");
+        attackTimer.reset();
+      }
+
+      // Slide
+      /*
+      if (inputHandler->isHeld(BUTTON::DOWN)*//* && g.onFloor*//*) {
+        state = S_SLIDE;
+        slideTimer.reset();
+      }
+      */
+
+        // die and respawn when falling of level
+        if (_position.y > 370.0f) {
+          _position.y = -(float)_renderable.textureRect.h;
+        }
+
         auto resp = _collidable.moveAndSlide(_position, &_velocity.v, dt);
         
         if (resp.hasCollision()) {
@@ -107,6 +189,22 @@ namespace obj {
 
         _position.x += _velocity.v.x * dt;
         _position.y += _velocity.v.y * dt;
+
+
+        auto collisionBelow = _collidable.tileExistsAt({
+          (int)_collidable.rect.x,
+          (int)(_collidable.rect.y + _collidable.rect.h + 1),
+          (int)_collidable.rect.w,
+          1
+        });
+
+        _gravity.onFloor = false;
+
+        if (collisionBelow.size() > 0) {
+          // @TODO: lookup in tilemap with tileId to see if it's solid
+          _gravity.onFloor = true;
+        }
+
 
         auto &v = _velocity;
         auto &p = _position;
@@ -123,7 +221,7 @@ namespace obj {
       GAME_OBJECT _type = GAME_OBJECT::PLAYER;
       Animator _animator;
 
-      float jumpPower = 6.0f;
+      float jumpPower = 0.7f;
       float backDashSpeed = 1.5f;
       float attackSpeed = 3.0f;
       float attackDelay = 450.0f;

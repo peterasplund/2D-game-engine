@@ -6,33 +6,46 @@ void AbstractGameObject::init() {
 
 
 void AbstractGameObject::update(float dt) {
+  _gravity.update(&_position, &_velocity, dt);
   _collidable.update(_position);
 
   auto &p = _position;
-  _velocity.v.x = 0;
-  _velocity.v.y = 0;
 
   // Friction
-  if (_velocity.v.x > 0.05) {
-    _velocity.v.x -= _velocity.friction;
-  } else if (_velocity.v.x < -0.05) {
-    _velocity.v.x += _velocity.friction;
-  } else {
-    _velocity.v.x = 0;
+  if (_velocity.v.x > 0.0f) {
+    if (_velocity.v.x - _velocity.friction > 0.0f) {
+      _velocity.v.x -= _velocity.friction;
+    }
+    else {
+      _velocity.v.x = 0;
+    }
+  } else if (_velocity.v.x < 0.0f) {
+    if (_velocity.v.x + _velocity.friction < 0.0f) {
+      _velocity.v.x += _velocity.friction;
+    }
+    else {
+      _velocity.v.x = 0;
+    }
   }
-  /*
 
   // Handle Y friction if we don't have gravity
-  //if (_gravity.entityGravity == 0.0f) {
-    if (_velocity.v.y > 0.2) {
-      _velocity.v.y -= _velocity.friction;
-    } else if (_velocity.v.y < -0.2) {
-      _velocity.v.y += (_velocity.friction * dt) / 10;
-    } else {
-      _velocity.v.y = 0;
-    }
-    */
-  //}
+  if (_gravity.entityGravity == 0.0f) {
+    if (_velocity.v.y > 0.0f) {
+      if (_velocity.v.y - _velocity.friction > 0.0f) {
+        _velocity.v.y -= _velocity.friction;
+      }
+      else {
+        _velocity.v.y = 0;
+      }
+    } else if (_velocity.v.y < 0.0f) {
+      if (_velocity.v.y + _velocity.friction < 0.0f) {
+        _velocity.v.y += _velocity.friction;
+      }
+      else {
+        _velocity.v.y = 0;
+      }
+    } 
+  }
 }
 
 void AbstractGameObject::draw(SDL_Renderer* renderer, v2f offset) {

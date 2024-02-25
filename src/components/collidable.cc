@@ -132,11 +132,17 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(Rect rect) {
   Tilemap* t = EntityManager::Instance()->getTilemap();
   for(int layerId = 0; layerId < t->getLayers()->size(); layerId++) {
     std::vector<int> tiles = t->getIndicesWithinRect(rect, layerId);
-    for(int tileId : tiles) {
-      response.push_back(TileExistsAtResponse {
-        layerId,
-        tileId,
-      });
+    for(int possibleIdx : tiles) {
+      int tileId = 0;
+      tileId = t->getLayers()->at(layerId).tiles.at(possibleIdx);
+      Rect r = t->getTilePosition(layerId, possibleIdx);
+
+      if (rect.hasIntersection(&r)) {
+        response.push_back(TileExistsAtResponse {
+          layerId,
+          tileId,
+        });
+      }
     }
   }
 

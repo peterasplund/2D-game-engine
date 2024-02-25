@@ -106,6 +106,7 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
   }
 }
 
+// @TODO: rename to getTileRect
 Rect Tilemap::getTilePosition(int layerIdx, int idx) {
   int x = 0;
   int y = 0;
@@ -142,9 +143,6 @@ int Tilemap::getIdxFromPoint(int x, int y, int layer) {
     return idx;
 }
 
-// @TODO: This is kinda naive right now. I We just sample corners and one point between each corner.
-// We wanna use this method:
-// https://youtu.be/8JJ-4JgR7Dg?list=PLag3Nl349Trp27qK-PXWsn8T5BA_SVITt&t=3223
 std::vector<int> Tilemap::getIndicesWithinRect(Rect r, int layer) {
   std::vector<int> indices;
 
