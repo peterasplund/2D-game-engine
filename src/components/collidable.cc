@@ -214,6 +214,12 @@ CollisionResponse collidable::moveAndSlide(v2f position, v2f* velocity, float dt
         continue;
       }
 
+      TileData tileData = EntityManager::Instance()->getTilemap()->getTileData(tileId);
+
+      if (!tileData.solid) {
+        continue;
+      }
+
       Rect otherRect = tilemap->getTilePosition(layer, possibleIdx);
       DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 

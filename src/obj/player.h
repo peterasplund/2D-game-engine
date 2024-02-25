@@ -201,8 +201,13 @@ namespace obj {
         _gravity.onFloor = false;
 
         if (collisionBelow.size() > 0) {
-          // @TODO: lookup in tilemap with tileId to see if it's solid
-          _gravity.onFloor = true;
+          for(auto collision : collisionBelow) {
+            TileData tileData = EntityManager::Instance()->getTilemap()->getTileData(collision.tileId);
+
+            if (tileData.solid) {
+              _gravity.onFloor = true;
+            }
+          }
         }
 
 

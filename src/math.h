@@ -139,40 +139,37 @@ inline constexpr auto operator -= (const v2<TL>& lhs, const TR& rhs) {
   return lhs;
 }
 
-
-typedef v2<int> v2i;
-typedef v2<float> v2f;
-
-struct Rect {
-  int x;
-  int y;
-  int w;
-  int h;
+template<class T, class J>
+struct Rectangle {
+  T x;
+  T y;
+  J w;
+  J h;
 
   int top() { return y; }
   int bottom() { return y + h; }
   int left() { return x; }
   int right() { return x + w; }
 
-  v2i pos() {
+  v2<T> pos() {
     return { x, y };
   }
 
-  v2i size() {
+  v2<J> size() {
     return { w, h };
   }
 
-  void setPos(v2i v) {
+  void setPos(v2<T> v) {
     x = v.x;
     y = v.y;
   }
 
-  void setSize(v2i v) {
+  void setSize(v2<J> v) {
     w = v.x;
     h = v.y;
   }
 
-  bool hasIntersection(Rect* other) {
+  bool hasIntersection(Rectangle* other) {
     if (right() > other->x && x < other->right()) {
       if (bottom() > other->y && y < other->bottom()) {
         return true;
@@ -182,71 +179,8 @@ struct Rect {
     return false;
   }
 
-  static Rect from_sdl_rect(SDL_Rect r) {
-    return Rect {
-      r.x,
-      r.y,
-      r.w,
-      r.h,
-    };
-  }
-
-  SDL_Rect to_sdl_rect() {
-    return SDL_Rect {
-      this->x,
-      this->y,
-      this->w,
-      this->h,
-    };
-  }
-
-  // @TODO: place this behind compiler flag
-  void debug() {
-    printf("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
-  }
-};
-
-struct RectF {
-  float x;
-  float y;
-  float w;
-  float h;
-
-  int top() { return y; }
-  int bottom() { return y + h; }
-  int left() { return x; }
-  int right() { return x + w; }
-
-  v2f pos() {
-    return { x, y };
-  }
-
-  v2f size() {
-    return { w, h };
-  }
-
-  void setPos(v2f v) {
-    x = v.x;
-    y = v.y;
-  }
-
-  void setSize(v2f v) {
-    w = v.x;
-    h = v.y;
-  }
-
-  bool hasIntersection(RectF* other) {
-    if (right() > other->x && x < other->right()) {
-      if (bottom() > other->y && y < other->bottom()) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  static Rect from_sdl_rect(SDL_Rect r) {
-    return Rect {
+  static Rectangle from_sdl_rect(SDL_Rect r) {
+    return Rectangle {
       r.x,
       r.y,
       r.w,
@@ -269,21 +203,9 @@ struct RectF {
   }
 };
 
-/*
-RectF group(RectF r1, RectF r2) {
-  float x = std::min(r1.x, r2.x);
-  float y = std::min(r1.y, r2.y);
+typedef v2<int> v2i;
+typedef v2<float> v2f;
+typedef Rectangle<float, float> RectF;
+typedef Rectangle<int, int> Rect;
 
-  float max_right = std::max(r1.right(), r2.right());
-  float max_bottom = std::max(r1.bottom(), r2.bottom());
-
-  return {
-    x,
-    y,
-    max_right - x,
-    max_bottom - y,
-  };
-}
-*/
-
-Rect group_rects(RectF r1, RectF r2);
+Rectangle<int, int> group_rects(Rectangle<float, float> r1, Rectangle<float, float> r2);

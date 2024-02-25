@@ -65,6 +65,19 @@ bool Tileset::load(std::string filename) {
           p.attribute("value").as_string()
         );
       }
+
+      if (type == "bool") {
+        std::string name = p.attribute("name").as_string();
+
+        if (name.compare("solid") == 0) {
+          tile.solid = p.attribute("value").as_bool();
+        }
+
+        tile.propertiesBool.emplace(
+          name,
+          p.attribute("value").as_bool()
+        );
+      }
     }
 
     tile.id = tileNode.attribute("id").as_int();

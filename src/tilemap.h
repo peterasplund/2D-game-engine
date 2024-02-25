@@ -83,6 +83,10 @@ class Tilemap
       return &_layers;
     }
 
+    TileData getTileData(int idx) {
+      return _tileset.getTileData(idx);
+    }
+
     Tileset* getTileset() {
       return &_tileset;
     }

@@ -21,6 +21,7 @@ struct TileData {
   // @TODO: try to use enum as index instead of string
   std::map<std::string, int> propertiesInt;
   std::map<std::string, float> propertiesFloat;
+  std::map<std::string, bool> propertiesBool;
   std::map<std::string, std::string> propertiesString;
 };
 
