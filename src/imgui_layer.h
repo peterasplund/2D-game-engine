@@ -10,6 +10,7 @@
 class ImguiLayer {
 private:
   bool imguiVisible = false;
+  bool debugRectangles = false;
 public:
   static ImguiLayer* Instance() {
     static ImguiLayer* _instance = nullptr;
@@ -67,6 +68,10 @@ public:
     imguiVisible = !imguiVisible;
   }
 
+  bool* getDebugRectanglesBool() {
+    return &debugRectangles;
+  }
+
   void debugEntities(std::vector<std::shared_ptr<AbstractGameObject>>* entities) {
     if (!imguiVisible) {
       return;
@@ -74,6 +79,8 @@ public:
 
     ImGui::Begin("Test");
     ImGui::SetWindowFontScale(0.5);
+
+    ImGui::Checkbox("Collision rectangles", &debugRectangles);
 
     for(const auto &obj : *entities) {
       ImGui::Text("- Object ID: 0 -");

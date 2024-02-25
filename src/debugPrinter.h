@@ -4,6 +4,7 @@
 #include "math.h"
 #include "entityManager.h"
 #include "abstractGameobject.h"
+#include "imgui_layer.h"
 
 struct DebugRect {
   Uint8 r;
@@ -14,9 +15,11 @@ struct DebugRect {
 
 class DebugPrinter {
 private:
+  bool* debugRectangles;
   std::vector<DebugRect> debug_rects;
 
   DebugPrinter() {
+    debugRectangles = ImguiLayer::Instance()->getDebugRectanglesBool();
   }
 
 public:

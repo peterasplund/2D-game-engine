@@ -1,7 +1,10 @@
 #include "debugPrinter.h"
 
 void DebugPrinter::addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b) {
-  // @TODO: check if debug variable is set
+  if (!*debugRectangles) {
+    return;
+  }
+
   debug_rects.push_back({
       r,
       g,
@@ -11,6 +14,10 @@ void DebugPrinter::addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b) {
 }
   
 void DebugPrinter::draw(SDL_Renderer* renderer) {
+  if (!*debugRectangles) {
+    return;
+  }
+
   for(auto r : debug_rects) {
     SDL_SetRenderDrawColor(renderer, r.r, r.g, r.b, 255);
     SDL_RenderDrawRect(renderer, &r.rect);
@@ -20,6 +27,10 @@ void DebugPrinter::draw(SDL_Renderer* renderer) {
 }
 
 void DebugPrinter::drawHitboxes(SDL_Renderer* renderer, Rect camera) {
+  if (!*debugRectangles) {
+    return;
+  }
+
   for(const auto &obj : *EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
     if (objRect.hasIntersection(&camera)) {
