@@ -24,7 +24,7 @@ class EntityManager {
     void setTileMap(Tilemap* x);
 
     std::vector<std::shared_ptr<AbstractGameObject>>* getEntities();
-    //std::vector<std::shared_ptr<AbstractGameObject>> getEntitiesByTag(OBJECT_TAG tag);
+    std::vector<std::shared_ptr<AbstractGameObject>> getEntitiesByTag(OBJECT_TAG tag);
     /// Gets the first object it finds by tag
     AbstractGameObject* getEntityByTag(OBJECT_TAG tag);
 

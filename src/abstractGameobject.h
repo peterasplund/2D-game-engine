@@ -7,8 +7,6 @@
 #include "globals.h"
 #include "math.h"
 
-// class collidable;
-
 class AbstractGameObject {
   public:
     collidable _collidable;
@@ -22,6 +20,7 @@ class AbstractGameObject {
     virtual ~AbstractGameObject() {
     }
     virtual void handleEvent(SDL_Event* event) {};
+    virtual void onInputPressed(int button) {};
     void setListenForCollisions();
     virtual bool contains(RectF other);
     virtual bool contains(AbstractGameObject other);
