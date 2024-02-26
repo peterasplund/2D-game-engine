@@ -4,47 +4,23 @@ void AbstractGameObject::init() {
   _collidable = collidable(_position, Rect::from_sdl_rect(_renderable.textureRect));
 }
 
+float friction(float v, float friction) {
+  if (std::abs(v) > 0.01) {
+    int sign = v > 0 ? 1 : -1;
+
+    return v - friction * sign;
+  }
+
+  return 0.0f;
+}
 
 void AbstractGameObject::update(float dt) {
   _gravity.update(&_position, &_velocity, dt);
   _collidable.update(_position);
 
-  auto &p = _position;
-
-  // Friction
-  if (_velocity.v.x > 0.0f) {
-    if (_velocity.v.x - _velocity.friction > 0.0f) {
-      _velocity.v.x -= _velocity.friction;
-    }
-    else {
-      _velocity.v.x = 0;
-    }
-  } else if (_velocity.v.x < 0.0f) {
-    if (_velocity.v.x + _velocity.friction < 0.0f) {
-      _velocity.v.x += _velocity.friction;
-    }
-    else {
-      _velocity.v.x = 0;
-    }
-  }
-
-  // Handle Y friction if we don't have gravity
+  _velocity.v.x = friction(_velocity.v.x, _velocity.friction);
   if (_gravity.entityGravity == 0.0f) {
-    if (_velocity.v.y > 0.0f) {
-      if (_velocity.v.y - _velocity.friction > 0.0f) {
-        _velocity.v.y -= _velocity.friction;
-      }
-      else {
-        _velocity.v.y = 0;
-      }
-    } else if (_velocity.v.y < 0.0f) {
-      if (_velocity.v.y + _velocity.friction < 0.0f) {
-        _velocity.v.y += _velocity.friction;
-      }
-      else {
-        _velocity.v.y = 0;
-      }
-    } 
+    _velocity.v.y = friction(_velocity.v.y, _velocity.friction);
   }
 }
 

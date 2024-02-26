@@ -43,14 +43,19 @@ public: Game() {
 
       SDL_Event event;
       ImguiLayer* imgui = ImguiLayer::Instance();
+
       while (SDL_PollEvent(&event)) {
-        window.pollEvent(event);
-        InputHandler::Instance()->pollEvent(event);
-        imgui->processEvents(&event);
+        for(const auto &obj : *EntityManager::Instance()->getEntities()) {
+          obj->handleEvent(&event);
+        }
 
         if (event.key.keysym.sym == SDLK_LSHIFT && event.key.state == SDL_PRESSED) {
           imgui->toggleVisible();
         }
+
+        window.pollEvent(event);
+        InputHandler::Instance()->pollEvent(event);
+        imgui->processEvents(&event);
       }
 
       // Old testing code to try out scene transition

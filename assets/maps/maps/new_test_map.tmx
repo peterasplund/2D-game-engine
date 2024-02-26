@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="4">
- <tileset firstgid="1" source="../../../../rust-projects/sdl_gameengine_rust_rewrite/assets/tilesets/dirt-tiles_0.tsx"/>
+ <tileset firstgid="1" source="../tilesets/dirt-tiles_0.tsx"/>
  <layer id="1" name="Tile Layer 1" width="30" height="25">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,

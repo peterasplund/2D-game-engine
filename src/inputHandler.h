@@ -19,6 +19,7 @@ class InputHandler
 private:
   static InputHandler* _instance;
   std::map<int, BUTTON> _buttons;
+  std::map<BUTTON, int> _buttons_translation;
   std::map<BUTTON, bool> _buttonsHold;
   v2i _mousePos;
 
@@ -45,10 +46,15 @@ public:
 
   void addButton(int keyCode, BUTTON button) {
     _buttons[keyCode] = button;
+    _buttons_translation[button] = keyCode;
   }
 
   bool isHeld(BUTTON button) {
     return _buttonsHold[button];
+  }
+
+  int buttonToSDLCode(BUTTON button) {
+    return _buttons_translation[button];
   }
 
   v2i getMousePosition() {

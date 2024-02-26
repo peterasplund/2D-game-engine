@@ -30,12 +30,88 @@
       "-O0",
       "-c",
       "-o",
+      "bin/scene/gameplay.o",
+      "src/scene/gameplay.cc"
+    ],
+    "directory": "/home/peter/code/sdl-game",
+    "file": "/home/peter/code/sdl-game/src/scene/gameplay.cc",
+    "output": "/home/peter/code/sdl-game/bin/scene/gameplay.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wwrite-strings",
+      "-std=c++17",
+      "-I/usr/local/include",
+      "-I/usr/include/SDL2",
+      "-I./lib/pugixml/src/",
+      "-I./lib/imgui/include/",
+      "-O0",
+      "-c",
+      "-o",
       "bin/main.o",
       "src/main.cc"
     ],
     "directory": "/home/peter/code/sdl-game",
     "file": "/home/peter/code/sdl-game/src/main.cc",
     "output": "/home/peter/code/sdl-game/bin/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wwrite-strings",
+      "-std=c++17",
+      "-I/usr/local/include",
+      "-I/usr/include/SDL2",
+      "-I./lib/pugixml/src/",
+      "-I./lib/imgui/include/",
+      "-O0",
+      "-c",
+      "-o",
+      "bin/window.o",
+      "src/window.cc"
+    ],
+    "directory": "/home/peter/code/sdl-game",
+    "file": "/home/peter/code/sdl-game/src/window.cc",
+    "output": "/home/peter/code/sdl-game/bin/window.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wwrite-strings",
+      "-std=c++17",
+      "-I/usr/local/include",
+      "-I/usr/include/SDL2",
+      "-I./lib/pugixml/src/",
+      "-I./lib/imgui/include/",
+      "-O0",
+      "-c",
+      "-o",
+      "bin/abstractGameobject.o",
+      "src/abstractGameobject.cc"
+    ],
+    "directory": "/home/peter/code/sdl-game",
+    "file": "/home/peter/code/sdl-game/src/abstractGameobject.cc",
+    "output": "/home/peter/code/sdl-game/bin/abstractGameobject.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wwrite-strings",
+      "-std=c++17",
+      "-I/usr/local/include",
+      "-I/usr/include/SDL2",
+      "-I./lib/pugixml/src/",
+      "-I./lib/imgui/include/",
+      "-O0",
+      "-c",
+      "-o",
+      "bin/debugPrinter.o",
+      "src/debugPrinter.cc"
+    ],
+    "directory": "/home/peter/code/sdl-game",
+    "file": "/home/peter/code/sdl-game/src/debugPrinter.cc",
+    "output": "/home/peter/code/sdl-game/bin/debugPrinter.o"
   },
   {
     "arguments": [
@@ -68,101 +144,30 @@
       "-O0",
       "-c",
       "-o",
-      "bin/abstractGameobject.o",
-      "src/abstractGameobject.cc"
+      "bin/math.o",
+      "src/math.cc"
     ],
     "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/src/abstractGameobject.cc",
-    "output": "/home/peter/code/sdl-game/bin/abstractGameobject.o"
+    "file": "/home/peter/code/sdl-game/src/math.cc",
+    "output": "/home/peter/code/sdl-game/bin/math.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
+      "-Wwrite-strings",
+      "-std=c++17",
+      "-I/usr/local/include",
       "-I/usr/include/SDL2",
+      "-I./lib/pugixml/src/",
+      "-I./lib/imgui/include/",
+      "-O0",
       "-c",
       "-o",
-      "bin/lib/imgui/src/imgui.o",
-      "lib/imgui/src/imgui.cpp"
+      "bin/tilemap.o",
+      "src/tilemap.cc"
     ],
     "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-I/usr/include/SDL2",
-      "-c",
-      "-o",
-      "bin/lib/imgui/src/imgui_draw.o",
-      "lib/imgui/src/imgui_draw.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui_draw.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui_draw.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-I/usr/include/SDL2",
-      "-c",
-      "-o",
-      "bin/lib/imgui/src/imgui_impl_sdl2.o",
-      "lib/imgui/src/imgui_impl_sdl2.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui_impl_sdl2.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui_impl_sdl2.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-I/usr/include/SDL2",
-      "-c",
-      "-o",
-      "bin/lib/imgui/src/imgui_impl_sdlrenderer2.o",
-      "lib/imgui/src/imgui_impl_sdlrenderer2.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui_impl_sdlrenderer2.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui_impl_sdlrenderer2.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-I/usr/include/SDL2",
-      "-c",
-      "-o",
-      "bin/lib/imgui/src/imgui_tables.o",
-      "lib/imgui/src/imgui_tables.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui_tables.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui_tables.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-I/usr/include/SDL2",
-      "-c",
-      "-o",
-      "bin/lib/imgui/src/imgui_widgets.o",
-      "lib/imgui/src/imgui_widgets.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/imgui/src/imgui_widgets.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/imgui/src/imgui_widgets.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "bin/lib/pugixml/src/pugixml.o",
-      "lib/pugixml/src/pugixml.cpp"
-    ],
-    "directory": "/home/peter/code/sdl-game",
-    "file": "/home/peter/code/sdl-game/lib/pugixml/src/pugixml.cpp",
-    "output": "/home/peter/code/sdl-game/bin/lib/pugixml/src/pugixml.o"
+    "file": "/home/peter/code/sdl-game/src/tilemap.cc",
+    "output": "/home/peter/code/sdl-game/bin/tilemap.o"
   }
 ]

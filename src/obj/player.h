@@ -118,11 +118,6 @@ namespace obj {
       }
 
       if (state != State::ATTACK) {
-        if (state != State::JUMP && inputHandler->isHeld(BUTTON::JUMP) && (_gravity.onFloor || state == State::SLIDE)) {
-          state = State::JUMP;
-          _velocity.v.y = -jumpPower;
-        }
-
         // temp move up/down
         /*
         if (inputHandler->isHeld(BUTTON::UP)) {
@@ -252,6 +247,20 @@ namespace obj {
         _renderable.texture = _animator.getTexture();
 
         AbstractGameObject::draw(renderer, offset);
+      }
+
+      void handleEvent(SDL_Event* event) override {
+        InputHandler* handler = InputHandler::Instance();
+        // @TODO: refactor this into an onKeyPressed event on AbstractGameObject or something
+        if (event->type == SDL_KEYDOWN && !handler->isHeld(BUTTON::JUMP) && event->key.keysym.sym == handler->buttonToSDLCode(BUTTON::JUMP)) {
+          // Jump
+          if (state != State::ATTACK) {
+            if (state != State::JUMP && (_gravity.onFloor || state == State::SLIDE)) {
+              state = State::JUMP;
+              _velocity.v.y = -jumpPower;
+            }
+          }
+        }
       }
 
     protected:

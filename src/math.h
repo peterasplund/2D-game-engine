@@ -5,7 +5,7 @@
 template<class T>
 struct v2
 {
-  static_assert(std::is_arithmetic<T>::value, "olc::v_2d<type> must be numeric");
+  static_assert(std::is_arithmetic<T>::value, "v2<type> must be numeric");
 
   T x = 0;
   T y = 0;
