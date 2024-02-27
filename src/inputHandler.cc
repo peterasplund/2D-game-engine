@@ -15,6 +15,12 @@ void InputHandler::onKeyPressed(BUTTON button) {
   }
 }
 
+void InputHandler::onKeyReleased(BUTTON button) {
+  for(const auto obj : EntityManager::Instance()->getEntities()) {
+    obj->onInputReleased(button);
+  }
+}
+
 void InputHandler::pollEvent(SDL_Event event) {
   std::map<int, BUTTON>::iterator it;
   
@@ -33,6 +39,10 @@ void InputHandler::pollEvent(SDL_Event event) {
     case SDL_KEYUP:
       for (it = _buttons.begin(); it != _buttons.end(); it ++) {
         if (event.key.keysym.sym == it->first) {
+          if (_buttonsHeld[it->second]) {
+            onKeyReleased(it->second);
+          }
+
           _buttonsHeld[it->second] = false;
         }
       }

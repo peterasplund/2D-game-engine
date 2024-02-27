@@ -49,5 +49,6 @@ public:
   int buttonToSDLCode(BUTTON button);
   v2i getMousePosition();
   void onKeyPressed(BUTTON button);
+  void onKeyReleased(BUTTON button);
   void pollEvent(SDL_Event event);
 };

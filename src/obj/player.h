@@ -33,7 +33,6 @@ namespace obj {
 
         setListenForCollisions();
 
-        //SDL_Texture* texture = AssetManager::Instance()->getTexture("assets/sprites/LightBandit_Spritesheet.png");
         SDL_Texture* texture = AssetManager::Instance()->getTexture("assets/sprites/warrior/Warrior/SpriteSheet/Warrior_Sheet-Effect.png");
 
         int tw = 69;
@@ -103,6 +102,8 @@ namespace obj {
         _animator.setAnimation("idle");
 
         this->_renderable.texture = texture;
+        
+        _normalGravity = _gravity.entityGravity;
       }
 
       void update(float dt) override {
@@ -193,14 +194,6 @@ namespace obj {
         _animator.setAnimation("idle");
       }
 
-      // Attack
-      if (inputHandler->isHeld(BUTTON::ATTACK) && attackTimer.elapsed() > attackDelay/* && g.onFloor*/) {
-        state = State::ATTACK;
-        _animator.reset();
-        _animator.setAnimation("attack");
-        attackTimer.reset();
-      }
-
       // Slide
       if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
         state = State::SLIDE;
@@ -232,6 +225,7 @@ namespace obj {
             TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(collision.tileId);
 
             if (tileData->solid) {
+              _jumpHold = false;
               _gravity.onFloor = true;
             }
           }
@@ -240,7 +234,46 @@ namespace obj {
 
         auto &v = _velocity;
         auto &p = _position;
+
+        printf("hold: %d\n", _jumpHold);
+        _gravity.entityGravity = _jumpHold && _velocity.v.y < -0.3f ? _jumpShortGravity : _normalGravity;
+
+        if (_justJumped) {
+          _jumpHold = true;
+          _justJumped = false;
+        }
       }
+
+      void jump() {
+          if (state != State::ATTACK) {
+            if (_gravity.onFloor || state == State::SLIDE) {
+              state = State::JUMP;
+              _velocity.v.y = -jumpPower;
+              _justJumped = true;
+            }
+          }
+      }
+
+      void attack() {
+        if (attackTimer.elapsed() > attackDelay/* && g.onFloor*/) {
+          state = State::ATTACK;
+          _animator.reset();
+          _animator.setAnimation("attack");
+          attackTimer.reset();
+        }
+      }
+
+      void onInputPressed(int button) override {
+        if (button == BUTTON::JUMP)   jump();
+        if (button == BUTTON::ATTACK) attack();
+      };
+
+      void onInputReleased(int button) override {
+        if (button == BUTTON::JUMP) {
+          printf("button released");
+          _jumpHold = false;
+        }
+      };
 
       void draw(SDL_Renderer* renderer, v2f offset) override {
         _renderable.textureRect = _animator.getFrame();
@@ -249,23 +282,15 @@ namespace obj {
         AbstractGameObject::draw(renderer, offset);
       }
 
-
-      void onInputPressed(int button) override {
-        if (button == BUTTON::JUMP) {
-          if (state != State::ATTACK) {
-            if (_gravity.onFloor || state == State::SLIDE) {
-              state = State::JUMP;
-              _velocity.v.y = -jumpPower;
-            }
-          }
-        }
-      };
-
     protected:
       GAME_OBJECT _type = GAME_OBJECT::PLAYER;
       Animator _animator;
 
-      float jumpPower = 0.55f;
+      bool _jumpHold = false;
+      bool _justJumped = false;
+      float _jumpShortGravity = 0.01f;
+      float _normalGravity;
+      float jumpPower = 0.45f;
       float backDashSpeed = 1.5f;
       float attackSpeed = 3.0f;
       float attackDelay = 450.0f;
