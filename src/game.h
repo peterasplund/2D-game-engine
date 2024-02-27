@@ -7,6 +7,7 @@
 #include "sceneManager.h"
 #include "scene.h"
 #include "scene/gameplay.h"
+#include "scene/overworld.h"
 #include "timer.h"
 
 class Game
@@ -29,9 +30,12 @@ public: Game() {
     Timer fpsTimer;
 
     GameplayScene* _gameplayScene = new GameplayScene(renderer, "new_test_map");
+    OverworldScene* _overworldScene = new OverworldScene(renderer, "overworld");
+    //_sceneManager->addScene("overworld", _overworldScene);
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
+    //_sceneManager->gotoScene("overworld", Transition::NONE);
 
     while (!window.isClosed()) {
       LAST = NOW;

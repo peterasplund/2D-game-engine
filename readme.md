@@ -2,10 +2,13 @@ SDL Game engine
 
 TODO:
 
-- Improve Makefile
-- Event system
+- Render debug rectangles relative to the camera
+- Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
+- Render bitmap fonts
+- Dialogue system
+- Migrate from Tiled to LDtk
 - Map manager with transition
-- Read Tiled documentation to come up with a standard way to handle levels
+- Decided to use grid-based or free movement in overworld
 
 deps:
 - SDL2-2.0.10

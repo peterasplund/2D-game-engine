@@ -4,14 +4,17 @@ Tilemap::Tilemap(const char* mapFile, SDL_Renderer* renderer) {
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_file(mapFile);
 
+  if (!result) {
+    printf("Error: Failed to load tilemap at: %s\n", mapFile);
+  }
+
   tileWidth = doc.child("map").attribute("tilewidth").as_int();
   tileHeight = doc.child("map").attribute("tileheight").as_int();
 
   // Set up tileset
   std::string tilesetSrcRel = doc.child("map").child("tileset").attribute("source").as_string();
-  std::string tilesetPath = "assets/maps/maps/";
+  std::string tilesetPath = "assets/maps/";
   std::string tilesetSrcAbs = tilesetPath + tilesetSrcRel;
-
   _tileset.load(tilesetPath + tilesetSrcRel);
 
   // get object positions

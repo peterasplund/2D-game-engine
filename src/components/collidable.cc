@@ -162,6 +162,7 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
         response.push_back(TileExistsAtResponse {
           layerId,
           tileId,
+          rF,
         });
       }
     }

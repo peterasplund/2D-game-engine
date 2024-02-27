@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "../abstractGameobject.h"
-#include "../obj/player.h"
+#include "../obj/player_overworld.h"
 #include "../obj/door.h"
 #include "../scene.h"
 #include "../tilemap.h"
@@ -11,7 +11,8 @@
 #include "../debugPrinter.h"
 #include "../components/camera.h"
 
-class GameplayScene : public Scene
+
+class OverworldScene : public Scene
 {
 private:
   SDL_Renderer* _renderer;
@@ -24,7 +25,7 @@ private:
   std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
 public:
-  GameplayScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
+  OverworldScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
     _renderer = renderer;
     _level = level;
   }

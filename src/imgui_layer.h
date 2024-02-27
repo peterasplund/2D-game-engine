@@ -10,8 +10,7 @@
 class ImguiLayer {
 private:
   bool imguiVisible = false;
-  bool debugRectangles = true;
-  //bool debugRectangles = false;
+  bool debugRectangles = false;
 public:
   static ImguiLayer* Instance() {
     static ImguiLayer* _instance = nullptr;

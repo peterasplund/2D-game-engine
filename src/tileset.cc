@@ -5,7 +5,7 @@ bool Tileset::load(std::string filename) {
   pugi::xml_parse_result result = doc.load_file(filename.c_str());
 
   if (!result) {
-    printf("ERROR: Failed to load the tilemap at: %s\n", filename.c_str());
+    printf("ERROR: Failed to load the tileset file at: %s\n", filename.c_str());
     return false;
   }
 
@@ -29,8 +29,8 @@ bool Tileset::load(std::string filename) {
   _columns = tilesetNode.attribute("columns").as_int();
 
   std::string absPath = "assets/maps/tilesets/";
-  //std::string imgSrc = imageNode.attribute("source").as_string();
-  std::string imgSrc = "../../dirt-tiles_0.png";
+  std::string imgSrc = imageNode.attribute("source").as_string();
+  //std::string imgSrc = "../../dirt-tiles_0.png";
   // @TODO: We have a bug with the image path here
   printf("imgSrc: %s\n\n\n", imgSrc.c_str());
   _texture = AssetManager::Instance()->getTexture(absPath + imgSrc);

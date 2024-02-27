@@ -27,6 +27,7 @@ struct CollisionResponse {
 struct TileExistsAtResponse {
   int layer;
   int tileId;
+  RectF rect;
 };
 
 class collidable {

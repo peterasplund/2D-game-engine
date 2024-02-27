@@ -1,11 +1,11 @@
-#include "gameplay.h"
+#include "overworld.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
-std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
+std::shared_ptr<AbstractGameObject> OverworldScene::instantiateGameObject(GAME_OBJECT obj) {
   std::shared_ptr<AbstractGameObject> o;
   switch (obj) {
     case GAME_OBJECT::PLAYER:
-      o = std::make_shared<obj::Player>();
+      o = std::make_shared<obj::PlayerOverworld>();
       break;
     case GAME_OBJECT::DOOR:
       o = std::make_shared<obj::Door>();
@@ -15,7 +15,7 @@ std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OB
   return o;
 }
 
-void GameplayScene::init() {
+void OverworldScene::init() {
   /*
   if (tilemap != nullptr) {
     delete tilemap;
@@ -28,7 +28,8 @@ void GameplayScene::init() {
   tilemap = new Tilemap(levelName, _renderer);
   EntityManager::Instance()->setTileMap(tilemap);
 
-  //_camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+  _camera = camera();
+  _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
 
   if (loaded) {
     return;
@@ -38,6 +39,7 @@ void GameplayScene::init() {
     { "player", GAME_OBJECT::PLAYER },
     { "door", GAME_OBJECT::DOOR },
   };
+
 
   bg1 = new Bg("assets/bgs/clouds.png", { 512, 352 });
   bg2 = new Bg("assets/bgs/town.png", { 512, 352 });
@@ -58,19 +60,19 @@ void GameplayScene::init() {
   }
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
-  // _camera.follow(player->getRectPointer());
+   _camera.follow(player->getRectPointer());
   loaded = true;
 }
 
-void GameplayScene::update(float dt) {
+void OverworldScene::update(float dt) {
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     obj->update(dt);
   }
 
-  // _camera.update();
+  _camera.update();
 }
 
-void GameplayScene::draw(SDL_Renderer* renderer) {
+void OverworldScene::draw(SDL_Renderer* renderer) {
   Rect camera = _camera.getRect();
 
   //bg1->draw(renderer, -camera.x * 0.04);
@@ -93,8 +95,7 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
       SDL_Rect sr = tileset->getTileTextureRect(tile);
 
       if (camera.hasIntersection(&tileRect)) {
-        //SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
-        SDL_Rect dr = { tileRect.x, tileRect.y, tileRect.w, tileRect.h };
+        SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
         SDL_RenderCopyEx(renderer, tileset->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
       }
 
@@ -107,10 +108,10 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
   // Draw objects
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
-    //if (objRect.hasIntersection(&camera)) {
-      //obj->draw(renderer, { (float)camera.x, (float)camera.y });
-      obj->draw(renderer, { 0.0, 0.0 });
-    //}
+    if (objRect.hasIntersection(&camera)) {
+      obj->draw(renderer, { (float)camera.x, (float)camera.y });
+      //obj->draw(renderer, { 0.0, 0.0 });
+    }
   }
   
   DebugPrinter::Instance()->drawHitboxes(renderer, camera);
