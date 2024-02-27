@@ -45,7 +45,7 @@ public: Game() {
       ImguiLayer* imgui = ImguiLayer::Instance();
 
       while (SDL_PollEvent(&event)) {
-        for(const auto &obj : *EntityManager::Instance()->getEntities()) {
+        for(const auto &obj : EntityManager::Instance()->getEntities()) {
           obj->handleEvent(&event);
         }
 

@@ -73,11 +73,10 @@ public:
     return &debugRectangles;
   }
 
-  void debugEntities(std::vector<std::shared_ptr<AbstractGameObject>>* entities) {
+  void debugEntities(const std::vector<std::shared_ptr<AbstractGameObject>>& entities) {
     if (!imguiVisible) {
       return;
     }
-
 
     ImGui::Begin("Test");
     ImGui::SetWindowFontScale(0.5);
@@ -87,7 +86,7 @@ public:
     if (ImGui::TreeNode("Entities")) {
       int i = 0;
       char nodeName[1024];
-      for(const auto &obj : *entities) {
+      for(const auto &obj : entities) {
         sprintf(nodeName, "- Object ID: %d -", i);
         if (ImGui::TreeNode(nodeName)) {
           ImGui::Text("Tag: %d", obj->getTag());

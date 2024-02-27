@@ -31,7 +31,7 @@ void DebugPrinter::drawHitboxes(SDL_Renderer* renderer, Rect camera) {
     return;
   }
 
-  for(const auto &obj : *EntityManager::Instance()->getEntities()) {
+  for(const auto &obj : EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
     if (objRect.hasIntersection(&camera)) {
       RectF r = obj->_collidable.addBoundingBox(obj->_position);

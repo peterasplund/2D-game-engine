@@ -174,7 +174,7 @@ std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(RectF rect) {
   auto entities = EntityManager::Instance()->getEntities();
   std::vector<std::shared_ptr<AbstractGameObject>> response;
 
-  for(const auto &entity : *entities) {
+  for(const auto &entity : entities) {
     if (rect.hasIntersection(&entity->_collidable.rect)) {
       response.push_back(entity);
     }

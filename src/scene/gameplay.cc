@@ -67,7 +67,7 @@ void GameplayScene::init() {
 }
 
 void GameplayScene::update(float dt) {
-  for(const auto &obj : *EntityManager::Instance()->getEntities()) {
+  for(const auto &obj : EntityManager::Instance()->getEntities()) {
     obj->update(dt);
   }
 
@@ -109,7 +109,7 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
 
   // @TODO: handle drawing some tiles after objects depending on their z-setting in the tmx-format
   // Draw objects
-  for(const auto &obj : *EntityManager::Instance()->getEntities()) {
+  for(const auto &obj : EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
     //if (objRect.hasIntersection(&camera)) {
       //obj->draw(renderer, { (float)camera.x, (float)camera.y });

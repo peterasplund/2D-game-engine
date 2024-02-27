@@ -10,7 +10,7 @@ InputHandler::InputHandler() {
 }
 
 void InputHandler::onKeyPressed(BUTTON button) {
-  for(const auto obj : *EntityManager::Instance()->getEntities()) {
+  for(const auto obj : EntityManager::Instance()->getEntities()) {
     obj->onInputPressed(button);
   }
 }

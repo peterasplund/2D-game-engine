@@ -22,15 +22,15 @@ void EntityManager::setTileMap(Tilemap* x) {
 _tilemap = x;
 }
 
-std::vector<std::shared_ptr<AbstractGameObject>>* EntityManager::getEntities() {
-  return &_entities;
+const std::vector<std::shared_ptr<AbstractGameObject>>& EntityManager::getEntities() {
+  return _entities;
 }
 
 // This is a bit naive without a good data structure but we'll be fine.
-AbstractGameObject* EntityManager::getEntityByTag(OBJECT_TAG tag) {
+std::shared_ptr<AbstractGameObject> EntityManager::getEntityByTag(OBJECT_TAG tag) {
   for(const auto &obj : _entities) {
     if (obj->getTag() == tag) {
-      return &(*obj); // lol
+      return obj;
     }
   }
 
