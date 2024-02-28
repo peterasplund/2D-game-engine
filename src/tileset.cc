@@ -36,10 +36,13 @@ bool Tileset::load(std::string filename) {
     return false;
   }
 
-  _tiles = std::vector<TileData>();
+  _tiles = std::map<int, TileData>();
 
   for (pugi::xml_node tileNode : tilesetNode.children("tile")) {
     TileData tile;
+    tile.id = tileNode.attribute("id").as_int();
+
+    // Add all properties to tile
     for (pugi::xml_node p : tileNode.child("properties").children("property")) {
       std::string type = p.attribute("type").as_string();
       if (type == "int") {
@@ -77,9 +80,7 @@ bool Tileset::load(std::string filename) {
       }
     }
 
-    tile.id = tileNode.attribute("id").as_int();
-
-    _tiles.push_back(tile);
+    _tiles.emplace(tile.id, tile);
   }
 
   return true;

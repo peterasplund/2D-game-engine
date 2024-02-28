@@ -39,8 +39,8 @@ class Tileset {
       return _texture;
     }
 
-    TileData* getTileData(int idx) {
-      return &_tiles.at(idx);
+    TileData* getTileData(int id) {
+      return &_tiles[id];
     }
 
     int getTileWidth() {
@@ -53,7 +53,7 @@ class Tileset {
 
   private:
     SDL_Texture* _texture;
-    std::vector<TileData> _tiles;
+    std::map<int, TileData> _tiles;
     int _tileWidth;
     int _tileHeight;
     int _tileCount;

@@ -9,6 +9,7 @@
 #include "tileset.h"
 #include "math.h"
 #include "pugixml.hpp"
+#include <cassert>
 
 typedef std::map<std::string, std::string> TiledLayer;
 
@@ -37,7 +38,7 @@ class Tilemap
   const std::string OBJECT_POSITIONS_NAME = "objects";
 
   public:
-    Tilemap(int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects);
+    Tilemap(int firstGID, int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects);
 
     ~Tilemap() {
     }
@@ -82,14 +83,33 @@ class Tilemap
       return &_layers;
     }
 
-    TileData* getTileData(int idx) {
-      return _tileset.getTileData(idx);
+    TileData* getTileDataByIdx(int idx, int layer) {
+      assert(layer <= _layers.size());
+      assert(idx <= _layers.at(layer).tiles.size());
+
+      int id = _layers.at(layer).tiles.at(idx);
+      return _tileset.getTileData(id - _firstGID);
     }
+
+    TileData* getTileData(int id) {
+      return _tileset.getTileData(id - _firstGID);
+    }
+
+    /*
+    std::vector<std::pair<int, TileData*>> getTileData(int idx) {
+      std::vector<std::pair<int, TileData*>> tiles;
+      for(int i = 0; i < _layers.size(); i ++) {
+        tiles.push_back(std::pair { i, getTileData(idx, i) } );
+      }
+      return tiles;
+    }
+    */
 
     Tileset* getTileset() {
       return &_tileset;
     }
   private:
+    int _firstGID;
     int _tilesWide;
     int _tilesTall;
 

@@ -46,7 +46,7 @@ namespace obj {
       /// Max run speed
       const float RUN_SPEED = 0.2f;
       /// How long to slide
-      const float SLIDE_POWER = 0.3f;
+      const float SLIDE_POWER = 0.36f;
       /// How fast to get to a stop
       const float SLIDE_DEACCELERATION = 0.004f;
       /// Jump buffer window in MS

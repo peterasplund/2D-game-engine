@@ -30,7 +30,7 @@ public: Game() {
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, "new_test_map");
+    GameplayScene* _gameplayScene = new GameplayScene(renderer, "dungeon");
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);

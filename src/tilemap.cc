@@ -1,6 +1,7 @@
 #include "tilemap.h"
 
-Tilemap::Tilemap(int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects) {
+Tilemap::Tilemap(int firstGID, int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects) {
+  _firstGID = firstGID;
   _tilesWide = tilesWide;
   _tilesTall = tilesTall;
   _tileset = tileset;

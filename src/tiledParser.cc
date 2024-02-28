@@ -19,14 +19,16 @@ Tilemap* tiled_load_map(const char* mapFile) {
 
   // Set up tileset
   std::string tilesetSrcRel = doc.child("map").child("tileset").attribute("source").as_string();
-  std::string tilesetPath = "assets/maps/";
+  std::string tilesetPath = "assets/maps/maps/";
   std::string tilesetSrcAbs = tilesetPath + tilesetSrcRel;
   Tileset tileset;
   tileset.load(tilesetPath + tilesetSrcRel);
 
+  int firstGID = doc.child("map").child("tileset").attribute("firstgid").as_int();
+
   // get object positions
   for (pugi::xml_node group : doc.child("map").children("objectgroup")) {
-    if (group.attribute("name").as_string() == OBJECT_POSITIONS_NAME) {
+    //if (group.attribute("name").as_string() == OBJECT_POSITIONS_NAME) {
       for (pugi::xml_node object = group.first_child(); object; object = object.next_sibling()) {
         TiledObject o;
 
@@ -67,7 +69,7 @@ Tilemap* tiled_load_map(const char* mapFile) {
 
         objects.push_back(o);
       }
-    }
+    //}
   }
 
   for (auto layer : doc.child("map").children("layer")) {
@@ -111,6 +113,7 @@ Tilemap* tiled_load_map(const char* mapFile) {
   }
 
   return new Tilemap(
+    firstGID,
     tilesWide,
     tilesTall,
     std::move(tileset),
