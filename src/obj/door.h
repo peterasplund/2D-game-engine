@@ -4,6 +4,7 @@
 #include "../animator.h"
 #include "../assetManager.h"
 #include "../inputHandler.h"
+#include "../renderer.h"
 
 namespace obj {
   class Door : public AbstractGameObject {
@@ -24,8 +25,8 @@ namespace obj {
         // AbstractGameObject::update(dt);
       }
 
-      void draw(SDL_Renderer* renderer, v2f offset) override {
-        AbstractGameObject::draw(renderer, offset);
+      void draw(Renderer* renderer) override {
+        AbstractGameObject::draw(renderer);
       }
 
     protected:

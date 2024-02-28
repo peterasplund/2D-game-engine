@@ -37,7 +37,6 @@ class Tilemap
   const std::string OBJECT_POSITIONS_NAME = "objects";
 
   public:
-    // Tilemap(const char* mapFile, SDL_Renderer* renderer);
     Tilemap(int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects);
 
     ~Tilemap() {

@@ -216,7 +216,7 @@ struct Rectangle {
     };
   }
 
-  SDL_Rect to_sdl_rect() {
+  SDL_Rect to_sdl_rect() const {
     return SDL_Rect {
       (int)round(this->x),
       (int)round(this->y),

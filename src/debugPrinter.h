@@ -4,13 +4,14 @@
 #include "math.h"
 #include "entityManager.h"
 #include "abstractGameobject.h"
+#include "renderer.h"
 #include "imgui_layer.h"
 
 struct DebugRect {
   Uint8 r;
   Uint8 g;
   Uint8 b;
-  SDL_Rect rect;
+  Rect rect;
 };
 
 class DebugPrinter {
@@ -36,6 +37,5 @@ public:
   }
 
   void addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b);
-  void draw(SDL_Renderer* renderer);
-  void drawHitboxes(SDL_Renderer* renderer, Rect camera);
+  void draw(Renderer* renderer);
 };

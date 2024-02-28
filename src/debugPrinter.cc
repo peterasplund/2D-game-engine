@@ -9,42 +9,35 @@ void DebugPrinter::addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b) {
       r,
       g,
       b,
-      rect->to_sdl_rect(),
+      *rect,
   });
 }
   
-void DebugPrinter::draw(SDL_Renderer* renderer) {
+void DebugPrinter::draw(Renderer* renderer) {
   if (!*debugRectangles) {
     return;
   }
 
   for(auto r : debug_rects) {
-    SDL_SetRenderDrawColor(renderer, r.r, r.g, r.b, 255);
-    SDL_RenderDrawRect(renderer, &r.rect);
+    renderer->setColor(r.r, r.g, r.b, 255);
+    renderer->renderRect(&r.rect);
   }
 
   debug_rects.clear();
-}
 
-void DebugPrinter::drawHitboxes(SDL_Renderer* renderer, Rect camera) {
-  if (!*debugRectangles) {
-    return;
-  }
-
-  for(const auto &obj : EntityManager::Instance()->getEntities()) {
-    Rect objRect = obj->getRect();
-    if (objRect.hasIntersection(&camera)) {
+  if (*debugRectangles) {
+    for(const auto &obj : EntityManager::Instance()->getEntities()) {
+      Rect objRect = obj->getRect();
       RectF r = obj->_collidable.addBoundingBox(obj->_position);
       SDL_Rect hitbox = r.to_sdl_rect();
-      SDL_Rect rect = { 
-        hitbox.x - camera.x,
-        hitbox.y - camera.y,
+      Rect rect = { 
+        (int)round(hitbox.x),
+        (int)round(hitbox.y),
         hitbox.w,
         hitbox.h,
       };
-      SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-      SDL_RenderDrawRect(renderer, &rect);
-      obj->draw(renderer, { (float)camera.x, (float)camera.y });
+      renderer->setColor(255, 0, 0, 255);
+      renderer->renderRect(&rect);
     }
   }
 }

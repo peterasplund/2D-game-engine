@@ -47,12 +47,12 @@ struct camera {
     following = subject;
   }
 
-  Rect getRect() {
+  RectF getRect() {
     return {
-      (int)round(pos.x),
-      (int)round(pos.y),
-      viewport.x,
-      viewport.y
+      pos.x,
+      pos.y,
+      (float)viewport.x,
+      (float)viewport.y
     };
   }
 };

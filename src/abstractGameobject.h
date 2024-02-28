@@ -5,6 +5,7 @@
 #include "components/gravity.h"
 #include "components/collidable.h"
 #include "globals.h"
+#include "renderer.h"
 #include "math.h"
 
 class AbstractGameObject {
@@ -16,7 +17,7 @@ class AbstractGameObject {
 
     virtual void init();
     virtual void update(float dt);
-    virtual void draw(SDL_Renderer* renderer, v2f offset);
+    virtual void draw(Renderer* renderer);
     virtual ~AbstractGameObject() {
     }
     virtual void handleEvent(SDL_Event* event) {};

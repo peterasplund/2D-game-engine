@@ -2,6 +2,7 @@
 #include "math.h"
 #include "window.h"
 #include "scene.h"
+#include "renderer.h"
 
 int min(int a, int b) {
   return a < b ? a : b;
@@ -23,8 +24,8 @@ class SceneManager
 private:
   std::map<std::string, Scene*> _scenes;
   std::string _current;
-  SDL_Renderer* _renderer;
-  SDL_Rect _fadeRect;
+  Renderer* _renderer;
+  Rect _fadeRect;
   int _fade = 0;
   std::string _transitioningTo = "";
   bool _fadingOut = true;
@@ -36,7 +37,7 @@ private:
     }
   }
 public:
-  SceneManager(SDL_Renderer* renderer) {
+  SceneManager(Renderer* renderer) {
     _renderer = renderer;
     _fadeRect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
   }
@@ -71,7 +72,7 @@ public:
     }
   }
 
-  void draw(SDL_Renderer* renderer) {
+  void draw(Renderer* renderer) {
     _scenes[_current]->draw(renderer);
     drawFade();
   }
@@ -91,10 +92,8 @@ public:
   void drawFade() {
     int fade = max(min(_fade, 255), 0);
     if (!_transitioningTo.empty()) {
-      SDL_SetRenderDrawColor(_renderer, 0, 0, 0, fade);
-      SDL_RenderFillRect(_renderer, &_fadeRect);
-
-      SDL_SetRenderDrawColor(_renderer, 0, 0, 0, fade);
+      _renderer->setColor(0, 0, 0, fade);
+      _renderer->renderRectFilled(&_fadeRect, false);
     }
   }
 

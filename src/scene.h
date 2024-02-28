@@ -1,12 +1,13 @@
 #pragma once
 #include "window.h"
+#include "renderer.h"
 
 class Scene
 {
 protected:
-  SDL_Renderer* _renderer;
+  Renderer* _renderer;
 public:
-  Scene(SDL_Renderer* renderer) {
+  Scene(Renderer* renderer) {
     _renderer = renderer;
   }
 
@@ -14,5 +15,5 @@ public:
 
   virtual void init() {}
   virtual void update(float dt) {}
-  virtual void draw(SDL_Renderer* renderer) {}
+  virtual void draw(Renderer* renderer) {}
 };

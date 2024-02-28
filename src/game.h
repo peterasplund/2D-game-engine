@@ -7,8 +7,8 @@
 #include "sceneManager.h"
 #include "scene.h"
 #include "scene/gameplay.h"
-#include "scene/overworld.h"
 #include "timer.h"
+#include "renderer.h"
 
 class Game
 {
@@ -22,20 +22,18 @@ public: Game() {
     InputHandler::Instance()->addButton(SDLK_p, BUTTON::MENU);
 
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
-    SDL_Renderer* renderer = window.getRenderer();
+    SDL_Renderer* sdl_renderer = window.getRenderer();
+    Renderer* renderer = new Renderer(sdl_renderer);
 
-    AssetManager::Instance()->init(renderer);
+    AssetManager::Instance()->init(sdl_renderer);
 
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
     GameplayScene* _gameplayScene = new GameplayScene(renderer, "new_test_map");
-    OverworldScene* _overworldScene = new OverworldScene(renderer, "overworld");
-    //_sceneManager->addScene("overworld", _overworldScene);
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
-    //_sceneManager->gotoScene("overworld", Transition::NONE);
 
     while (!window.isClosed()) {
       LAST = NOW;
@@ -82,7 +80,7 @@ public: Game() {
       // EntityManager::Instance()->imgui();
       imgui->drawEnd();
 
-      SDL_RenderPresent(renderer);
+      renderer->present();
 
 
       //if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {

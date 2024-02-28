@@ -1,7 +1,7 @@
 #include "abstractGameobject.h"
 
 void AbstractGameObject::init() {
-  _collidable = collidable(_position, Rect::from_sdl_rect(_renderable.textureRect));
+  _collidable = collidable(_position, _renderable.textureRect);
 }
 
 void AbstractGameObject::update(float dt) {
@@ -12,9 +12,9 @@ void AbstractGameObject::update(float dt) {
   _collidable.update(_position);
 }
 
-void AbstractGameObject::draw(SDL_Renderer* renderer, v2f offset) {
+void AbstractGameObject::draw(Renderer* renderer) {
   // @TODO: add vectors instead
-  _renderable.render(renderer, this->_position - offset);
+  _renderable.render(renderer, this->_position);
 }
 
 void AbstractGameObject::setListenForCollisions() {

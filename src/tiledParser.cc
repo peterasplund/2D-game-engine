@@ -1,4 +1,4 @@
-#include "tilemapParser.h"
+#include "tiledParser.h"
 
 Tilemap* tiled_load_map(const char* mapFile) {
   const std::string OBJECT_POSITIONS_NAME = "objects";

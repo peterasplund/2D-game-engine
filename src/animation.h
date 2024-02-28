@@ -1,18 +1,19 @@
 #pragma once
 
-#include "timer.h"
 #include <vector>
+#include "timer.h"
+#include "math.h"
 
 class Animation
 {
   struct Frame
   {
-    Frame(SDL_Rect& rect, unsigned int timeToNextFrame)
+    Frame(Rect& rect, unsigned int timeToNextFrame)
       : rect(rect)
       , timeToNextFrame(timeToNextFrame)
     { }
 
-    SDL_Rect rect;
+    Rect rect;
     unsigned int timeToNextFrame;
   };
 
@@ -25,7 +26,7 @@ class Animation
     ~Animation() {
     }
 
-    void addFrame(SDL_Rect rect, float timeToNextFrame) {
+    void addFrame(Rect rect, float timeToNextFrame) {
       frames.emplace_back(rect, timeToNextFrame);
     }
 
@@ -45,7 +46,7 @@ class Animation
       return currentFrame >= frames.size() && !looping;
     }
 
-    SDL_Rect getFrame(Timer* timer) {
+    Rect getFrame(Timer* timer) {
       ellapsedMS  = timer->elapsed();
 
       if (ellapsedMS >= frames.at(currentFrame).timeToNextFrame)

@@ -14,7 +14,7 @@
 class GameplayScene : public Scene
 {
 private:
-  SDL_Renderer* _renderer;
+  Renderer* _renderer;
   camera _camera;
   Bg* bg1;
   Bg* bg2;
@@ -24,12 +24,12 @@ private:
   std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
 public:
-  GameplayScene(SDL_Renderer* renderer, std::string level) : Scene(renderer) {
+  GameplayScene(Renderer* renderer, std::string level) : Scene(renderer) {
     _renderer = renderer;
     _level = level;
   }
 
   void init();
   void update(float dt);
-  void draw(SDL_Renderer* renderer);
+  void draw(Renderer* renderer);
 };

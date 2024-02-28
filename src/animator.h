@@ -66,7 +66,7 @@ class Animator
       return _animations[_currentAnimation]->getTexture();
     }
 
-    SDL_Rect getFrame() {
+    Rect getFrame() {
       if (_currentAnimation.empty()) {
         printf("Error: No animation available at _currentAnimation\n");
         return {};

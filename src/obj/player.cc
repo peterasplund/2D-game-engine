@@ -280,9 +280,9 @@ void obj::Player::onInputReleased(int button) {
   }
 };
 
-void obj::Player::draw(SDL_Renderer* renderer, v2f offset) {
+void obj::Player::draw(Renderer* renderer) {
   _renderable.textureRect = _animator.getFrame();
   _renderable.texture = _animator.getTexture();
 
-  AbstractGameObject::draw(renderer, offset);
+  AbstractGameObject::draw(renderer);
 }

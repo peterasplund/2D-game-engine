@@ -85,8 +85,7 @@ bool Tileset::load(std::string filename) {
   return true;
 }
 
-// @TODO:  The x and y logic might be super wrong
-SDL_Rect Tileset::getTileTextureRect(int id) {
+Rect Tileset::getTileTextureRect(int id) {
   int x = 0;
   int y = 0;
 

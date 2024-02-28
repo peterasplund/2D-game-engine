@@ -28,7 +28,8 @@ void GameplayScene::init() {
   tilemap = tiled_load_map(levelName);
   EntityManager::Instance()->setTileMap(tilemap);
 
-  //_camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+  _camera = camera();
+  _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
 
   if (loaded) {
     return;
@@ -58,7 +59,8 @@ void GameplayScene::init() {
   }
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
-  // _camera.follow(player->getRectPointer());
+  _camera.follow(player->getRectPointer());
+  _renderer->setOffsetPtr(&_camera.pos);
   loaded = true;
 }
 
@@ -67,11 +69,12 @@ void GameplayScene::update(float dt) {
     obj->update(dt);
   }
 
-  // _camera.update();
+  _camera.update();
 }
 
-void GameplayScene::draw(SDL_Renderer* renderer) {
-  Rect camera = _camera.getRect();
+void GameplayScene::draw(Renderer* renderer) {
+  RectF camera = _camera.getRect();
+  v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
   //bg1->draw(renderer, -camera.x * 0.04);
   //bg2->draw(renderer, -camera.x * 0.2);
@@ -90,13 +93,17 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
       Rect tileRect = tilemap->getTileRect(layerIdx, i);
 
       Tileset* tileset = tilemap->getTileset();
-      SDL_Rect sr = tileset->getTileTextureRect(tile);
+      Rect sr = tileset->getTileTextureRect(tile);
 
       if (camera.hasIntersection(&tileRect)) {
-        //SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
-        SDL_Rect dr = { tileRect.x, tileRect.y, tileRect.w, tileRect.h };
-        printf("render tile at: (%d, %d)\n", dr.x, dr.y);
-        SDL_RenderCopyEx(renderer, tileset->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
+        Rect dr = { 
+          (int)round(tileRect.x),
+          (int)round(tileRect.y),
+          tileRect.w,
+          tileRect.h
+        };
+
+        renderer->renderTexture(tileset->getTexture(), &sr, &dr, SDL_FLIP_NONE);
       }
 
       i ++;
@@ -108,13 +115,10 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
   // Draw objects
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getRect();
-    //if (objRect.hasIntersection(&camera)) {
-      //obj->draw(renderer, { (float)camera.x, (float)camera.y });
-      obj->draw(renderer, { 0.0, 0.0 });
-    //}
+    if (objRect.hasIntersection(&camera)) {
+      obj->draw(renderer);
+    }
   }
   
-  DebugPrinter::Instance()->drawHitboxes(renderer, camera);
   DebugPrinter::Instance()->draw(renderer);
-  SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 }

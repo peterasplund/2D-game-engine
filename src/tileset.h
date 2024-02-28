@@ -6,6 +6,7 @@
 #include "SDL_image.h"
 #include "pugixml.hpp"
 #include "assetManager.h"
+#include "math.h"
 
 enum class TileType {
   NORMAL,
@@ -32,7 +33,7 @@ class Tileset {
 
     bool load(std::string filename);
 
-    SDL_Rect getTileTextureRect(int id);
+    Rect getTileTextureRect(int id);
 
     SDL_Texture* getTexture() {
       return _texture;

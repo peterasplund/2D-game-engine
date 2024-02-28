@@ -4,6 +4,7 @@
 #include "../animator.h"
 #include "../assetManager.h"
 #include "../inputHandler.h"
+#include "../renderer.h"
 
 namespace obj {
   enum class State {
@@ -25,7 +26,7 @@ namespace obj {
       void attack();
       void onInputPressed(int button) override;
       void onInputReleased(int button) override;
-      void draw(SDL_Renderer* renderer, v2f offset) override;
+      void draw(Renderer* renderer) override;
 
     protected:
       /// How high the initial jump should be
