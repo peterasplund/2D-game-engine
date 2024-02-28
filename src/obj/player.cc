@@ -30,6 +30,7 @@ void obj::Player::init() {
   _renderable.spriteOffset = { 15, 0 };
 
   Animation* animIdle = new Animation(texture);
+  Animation* animCrouch = new Animation(texture);
   Animation* animRun = new Animation(texture);
   Animation* animAttack = new Animation(texture, false);
   Animation* animJump = new Animation(texture, false);
@@ -44,6 +45,11 @@ void obj::Player::init() {
   animIdle->addFrame({ tw * 3, th * 0, tw, th }, 500);
   animIdle->addFrame({ tw * 4, th * 0, tw, th }, 500);
   animIdle->addFrame({ tw * 5, th * 0, tw, th }, 500);
+
+  animCrouch->addFrame({ tw * 4, th * 10, tw, th }, 500);
+  animCrouch->addFrame({ tw * 5, th * 10, tw, th }, 500);
+  animCrouch->addFrame({ tw * 0, th * 11, tw, th }, 500);
+  animCrouch->addFrame({ tw * 1, th * 11, tw, th }, 500);
 
   animRun->addFrame({ tw * 0, th * 1, tw, th }, 100);
   animRun->addFrame({ tw * 1, th * 1, tw, th }, 100);
@@ -80,6 +86,7 @@ void obj::Player::init() {
 
   this->_animator = Animator();
   _animator.addAnimation("idle", animIdle);
+  _animator.addAnimation("crouch", animCrouch);
   _animator.addAnimation("run", animRun);
   _animator.addAnimation("attack", animAttack);
   _animator.addAnimation("jump", animJump);
@@ -98,82 +105,101 @@ void obj::Player::init() {
 void obj::Player::update(float dt) {
   AbstractGameObject::update(dt);
   InputHandler* inputHandler = InputHandler::Instance();
+  isMoving = false;
 
-if (state == State::SLIDE) {
-  if (_animator.getCurrent() != "slide") {
-    _animator.reset();
-    _animator.setAnimation("slide");
-    _velocity.v.x += direction == "left" ? -0.6 : 0.6;
-  }
-}
-
-if (state != State::ATTACK) {
-  if (state != State::SLIDE) {
+  if (state != State::ATTACK && state != State::CROUCH && state != State::SLIDE) {
     if (inputHandler->isHeld(BUTTON::LEFT)) {
-      direction = "left";
-      _velocity.v.x -= RUN_ACCELERATION;
-      _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
+      _velocity.v.x -= _gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION;
       state = State::RUN;
+      isMoving = true;
     } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-      direction = "right";
-      _velocity.v.x += RUN_ACCELERATION;
-      _renderable.textureFlip = SDL_FLIP_NONE;
+      _velocity.v.x += _gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION;
       state = State::RUN;
+      isMoving = true;
     } else if (state != State::SLIDE) {
       state = State::IDLE;
     }
   }
-}
 
-if (_velocity.v.x >= RUN_SPEED) {
-  _velocity.v.x = RUN_SPEED;
-}
-else if (_velocity.v.x <= -RUN_SPEED) {
-  _velocity.v.x = -RUN_SPEED;
-}
-
-if (state != State::SLIDE) {
-  if (state == State::ATTACK) {
-      _animator.setAnimation("attack");
-  }
-  else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
-      _animator.setAnimation("jump");
-      if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
-        _animator.setAnimation("upToFall");
+  // Crouch
+  if (inputHandler->isHeld(BUTTON::DOWN) && onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+    if (_gravity.onFloor) {
+      if (state == State::IDLE || state == State::RUN) {
+        if (state != State::CROUCH) {
+          state = State::CROUCH;
+        }
       }
+    }
+  } else if (state == State::CROUCH) {
+    state = State::IDLE;
   }
-  else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
-      _animator.setAnimation("fall");
+
+  if (state != State::SLIDE) {
+    if (_velocity.v.x >= RUN_SPEED) {
+      _velocity.v.x = RUN_SPEED;
+    }
+    else if (_velocity.v.x <= -RUN_SPEED) {
+      _velocity.v.x = -RUN_SPEED;
+    }
   }
-  else {
-    if (state == State::RUN) {
-      _animator.setAnimation("run");
+
+  if (state == State::CROUCH) {
+    _animator.setAnimation("crouch");
+  }
+  else if (state != State::SLIDE) {
+    if (state == State::ATTACK) {
+        _animator.setAnimation("attack");
+    }
+    else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
+        _animator.setAnimation("jump");
+        if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
+          _animator.setAnimation("upToFall");
+        }
+    }
+    else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
+        _animator.setAnimation("fall");
     }
     else {
-      _animator.setAnimation("idle");
+      if (state == State::RUN) {
+        _animator.setAnimation("run");
+      }
+      else {
+        _animator.setAnimation("idle");
+      }
     }
   }
-}
 
-// End ttack
-if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
-  state = State::IDLE;
-  _animator.reset();
-  _animator.setAnimation("idle");
-}
+  if (_velocity.v.x > 0.01f) {
+    direction = "right";
+  }
+  else if (_velocity.v.x < -0.01f) {
+    direction = "left";
+  }
 
-// End slide
-if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
-  state = State::IDLE;
-  _animator.reset();
-  _animator.setAnimation("idle");
-}
+  _renderable.textureFlip = direction == "left" ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
-// Slide
-if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
-  state = State::SLIDE;
-  slideTimer.reset();
-}
+  // End attack
+  if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
+    state = State::IDLE;
+    _animator.reset();
+    _animator.setAnimation("idle");
+  }
+
+  // End slide
+  if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
+    state = State::IDLE;
+    _animator.reset();
+    _animator.setAnimation("idle");
+  }
+
+  if (state == State::SLIDE) {
+    if (_animator.getCurrent() != "slide") {
+      _animator.reset();
+      _animator.setAnimation("slide");
+      _velocity.v.x += direction == "left" ? -SLIDE_POWER : SLIDE_POWER;
+    }
+  }
+
 
   // die and respawn when falling of level
   if (_position.y > 370.0f) {
@@ -195,6 +221,7 @@ if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
 
 
   _gravity.onFloor = false;
+  onOneWayPlatform = false;
   if (tilesBelow.size() > 0) {
     for(auto tile : tilesBelow) {
       TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
@@ -204,12 +231,15 @@ if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
         _gravity.onFloor = true;
       }
       else {
-        if (tileData->propertiesBool.find("oneway") != tileData->propertiesBool.end()) {
-          if (tileData->propertiesBool.at("oneway") && _velocity.v.y >= 0.f && _collidable.rect.bottom() <= tile.rect.y + ONEWAY_PLATFORM_GRACE) {
-            _jumpHold = false;
-            _gravity.onFloor = true;
-            _velocity.v.y = 0.0f;
-            _position.y = tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
+        if (onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+          if (tileData->propertiesBool.find("oneway") != tileData->propertiesBool.end()) {
+            if (tileData->propertiesBool.at("oneway") && _velocity.v.y >= 0.f && _collidable.rect.bottom() <= tile.rect.y + ONEWAY_PLATFORM_GRACE) {
+              onOneWayPlatform = true;
+              _jumpHold = false;
+              _gravity.onFloor = true;
+              _velocity.v.y = 0.0f;
+              _position.y = tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
+            }
           }
         }
       }
@@ -223,8 +253,16 @@ if (inputHandler->isHeld(BUTTON::DOWN) && _gravity.onFloor) {
 
   _gravity.entityGravity = _jumpHold && _velocity.v.y < -0.3f ? JUMP_SHORT_GRAVITY : _normalGravity;
 
-  if (!inputHandler->isHeld(BUTTON::LEFT) && !inputHandler->isHeld(BUTTON::RIGHT)) {
-    _velocity.v.x = calcFriction(_velocity.v.x, RUN_DEACCELERATION);
+  if (!isMoving) {
+    if (!_gravity.onFloor) {
+      _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION);
+    }
+    else if (state == State::SLIDE) {
+      _velocity.v.x = calcFriction(_velocity.v.x, SLIDE_DEACCELERATION);
+    }
+    else {
+      _velocity.v.x = calcFriction(_velocity.v.x, RUN_DEACCELERATION);
+    }
   }
 
   // Jump buffer
@@ -249,7 +287,7 @@ void obj::Player::performJump() {
 }
 
 void obj::Player::jump() {
-    if (state != State::ATTACK) {
+    if (state != State::ATTACK && state != State::CROUCH) {
       if (_gravity.onFloor || state == State::SLIDE) {
         performJump();
       }
@@ -269,8 +307,31 @@ void obj::Player::attack() {
   }
 }
 
+void obj::Player::slide() {
+  // Slide
+  if (state == State::CROUCH) {
+    // Check if on top of one-way platform. In that case we don't wanna slide 
+    // but deactivate the solid of the platform until we're below it
+    if (onOneWayPlatform) {
+      onwayPlatformFallThroughTimer.reset();
+      state = State::JUMP;
+    }
+    else {
+      state = State::SLIDE;
+      slideTimer.reset();
+    }
+  }
+}
+
 void obj::Player::onInputPressed(int button) {
-  if (button == BUTTON::JUMP)   jump();
+  if (button == BUTTON::JUMP) {
+    if (state == State::CROUCH) {
+      slide();
+    }
+    else {
+      jump();
+    }
+  }
   if (button == BUTTON::ATTACK) attack();
 };
 
