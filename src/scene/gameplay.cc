@@ -25,7 +25,7 @@ void GameplayScene::init() {
   char levelName[32];
   sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
 
-  tilemap = new Tilemap(levelName, _renderer);
+  tilemap = tiled_load_map(levelName);
   EntityManager::Instance()->setTileMap(tilemap);
 
   //_camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
@@ -87,7 +87,7 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
         continue;
       }
 
-      Rect tileRect = tilemap->getTilePosition(layerIdx, i);
+      Rect tileRect = tilemap->getTileRect(layerIdx, i);
 
       Tileset* tileset = tilemap->getTileset();
       SDL_Rect sr = tileset->getTileTextureRect(tile);
@@ -95,6 +95,7 @@ void GameplayScene::draw(SDL_Renderer* renderer) {
       if (camera.hasIntersection(&tileRect)) {
         //SDL_Rect dr = { tileRect.x - camera.x, tileRect.y - camera.y, tileRect.w, tileRect.h };
         SDL_Rect dr = { tileRect.x, tileRect.y, tileRect.w, tileRect.h };
+        printf("render tile at: (%d, %d)\n", dr.x, dr.y);
         SDL_RenderCopyEx(renderer, tileset->getTexture(), &sr, &dr, 0, 0, SDL_FLIP_NONE);
       }
 

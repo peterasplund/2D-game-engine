@@ -5,7 +5,7 @@
 #include "../obj/player_overworld.h"
 #include "../obj/door.h"
 #include "../scene.h"
-#include "../tilemap.h"
+#include "../tiledParser.h"
 #include "../bg.h"
 #include "../entityManager.h"
 #include "../debugPrinter.h"

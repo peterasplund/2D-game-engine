@@ -12,7 +12,7 @@
 
 typedef std::map<std::string, std::string> TiledLayer;
 
-// This will be removed soon
+// Rename this to TileObject. Not Tiled specific
 struct TiledObject {
   std::string name;
   v2i position;
@@ -35,30 +35,30 @@ class TileLayer {
 class Tilemap
 {
   const std::string OBJECT_POSITIONS_NAME = "objects";
-  int tileWidth, tileHeight;
 
   public:
-    Tilemap(const char* mapFile, SDL_Renderer* renderer);
+    // Tilemap(const char* mapFile, SDL_Renderer* renderer);
+    Tilemap(int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects);
 
     ~Tilemap() {
     }
 
     int getTileWidth() {
-      return tileWidth;
+      return _tileset.getTileWidth();
     }
 
     int getTileHeight() {
-      return tileHeight;
+      return _tileset.getTileHeight();
     }
 
     // @TODO: is this needed?
     int getWidthInPixels() {
-      return _tilesWide * tileWidth;
+      return _tilesWide * getTileWidth();
     }
 
     // @TODO: is this needed?
     int getHeightInPixels() {
-      return _tilesTall * tileHeight;
+      return _tilesTall * getTileHeight();
     }
 
     std::vector<TiledObject> getObjects() {
@@ -68,7 +68,7 @@ class Tilemap
     bool isOutsideMap(int x, int y) {
       return (
         x < 0 || y < 0 ||
-        x > _tilesWide * tileWidth || y > _tilesTall * tileHeight
+        x > _tilesWide * getTileWidth() || y > _tilesTall * getTileHeight()
       );
     }
 
@@ -77,7 +77,7 @@ class Tilemap
     /// Returns -1 if empty tile
     int getIdxFromPoint(int x, int y, int layer);
 
-    Rect getTilePosition(int layerIdx, int idx);
+    Rect getTileRect(int layerIdx, int idx);
 
     std::vector<TileLayer>* getLayers() {
       return &_layers;

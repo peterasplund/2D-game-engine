@@ -25,7 +25,7 @@ void OverworldScene::init() {
   char levelName[32];
   sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
 
-  tilemap = new Tilemap(levelName, _renderer);
+  tilemap = tiled_load_map(levelName);
   EntityManager::Instance()->setTileMap(tilemap);
 
   _camera = camera();
@@ -89,7 +89,7 @@ void OverworldScene::draw(SDL_Renderer* renderer) {
         continue;
       }
 
-      Rect tileRect = tilemap->getTilePosition(layerIdx, i);
+      Rect tileRect = tilemap->getTileRect(layerIdx, i);
 
       Tileset* tileset = tilemap->getTileset();
       SDL_Rect sr = tileset->getTileTextureRect(tile);

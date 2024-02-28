@@ -149,7 +149,7 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
     for(int possibleIdx : tiles) {
       int tileId = 0;
       tileId = t->getLayers()->at(layerId).tiles.at(possibleIdx);
-      Rect r = t->getTilePosition(layerId, possibleIdx);
+      Rect r = t->getTileRect(layerId, possibleIdx);
 
       RectF rF = {
         (float)r.x,
@@ -231,7 +231,7 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
           continue;
         }
 
-        Rect otherRect = tilemap->getTilePosition(layer, possibleIdx);
+        Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
         RectF otherRectF = {
           (float)otherRect.x,
           (float)otherRect.y,
@@ -282,7 +282,7 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
           continue;
         }
 
-        Rect otherRect = tilemap->getTilePosition(layer, possibleIdx);
+        Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
         RectF otherRectF = {
           (float)otherRect.x,
           (float)otherRect.y,
@@ -360,7 +360,7 @@ CollisionResponse collidable::moveAndSlide(v2f position, velocity* velocity, flo
         continue;
       }
 
-      Rect otherRect = tilemap->getTilePosition(layer, possibleIdx);
+      Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
       DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 
       bool result = dynamicRectVsRect(&r, *velocity, otherRect, contact_point, contact_normal, t_hit, dt);

@@ -30,9 +30,6 @@ bool Tileset::load(std::string filename) {
 
   std::string absPath = "assets/maps/tilesets/";
   std::string imgSrc = imageNode.attribute("source").as_string();
-  //std::string imgSrc = "../../dirt-tiles_0.png";
-  // @TODO: We have a bug with the image path here
-  printf("imgSrc: %s\n\n\n", imgSrc.c_str());
   _texture = AssetManager::Instance()->getTexture(absPath + imgSrc);
 
   if (_texture == nullptr) {

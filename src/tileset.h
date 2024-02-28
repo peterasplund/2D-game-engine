@@ -42,6 +42,14 @@ class Tileset {
       return &_tiles.at(idx);
     }
 
+    int getTileWidth() {
+      return _tileWidth;
+    }
+
+    int getTileHeight() {
+      return _tileHeight;
+    }
+
   private:
     SDL_Texture* _texture;
     std::vector<TileData> _tiles;
