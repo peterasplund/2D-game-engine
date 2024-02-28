@@ -1026,7 +1026,7 @@
  <tile id="146">
   <properties>
    <property name="ladder" type="bool" value="false"/>
-   <property name="oneway" type="bool" value="false"/>
+   <property name="oneway" type="bool" value="true"/>
    <property name="solid" type="bool" value="false"/>
   </properties>
  </tile>

@@ -15,6 +15,7 @@ namespace obj {
     ATTACK,
     HURT,
     SLIDE,
+    CLIMBING,
   };
 
   class Player : public AbstractGameObject {
@@ -53,6 +54,9 @@ namespace obj {
       const int JUMP_BUFFER_WINDOW = 100; 
       /// Error margin to land on one-way platform. How many pixels below we can be and still snap on top of it.
       const int ONEWAY_PLATFORM_GRACE = 3;
+      
+      // How close we need to be to the ladder to climb it.
+      const int LADDER_X_DEADZONE = 5;
 
       /// When couching and pressing jump on top of a one-way platform we let the player go through it.
       /// This is how long we should act like it's not solid for.

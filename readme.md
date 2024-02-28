@@ -2,6 +2,7 @@ SDL Game engine
 
 TODO:
 
+- Stairs!!
 - Move out Tiled based logic for loading Tileset. The same way as with the tilemap.
 - Render debug rectangles relative to the camera
 - Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.

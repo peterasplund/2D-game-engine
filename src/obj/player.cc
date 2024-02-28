@@ -38,6 +38,7 @@ void obj::Player::init() {
   Animation* animBackDash = new Animation(texture, false);
   Animation* animSlide = new Animation(texture, false);
   Animation* animUpToFall = new Animation(texture, false);
+  Animation* animClimb = new Animation(texture);
 
   animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
   animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
@@ -84,6 +85,15 @@ void obj::Player::init() {
   animSlide->addFrame({ tw * 4, th * 14, tw, th }, 100);
   animSlide->addFrame({ tw * 5, th * 14, tw, th }, 100);
 
+  animClimb->addFrame({ tw * 1, th * 15, tw, th }, 100);
+  animClimb->addFrame({ tw * 2, th * 15, tw, th }, 100);
+  animClimb->addFrame({ tw * 2, th * 15, tw, th }, 100);
+  animClimb->addFrame({ tw * 4, th * 15, tw, th }, 100);
+  animClimb->addFrame({ tw * 5, th * 15, tw, th }, 100);
+  animClimb->addFrame({ tw * 0, th * 16, tw, th }, 100);
+  animClimb->addFrame({ tw * 1, th * 16, tw, th }, 100);
+  animClimb->addFrame({ tw * 2, th * 16, tw, th }, 100);
+
   this->_animator = Animator();
   _animator.addAnimation("idle", animIdle);
   _animator.addAnimation("crouch", animCrouch);
@@ -94,6 +104,7 @@ void obj::Player::init() {
   _animator.addAnimation("fall", animFall);
   _animator.addAnimation("backDash", animBackDash);
   _animator.addAnimation("slide", animSlide);
+  _animator.addAnimation("climb", animClimb);
   
   _animator.setAnimation("idle");
 
@@ -106,6 +117,68 @@ void obj::Player::update(float dt) {
   AbstractGameObject::update(dt);
   InputHandler* inputHandler = InputHandler::Instance();
   isMoving = false;
+
+  if (state == State::CLIMBING) {
+    _velocity.v.y = -0.0f;
+    _renderable.textureFlip = SDL_FLIP_NONE;
+    if (InputHandler::Instance()->isHeld(BUTTON::UP)) {
+      _velocity.v.y = -0.1f;
+    }
+    else if (InputHandler::Instance()->isHeld(BUTTON::DOWN)) {
+      _velocity.v.y = 0.1f;
+    }
+
+    _velocity.v.x = 0.0f;
+    _animator.setAnimation("climb");
+    _animator.stop();
+    if (_velocity.v.y < -0.001f) {
+      if (!_animator.isPlaying()) {
+        _animator.start();
+      }
+    }
+    else if (_velocity.v.y > 0.001f) {
+      if (!_animator.isPlaying()) {
+        _animator.start();
+      }
+      // @TODO: reverse animation
+    }
+
+
+    //_collidable.update(_position);
+    auto resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
+
+    if (resp.bottom) {
+      state = State::IDLE;
+    }
+
+    _velocity.v = {0,0};
+
+    auto tilesWithin = _collidable.tileExistsAt({
+      round(_collidable.rect.x),
+      _collidable.rect.y,
+      floor(_collidable.rect.w),
+      _collidable.rect.h
+    });
+
+    bool onLadder = false;
+    if (tilesWithin.size() > 0) {
+      for(auto tile : tilesWithin) {
+        TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
+        if (tileData->propertiesBool.find("ladder") != tileData->propertiesBool.end()) {
+          if (tileData->propertiesBool.at("ladder")) {
+            onLadder = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!onLadder) {
+      state = State::IDLE;
+    }
+
+    return;
+  }
 
   if (state != State::ATTACK && state != State::CROUCH && state != State::SLIDE) {
     if (inputHandler->isHeld(BUTTON::LEFT)) {
@@ -212,6 +285,36 @@ void obj::Player::update(float dt) {
     // resp.print();
   }
 
+  auto tilesWithin = _collidable.tileExistsAt({
+    round(_collidable.rect.x),
+    _collidable.rect.y,
+    floor(_collidable.rect.w),
+    _collidable.rect.h
+  });
+
+  // Climb onto ladder
+  if (tilesWithin.size() > 0) {
+    for(auto tile : tilesWithin) {
+      int tileCenter = tile.rect.x + tile.rect.w / 2;
+      int playerCenter = _collidable.rect.x + _collidable.rect.w / 2;
+      if (playerCenter > tileCenter - LADDER_X_DEADZONE && playerCenter < tileCenter + LADDER_X_DEADZONE) { 
+        if (inputHandler->isHeld(BUTTON::UP)) {
+          TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
+          if (tileData->propertiesBool.find("ladder") != tileData->propertiesBool.end()) {
+            if (tileData->propertiesBool.at("ladder")) {
+              // @TODO: something is wrong with the tile rect or something
+              _position.x = tile.rect.x - 23;
+              //_position.y = tile.rect.y - _collidable.rect.y;
+              state = State::CLIMBING;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
   auto tilesBelow = _collidable.tileExistsAt({
     round(_collidable.rect.x),
     (_collidable.rect.y + _collidable.rect.h + 1),
@@ -287,15 +390,15 @@ void obj::Player::performJump() {
 }
 
 void obj::Player::jump() {
-    if (state != State::ATTACK && state != State::CROUCH) {
-      if (_gravity.onFloor || state == State::SLIDE) {
-        performJump();
-      }
-      if (!_gravity.onFloor) {
-        jumpBufferTimer.reset();
-        jumpBuffered = true;
-      }
+  if (state != State::ATTACK && state != State::CROUCH) {
+    if (_gravity.onFloor || state == State::SLIDE || state == State::CLIMBING) {
+      performJump();
     }
+    if (!_gravity.onFloor) {
+      jumpBufferTimer.reset();
+      jumpBuffered = true;
+    }
+  }
 }
 
 void obj::Player::attack() {
@@ -308,6 +411,10 @@ void obj::Player::attack() {
 }
 
 void obj::Player::slide() {
+  if (state == State::CLIMBING) {
+    return;
+  }
+
   // Slide
   if (state == State::CROUCH) {
     // Check if on top of one-way platform. In that case we don't wanna slide 

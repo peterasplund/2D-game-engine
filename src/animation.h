@@ -46,6 +46,10 @@ class Animation
       return currentFrame >= frames.size() && !looping;
     }
 
+    bool isPlaying() {
+      return active;
+    }
+
     Rect getFrame(Timer* timer) {
       ellapsedMS  = timer->elapsed();
 
