@@ -27,6 +27,7 @@ namespace obj {
       void jump();
       void attack();
       void slide();
+      TileData* tileAt(RectF rect, std::string property);
       void onInputPressed(int button) override;
       void onInputReleased(int button) override;
       void draw(Renderer* renderer) override;
@@ -75,13 +76,13 @@ namespace obj {
       bool _jumpHold = false;
       bool _justJumped = false;
       float backDashSpeed = 1.5f;
-      float attackSpeed = 3.0f;
-      float attackDelay = 450.0f;
+      float attackDelay = 280.0f;
       float slideDelay = 400.0f;
       bool isBackDashing = false;
       bool jumpBuffered = false;
       bool previouslyOnFloor = false;
       bool isMoving = false;
       bool onOneWayPlatform = false;
+      bool dead = false;
   };
 }

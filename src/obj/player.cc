@@ -33,12 +33,15 @@ void obj::Player::init() {
   Animation* animCrouch = new Animation(texture);
   Animation* animRun = new Animation(texture);
   Animation* animAttack = new Animation(texture, false);
+  Animation* animAttack2 = new Animation(texture, false);
+  Animation* animJumpAttack = new Animation(texture, false);
   Animation* animJump = new Animation(texture, false);
   Animation* animFall = new Animation(texture, false);
   Animation* animBackDash = new Animation(texture, false);
   Animation* animSlide = new Animation(texture, false);
   Animation* animUpToFall = new Animation(texture, false);
   Animation* animClimb = new Animation(texture);
+  Animation* animDie = new Animation(texture, false);
 
   animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
   animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
@@ -61,11 +64,23 @@ void obj::Player::init() {
   animRun->addFrame({ tw * 0, th * 2, tw, th }, 100);
   animRun->addFrame({ tw * 1, th * 2, tw, th }, 100);
 
-  animAttack->addFrame({ tw * 0, th * 3, tw, th }, 100);
-  animAttack->addFrame({ tw * 1, th * 3, tw, th }, 100);
-  animAttack->addFrame({ tw * 2, th * 3, tw, th }, 100);
-  animAttack->addFrame({ tw * 3, th * 3, tw, th }, 100);
-  animAttack->addFrame({ tw * 4, th * 3, tw, th }, 100);
+  animAttack->addFrame({ tw * 0, th * 3, tw, th }, 70);
+  animAttack->addFrame({ tw * 1, th * 3, tw, th }, 70);
+  animAttack->addFrame({ tw * 2, th * 3, tw, th }, 70);
+  animAttack->addFrame({ tw * 3, th * 3, tw, th }, 70);
+  animAttack->addFrame({ tw * 4, th * 3, tw, th }, 70);
+
+  animAttack2->addFrame({ tw * 5, th * 12, tw, th }, 70);
+  animAttack2->addFrame({ tw * 0, th * 13, tw, th }, 70);
+  animAttack2->addFrame({ tw * 1, th * 13, tw, th }, 70);
+  animAttack2->addFrame({ tw * 2, th * 13, tw, th }, 70);
+  animAttack2->addFrame({ tw * 3, th * 13, tw, th }, 50);
+
+  animJumpAttack->addFrame({ tw * 5, th * 12, tw, th }, 70);
+  animJumpAttack->addFrame({ tw * 0, th * 13, tw, th }, 70);
+  animJumpAttack->addFrame({ tw * 1, th * 13, tw, th }, 70);
+  animJumpAttack->addFrame({ tw * 2, th * 13, tw, th }, 70);
+  animJumpAttack->addFrame({ tw * 3, th * 13, tw, th }, 50);
 
   animJump->addFrame({ tw * 5, th * 6, tw, th }, 100);
   animJump->addFrame({ tw * 0, th * 7, tw, th }, 100);
@@ -94,17 +109,32 @@ void obj::Player::init() {
   animClimb->addFrame({ tw * 1, th * 16, tw, th }, 100);
   animClimb->addFrame({ tw * 2, th * 16, tw, th }, 100);
 
+  animDie->addFrame({ tw * 2, th * 4, tw, th }, 70);
+  animDie->addFrame({ tw * 3, th * 4, tw, th }, 70);
+  animDie->addFrame({ tw * 4, th * 4, tw, th }, 70);
+  animDie->addFrame({ tw * 5, th * 4, tw, th }, 70);
+  animDie->addFrame({ tw * 0, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 1, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 2, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 3, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 4, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 5, th * 5, tw, th }, 70);
+  animDie->addFrame({ tw * 0, th * 6, tw, th }, 70);
+
   this->_animator = Animator();
   _animator.addAnimation("idle", animIdle);
   _animator.addAnimation("crouch", animCrouch);
   _animator.addAnimation("run", animRun);
   _animator.addAnimation("attack", animAttack);
+  _animator.addAnimation("attack2", animAttack2);
+  _animator.addAnimation("jumpAttack", animJumpAttack);
   _animator.addAnimation("jump", animJump);
   _animator.addAnimation("upToFall", animUpToFall);
   _animator.addAnimation("fall", animFall);
   _animator.addAnimation("backDash", animBackDash);
   _animator.addAnimation("slide", animSlide);
   _animator.addAnimation("climb", animClimb);
+  _animator.addAnimation("die", animDie);
   
   _animator.setAnimation("idle");
 
@@ -113,10 +143,47 @@ void obj::Player::init() {
   _normalGravity = _gravity.entityGravity;
 }
 
+TileData* obj::Player::tileAt(RectF rect, std::string property = "") {
+  auto tilesAbove = _collidable.tileExistsAt(rect);
+
+  if (tilesAbove.size() > 0) {
+    for(auto tile : tilesAbove) {
+      TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
+      if (property == "") {
+        return tileData;
+      }
+
+      auto it = tileData->propertiesBool.find(property);
+      if (it != tileData->propertiesBool.end()) {
+        if (it->second) {
+          return tileData;
+        }
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 void obj::Player::update(float dt) {
   AbstractGameObject::update(dt);
   InputHandler* inputHandler = InputHandler::Instance();
   isMoving = false;
+
+  if (dead) {
+    _animator.setAnimation("die");
+    if (!_animator.isPlaying()) {
+      _animator.start();
+    }
+    return;
+  }
+
+  TileData* ladderAbove = tileAt({
+    round(_collidable.rect.x),
+    _collidable.rect.y - _collidable.rect.h / 2,
+    floor(_collidable.rect.w),
+    _collidable.rect.h / 2
+  }, "ladder");
 
   if (state == State::CLIMBING) {
     _velocity.v.y = -0.0f;
@@ -129,8 +196,15 @@ void obj::Player::update(float dt) {
     }
 
     _velocity.v.x = 0.0f;
-    _animator.setAnimation("climb");
-    _animator.stop();
+
+    if (!ladderAbove) {
+      _animator.setAnimation("crouch");
+    }
+    else {
+      _animator.setAnimation("climb");
+      _animator.stop();
+    }
+
     if (_velocity.v.y < -0.001f) {
       if (!_animator.isPlaying()) {
         _animator.start();
@@ -160,18 +234,12 @@ void obj::Player::update(float dt) {
       _collidable.rect.h
     });
 
-    bool onLadder = false;
-    if (tilesWithin.size() > 0) {
-      for(auto tile : tilesWithin) {
-        TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
-        if (tileData->propertiesBool.find("ladder") != tileData->propertiesBool.end()) {
-          if (tileData->propertiesBool.at("ladder")) {
-            onLadder = true;
-            break;
-          }
-        }
-      }
-    }
+    TileData* onLadder = tileAt({
+      round(_collidable.rect.x),
+      _collidable.rect.y,
+      floor(_collidable.rect.w),
+      _collidable.rect.h
+    }, "ladder");
 
     if (!onLadder) {
       state = State::IDLE;
@@ -221,7 +289,12 @@ void obj::Player::update(float dt) {
   }
   else if (state != State::SLIDE) {
     if (state == State::ATTACK) {
-        _animator.setAnimation("attack");
+        if (_gravity.onFloor) {
+          _animator.setAnimation("attack");
+        }
+        else {
+          _animator.setAnimation("jumpAttack");
+        }
     }
     else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
         _animator.setAnimation("jump");
@@ -292,6 +365,10 @@ void obj::Player::update(float dt) {
     _collidable.rect.h
   });
 
+  if (_position.x > 200) {
+      dead = true;
+  }
+
   // Climb onto ladder
   if (tilesWithin.size() > 0) {
     for(auto tile : tilesWithin) {
@@ -321,7 +398,6 @@ void obj::Player::update(float dt) {
     floor(_collidable.rect.w),
     1
   });
-
 
   _gravity.onFloor = false;
   onOneWayPlatform = false;
