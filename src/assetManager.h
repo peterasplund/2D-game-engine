@@ -50,6 +50,10 @@ private:
 
     tex = SDL_CreateTextureFromSurface(_renderer, surface);
 
+    if (tex == NULL) {
+      printf("Failed to create texture\n");
+    }
+
     if (surface == NULL || surface == NULL) {
       printf("Create texture error: %s\n", SDL_GetError());
       return NULL;

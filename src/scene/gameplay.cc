@@ -1,4 +1,5 @@
 #include "gameplay.h"
+#include "../obj/enemy.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
@@ -57,6 +58,13 @@ void GameplayScene::init() {
     object->init();
     EntityManager::Instance()->addEntity(std::move(object));
   }
+
+  obj::Enemy enemy;
+  auto enemyPtr = std::make_shared<obj::Enemy>(enemy);
+  enemyPtr->_position.x = 400;
+  enemyPtr->_position.y = 50;
+  enemyPtr->init();
+  EntityManager::Instance()->addEntity(enemyPtr);
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
   _camera.follow(player->getRectPointer());

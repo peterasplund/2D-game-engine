@@ -41,7 +41,7 @@ public: Game() {
       
       deltaTime = std::min<double>((double)((NOW - LAST)*1000 / SDL_GetPerformanceFrequency() ), MAX_DELTA_TIME);
 
-      window.clear();
+      renderer->clearScreen();
 
       SDL_Event event;
       ImguiLayer* imgui = ImguiLayer::Instance();

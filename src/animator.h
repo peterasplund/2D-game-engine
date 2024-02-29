@@ -76,7 +76,7 @@ class Animator
 
     Rect getFrame() {
       if (_currentAnimation.empty()) {
-        printf("Error: No animation available at _currentAnimation\n");
+        printf("Error: No animation available at _currentAnimation...\n");
         return {};
       }
 

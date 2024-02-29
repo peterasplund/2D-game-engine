@@ -198,7 +198,7 @@ void obj::Player::update(float dt) {
     _velocity.v.x = 0.0f;
 
     if (!ladderAbove) {
-      _animator.setAnimation("crouch");
+      //_animator.setAnimation("crouch");
     }
     else {
       _animator.setAnimation("climb");
@@ -366,7 +366,7 @@ void obj::Player::update(float dt) {
   });
 
   if (_position.x > 200) {
-      dead = true;
+      //dead = true;
   }
 
   // Climb onto ladder
