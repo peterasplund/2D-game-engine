@@ -139,6 +139,7 @@
    <property name="ladder" type="bool" value="false"/>
    <property name="oneway" type="bool" value="false"/>
    <property name="solid" type="bool" value="false"/>
+   <property name="stair_45_r" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="20">
@@ -146,6 +147,7 @@
    <property name="ladder" type="bool" value="false"/>
    <property name="oneway" type="bool" value="false"/>
    <property name="solid" type="bool" value="false"/>
+   <property name="stair_45_l" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="21">
@@ -4892,6 +4894,7 @@
    <property name="ladder" type="bool" value="false"/>
    <property name="oneway" type="bool" value="false"/>
    <property name="solid" type="bool" value="false"/>
+   <property name="stair_45_r" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="699">
@@ -4899,6 +4902,7 @@
    <property name="ladder" type="bool" value="false"/>
    <property name="oneway" type="bool" value="false"/>
    <property name="solid" type="bool" value="false"/>
+   <property name="stair_45_l" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="700">

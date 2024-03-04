@@ -22,6 +22,9 @@ public:
   void renderTexture(SDL_Texture* texture, Rect* sr, Rect* dr, SDL_RendererFlip textureFlip, bool useOffset = true);
   void renderRect(Rect* rectangle, bool useOffset = true);
   void renderRectFilled(Rect* rectangle, bool useOffset = true);
+  SDL_Renderer* getSdlRenderer() {
+    return _renderer;
+  }
   void clearScreen() {
     SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
     //SDL_SetRenderDrawColor(_renderer, 20, 20, 20, 255);

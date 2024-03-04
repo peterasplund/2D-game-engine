@@ -10,6 +10,12 @@ struct CollisionInfo {
   Rect rect;
 };
 
+collidable::collidable() { }
+
+collidable::collidable(v2f position, Rect boundingBox) {
+  this->boundingBox = boundingBox;
+}
+
 // Calculate "Near time" and "Far time"
 // https://youtu.be/8JJ-4JgR7Dg?t=1813
 bool rayVsRect(v2f& ray_origin, v2f& ray_dir, RectF* target,
@@ -98,49 +104,6 @@ bool dynamicRectVsRect(
   return false;
 }
 
-CollisionResponse resolveCollision(RectF* inRect, velocity *inVelocity, float fTimeStep, Rect* r_static, int tileId)
-{
-  CollisionResponse response;
-  v2f contact_point, contact_normal;
-  float contact_time = 0.0f;
-
-  if (dynamicRectVsRect(inRect, *inVelocity, *r_static, contact_point, contact_normal, contact_time, fTimeStep))
-  {
-    if (contact_normal.y > 0) response.top = tileId;
-    if (contact_normal.y < 0) response.bottom = tileId;
-    if (contact_normal.x > 0) response.left = tileId;
-    if (contact_normal.x < 0) response.right = tileId;
-
-    if (response.top != -1) {
-      printf("hit top\n");
-    }
-    
-    if (response.bottom != -1) {
-      printf("hit bottom\n");
-    }
-
-    /*
-    if (response.left != -1) {
-      printf("hit left\n");
-    }
-    
-    if (response.right != -1) {
-      printf("hit right\n");
-    }
-    */
-
-    inVelocity->v += contact_normal * v2f(std::abs(inVelocity->v.x), std::abs(inVelocity->v.y)) * (1 - contact_time);
-  }
-
-  return response;
-}
-
-collidable::collidable() { }
-
-collidable::collidable(v2f position, Rect boundingBox) {
-  this->boundingBox = boundingBox;
-}
-
 std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
   std::vector<TileExistsAtResponse> response;
   Tilemap* t = EntityManager::Instance()->getTilemap();
@@ -202,150 +165,14 @@ void collidable::update(v2f position) {
   };
 }
 
-CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, float dt) {
-  CollisionResponse respnse = { false, false, false, false };
-  Rect collidedWith;
-  v2 newPos = *position + velocity->v * dt;
-
-  Tilemap* tilemap = EntityManager::Instance()->getTilemap();
-
-  auto layers = tilemap->getLayers();
-
-  if (velocity->v.y != 0) {
-    RectF r = addBoundingBox({position->x, newPos.y});
-    bool collided = false;
-
-    for (int layer = 0; layer < layers->size(); layer++) {
-      std::vector<int> possibleIndices = tilemap->getIndicesWithinRect(r, layer);
-      for (int possibleIdx : possibleIndices) {
-        int tileId = 0;
-        tileId = layers->at(layer).tiles.at(possibleIdx);
-
-        if (tileId == 0) {
-          continue;
-        }
-
-        TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tileId);
-
-        if (!tileData->solid) {
-          continue;
-        }
-
-        Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
-        RectF otherRectF = {
-          (float)otherRect.x,
-          (float)otherRect.y,
-          (float)otherRect.w,
-          (float)otherRect.h,
-        };
-        SDL_Rect otherRectSDL = otherRectF.to_sdl_rect();
-        SDL_Rect rSDL = r.to_sdl_rect();
-        DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
-
-        if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
-          collidedWith = otherRect;
-          collided = true;
-        }
-      }
-    }
-
-    if (collided) {
-      if (velocity->v.y > 0.0f) {
-        newPos.y = floor(collidedWith.y - boundingBox.y - boundingBox.h);
-        respnse.top = true;
-      }
-      else {
-        newPos.y = floor(collidedWith.bottom() - boundingBox.y);
-        respnse.bottom = true;
-      }
-      velocity->v.y = 0.0f;
-    }
-  }
-
-  if (velocity->v.x != 0) {
-    RectF r = addBoundingBox({newPos.x, position->y});
-    bool collided = false;
-
-    for (int layer = 0; layer < layers->size(); layer++) {
-      std::vector<int> possibleIndices = tilemap->getIndicesWithinRect(r, layer);
-      for (int possibleIdx : possibleIndices) {
-        int tileId = 0;
-        tileId = layers->at(layer).tiles.at(possibleIdx);
-
-        if (tileId == 0) {
-          continue;
-        }
-
-        TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tileId);
-
-        if (!tileData->solid) {
-          continue;
-        }
-
-        Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
-        RectF otherRectF = {
-          (float)otherRect.x,
-          (float)otherRect.y,
-          (float)otherRect.w,
-          (float)otherRect.h,
-        };
-        SDL_Rect otherRectSDL = otherRectF.to_sdl_rect();
-        SDL_Rect rSDL = r.to_sdl_rect();
-        DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
-
-        if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
-          collidedWith = otherRect;
-          collided = true;
-        }
-      }
-    }
-
-    if (collided) {
-      if (velocity->v.x > 0.0f) {
-        newPos.x = floor(collidedWith.x - boundingBox.x - boundingBox.w);
-        respnse.right = true;
-      }
-      else {
-        newPos.x = floor(collidedWith.right() - boundingBox.x);
-        respnse.left = true;
-      }
-      velocity->v.x = 0.0f;
-    }
-  }
-
-  position->x = newPos.x;
-  position->y = newPos.y;
-
-
-  return respnse;
-}
-
-
-/*
-CollisionResponse collidable::moveAndSlide(v2f position, velocity* velocity, float dt) {
-  RectF r = addBoundingBox(position);
-
-  v2f contact_point;
-  v2f contact_normal;
-  float t_hit = 0;
-  std::vector<CollisionInfo> collisions;
+Rect getCollisionAt(RectF r) {
+  bool collided = false;
 
   Tilemap* tilemap = EntityManager::Instance()->getTilemap();
   auto layers = tilemap->getLayers();
-
-  RectF nextPositionF = addBoundingBox(v2f {
-    round(position.x + velocity->v.x * dt),
-    round(position.y + velocity->v.y * dt),
-  });
-
-  Rect summedPositions = group_rects(r, nextPositionF);
-  summedPositions.x -= 32;
-  summedPositions.w += 64;
-  summedPositions.y -= 32;
-  summedPositions.h += 64;
 
   for (int layer = 0; layer < layers->size(); layer++) {
-    std::vector<int> possibleIndices = tilemap->getIndicesWithinRect(summedPositions, layer);
+    std::vector<int> possibleIndices = tilemap->getIndicesWithinRect(r, layer);
     for (int possibleIdx : possibleIndices) {
       int tileId = 0;
       tileId = layers->at(layer).tiles.at(possibleIdx);
@@ -361,66 +188,64 @@ CollisionResponse collidable::moveAndSlide(v2f position, velocity* velocity, flo
       }
 
       Rect otherRect = tilemap->getTileRect(layer, possibleIdx);
+      SDL_Rect otherRectSDL = otherRect.to_sdl_rect();
+      SDL_Rect rSDL = r.to_sdl_rect();
       DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 
-      bool result = dynamicRectVsRect(&r, *velocity, otherRect, contact_point, contact_normal, t_hit, dt);
-
-      if (result) {
-        collisions.push_back(CollisionInfo {
-          layer,
-          possibleIdx,
-          tileId,
-          t_hit,
-          contact_normal,
-          otherRect,
-        });
+      if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
+        return otherRect;
       }
     }
   }
 
-  std::sort(collisions.begin(), collisions.end(), [](CollisionInfo &a, CollisionInfo& b) {
-    return a.t_hit < b.t_hit;
-  });
-
-  CollisionResponse response;
-
-  for (auto j : collisions) {
-    CollisionResponse currentResponse = resolveCollision(&r, velocity, dt, &j.rect, j.tileId);
-    
-    */
-    /*
-    if (j.contactNormal.y > 0) response.top = j.tileId;
-    if (j.contactNormal.y < 0) response.bottom = j.tileId;
-    if (j.contactNormal.x > 0) response.left = j.tileId;
-    if (j.contactNormal.x < 0) response.right = j.tileId;
-
-    if (response.top != -1) {
-      printf("hit top\n");
-    }
-    
-    if (response.bottom != -1) {
-      printf("hit bottom\n");
-    }
-
-    velocity->v += j.contactNormal * v2f(std::abs(velocity->v.x), std::abs(velocity->v.y)) * (1 - j.t_hit);
-    */
-    /*
-  }
-
-  // Final check to assert we're not within a solid
-  nextPositionF = addBoundingBox(v2f {
-    position.x + velocity->v.x * dt,
-    position.y + velocity->v.y * dt,
-  });
-  SDL_Rect r1 = nextPositionF.to_sdl_rect();
-
-  for (auto j : collisions) {
-    SDL_Rect r2 = j.rect.to_sdl_rect();
-    if (SDL_HasIntersection(&r1, &r2)) {
-      printf("ERROR: We're within a wall!\n");
-    }
-  }
-
-  return response;
+  return {-1, -1, -1, -1};
 }
-*/
+
+CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, float dt) {
+  CollisionResponse respnse = { false, false, false, false };
+  v2 newPos = *position + velocity->v * dt;
+
+  Tilemap* tilemap = EntityManager::Instance()->getTilemap();
+  auto layers = tilemap->getLayers();
+  Rect collidedWith;
+
+  if (velocity->v.y != 0) {
+    RectF r = addBoundingBox({position->x, newPos.y});
+    collidedWith = getCollisionAt(r);
+
+    if (collidedWith.w != -1 && collidedWith.h != -1) {
+      if (velocity->v.y > 0.0f) {
+        newPos.y = floor(collidedWith.y - boundingBox.y - boundingBox.h);
+        respnse.top = true;
+      }
+      else {
+        newPos.y = floor(collidedWith.bottom() - boundingBox.y);
+        respnse.bottom = true;
+      }
+      velocity->v.y = 0.0f;
+    }
+  }
+
+  if (velocity->v.x != 0) {
+    Rect collidedWith;
+    RectF r = addBoundingBox({newPos.x, position->y});
+    collidedWith = getCollisionAt(r);
+
+    if (collidedWith.w != -1 && collidedWith.h != -1) {
+      if (velocity->v.x > 0.0f) {
+        newPos.x = floor(collidedWith.x - boundingBox.x - boundingBox.w);
+        respnse.right = true;
+      }
+      else {
+        newPos.x = floor(collidedWith.right() - boundingBox.x);
+        respnse.left = true;
+      }
+      velocity->v.x = 0.0f;
+    }
+  }
+
+  position->x = newPos.x;
+  position->y = newPos.y;
+
+  return respnse;
+}

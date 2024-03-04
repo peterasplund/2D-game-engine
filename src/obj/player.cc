@@ -217,11 +217,9 @@ void obj::Player::update(float dt) {
       // @TODO: reverse animation
     }
 
-
-    //_collidable.update(_position);
     auto resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
 
-    if (resp.bottom) {
+    if (resp.top) {
       state = State::IDLE;
     }
 
@@ -365,10 +363,6 @@ void obj::Player::update(float dt) {
     _collidable.rect.h
   });
 
-  if (_position.x > 200) {
-      //dead = true;
-  }
-
   // Climb onto ladder
   if (tilesWithin.size() > 0) {
     for(auto tile : tilesWithin) {
@@ -390,7 +384,6 @@ void obj::Player::update(float dt) {
       }
     }
   }
-
 
   auto tilesBelow = _collidable.tileExistsAt({
     round(_collidable.rect.x),

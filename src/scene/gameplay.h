@@ -10,6 +10,7 @@
 #include "../entityManager.h"
 #include "../debugPrinter.h"
 #include "../components/camera.h"
+#include "../hud.h"
 
 class GameplayScene : public Scene
 {
@@ -18,6 +19,7 @@ private:
   camera _camera;
   Bg* bg1;
   Bg* bg2;
+  Hud* hud;
   Tilemap* tilemap;
   std::string _level;
   bool loaded = false;

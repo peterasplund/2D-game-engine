@@ -41,8 +41,9 @@ void GameplayScene::init() {
     { "door", GAME_OBJECT::DOOR },
   };
 
-  bg1 = new Bg("assets/bgs/clouds.png", { 512, 352 });
-  bg2 = new Bg("assets/bgs/town.png", { 512, 352 });
+  bg1 = new Bg("assets/bgs/sky.png", { 480, 270 });
+  bg2 = new Bg("assets/bgs/houses.png", { 480, 270 });
+  hud = new Hud();
 
   std::vector<TiledObject> objects = tilemap->getObjects();
   for (TiledObject o : objects) {
@@ -84,8 +85,8 @@ void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
   v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
-  //bg1->draw(renderer, -camera.x * 0.04);
-  //bg2->draw(renderer, -camera.x * 0.2);
+  bg1->draw(renderer->getSdlRenderer(), 0);
+  bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
   std::vector<TileLayer>* layers = tilemap->getLayers();
   // Draw tiles
@@ -122,11 +123,13 @@ void GameplayScene::draw(Renderer* renderer) {
   // @TODO: handle drawing some tiles after objects depending on their z-setting in the tmx-format
   // Draw objects
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
-    Rect objRect = obj->getRect();
+    Rect objRect = obj->getTextureRect();
     if (objRect.hasIntersection(&camera)) {
       obj->draw(renderer);
     }
   }
+
+  hud->draw(renderer->getSdlRenderer());
   
   DebugPrinter::Instance()->draw(renderer);
 }

@@ -30,6 +30,14 @@ class AbstractGameObject {
     Rect getRect();
     RectF getRectFloat();
     RectF* getRectPointer();
+    Rect getTextureRect() {
+      return {
+        (int)round(_position.x),
+        (int)round(_position.y),
+        _renderable.textureRect.w,
+        _renderable.textureRect.h,
+      };
+    }
     v2f getPosition();
     v2f* getPositionPointer();
     bool getListensForCollisions();
