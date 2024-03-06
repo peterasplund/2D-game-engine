@@ -3,14 +3,10 @@
 #include "SDL_image.h"
 #include "math.h"
 
-/*
-  average width +5
-  ascender height +7
-  descender height -2
-  x-height +5
-*/
+// https://opengameart.org/content/bitmap-font
 
 class Font {
+public:
   Font(SDL_Renderer* renderer) {
     _renderer = renderer;
   }
@@ -38,13 +34,46 @@ class Font {
     return true;
   }
 
-  void drawString(char* str, v2i position) {
+  // @TODO: move overflowing logic into dialogue.h
+  void drawString(const char* str, v2i position, int stopAt) {
+    v2i glyph;
+
+    int x = position.x;
+    int y = position.y;
+
+    char prevChar = '0';
     for (int i = 0; str[i] != '\0'; i++) {
-      v2i glyph = charToGlyph(str[i]);
-      drawGlyph(glyph, { 
-          position.x + (i * GLYPH_WIDTH),
-          position.y,
-      });
+      if (i >= stopAt) {
+        break;
+      }
+
+      glyph = charToGlyph(str[i]);
+      drawGlyph(glyph, { x, y });
+
+      // Check if next word causes an overflow
+      // We only wanna do this in the beginning of a word
+      int wordWidth = 0;
+      if (str[i] == ' ') {
+        for (int j = i + 1; str[j] != '\0' && str[j] != ' '; j++) {
+          wordWidth += GLYPH_WIDTH;
+        }
+      }
+
+      bool overflowing = x + wordWidth > BOUNDS.w;
+
+      if (!overflowing) {
+        x = x + GLYPH_WIDTH;
+      }
+      else {
+        printf("Overflowing\n");
+        y += GLYPH_HEIGHT;
+        x = position.x;
+        
+        // Remove next space if there's is one when moving to next line.
+        if (str[i] != '\n' && str[i + 1] == ' ') {
+          i ++;
+        }
+      }
     }
   }
 
@@ -53,20 +82,22 @@ private:
   SDL_Texture* _texture;
 
   const char* TEXTURE_PATH = "assets/font.png";
-  const int GLYPH_WIDTH = 5;
-  const int GLYPH_HEIGHT = 7;
-  const int OFFSET_X = 3;
-  const int OFFSET_Y = 40;
+  const int GLYPH_WIDTH = 8;
+  const int GLYPH_HEIGHT = 12;
+  const Rect BOUNDS = { 0, 0, 200, 300 };
 
   v2i charToGlyph(char x) {
-    // @TODO: implement
-    return {0,0};
+    int asciiPos = x - 32;
+    int top = asciiPos / 16 * GLYPH_HEIGHT;
+    int left = asciiPos % 16 * GLYPH_WIDTH;
+
+    return {left, top};
   }
 
   void drawGlyph(v2i glyph, v2i position) {
     SDL_Rect sdl_sr = {
-      GLYPH_WIDTH * glyph.x,
-      GLYPH_HEIGHT * glyph.y,
+      glyph.x,
+      glyph.y,
       GLYPH_WIDTH,
       GLYPH_HEIGHT,
     };

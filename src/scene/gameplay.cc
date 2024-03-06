@@ -85,8 +85,8 @@ void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
   v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
-  bg1->draw(renderer->getSdlRenderer(), 0);
-  bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
+  //bg1->draw(renderer->getSdlRenderer(), 0);
+  //bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
   std::vector<TileLayer>* layers = tilemap->getLayers();
   // Draw tiles

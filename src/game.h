@@ -9,6 +9,7 @@
 #include "scene/gameplay.h"
 #include "timer.h"
 #include "renderer.h"
+#include "dialogue.h"
 
 class Game
 {
@@ -24,6 +25,10 @@ public: Game() {
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* sdl_renderer = window.getRenderer();
     Renderer* renderer = new Renderer(sdl_renderer);
+    Dialogue* dialogue = new Dialogue(sdl_renderer);
+
+    dialogue->init();
+    dialogue->message("Hello world! This is a very long string that will likely cause the text to wrap. If it doesn't then we've got a problem.");
 
     AssetManager::Instance()->init(sdl_renderer);
 
@@ -72,8 +77,11 @@ public: Game() {
       }
       */
 
-      _sceneManager->update(deltaTime);
-      _sceneManager->draw(renderer);
+      //_sceneManager->update(deltaTime);
+      //_sceneManager->draw(renderer);
+      //font->drawString("Hello world!", {10, 10});
+      dialogue->update();
+      dialogue->draw();
 
       imgui->drawBegin();
       imgui->debugEntities(EntityManager::Instance()->getEntities());
