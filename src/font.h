@@ -2,84 +2,48 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "math.h"
+#include "renderer.h"
 
 // https://opengameart.org/content/bitmap-font
 
+
+enum class FONT_COLOR {
+  NONE,
+  CHARACTER,
+  KEY_ITEM,
+};
+
 class Font {
 public:
-  Font(SDL_Renderer* renderer) {
+  Font(Renderer* renderer) {
     _renderer = renderer;
   }
 
   bool init() {
-    SDL_Surface* surface = IMG_Load(TEXTURE_PATH);
-    if (surface == NULL) {
-      printf("Image load error: Path(%s) - Error(%s)\n", TEXTURE_PATH, IMG_GetError());
-      return false;
-    }
-
-    _texture = SDL_CreateTextureFromSurface(_renderer, surface);
-
-    if (_texture == NULL) {
-      printf("Failed to create texture\n");
-    }
-
-    if (surface == NULL || surface == NULL) {
-      printf("Create texture error: %s\n", SDL_GetError());
-      return false;
-    }
-
-    SDL_FreeSurface(surface); 
+    Sprite* sprite = new Sprite();;
+     _renderer->loadSprite(TEXTURE_PATH, sprite);
+    _sprite = sprite;
 
     return true;
   }
 
-  // @TODO: move overflowing logic into dialogue.h
-  void drawString(const char* str, v2i position, int stopAt) {
-    v2i glyph;
+  void drawLetter(const char letter, v2i position, FONT_COLOR color = FONT_COLOR::NONE) {
+      setTextColor(color);
+      v2i glyph = charToGlyph(letter);
+      drawGlyph(glyph, position);
+  }
 
-    int x = position.x;
-    int y = position.y;
+  int getGlyphWidth() {
+    return GLYPH_WIDTH;
+  }
 
-    char prevChar = '0';
-    for (int i = 0; str[i] != '\0'; i++) {
-      if (i >= stopAt) {
-        break;
-      }
-
-      glyph = charToGlyph(str[i]);
-      drawGlyph(glyph, { x, y });
-
-      // Check if next word causes an overflow
-      // We only wanna do this in the beginning of a word
-      int wordWidth = 0;
-      if (str[i] == ' ') {
-        for (int j = i + 1; str[j] != '\0' && str[j] != ' '; j++) {
-          wordWidth += GLYPH_WIDTH;
-        }
-      }
-
-      bool overflowing = x + wordWidth > BOUNDS.w;
-
-      if (!overflowing) {
-        x = x + GLYPH_WIDTH;
-      }
-      else {
-        printf("Overflowing\n");
-        y += GLYPH_HEIGHT;
-        x = position.x;
-        
-        // Remove next space if there's is one when moving to next line.
-        if (str[i] != '\n' && str[i + 1] == ' ') {
-          i ++;
-        }
-      }
-    }
+  int getGlyphHeight() {
+    return GLYPH_HEIGHT;
   }
 
 private:
-  SDL_Renderer* _renderer;
-  SDL_Texture* _texture;
+  Renderer* _renderer;
+  Sprite* _sprite;
 
   const char* TEXTURE_PATH = "assets/font.png";
   const int GLYPH_WIDTH = 8;
@@ -94,7 +58,22 @@ private:
     return {left, top};
   }
 
+  void setTextColor(FONT_COLOR color) {
+    switch (color) {
+      case FONT_COLOR::KEY_ITEM:
+        SDL_SetTextureColorMod(_sprite->texture, 200, 15, 15);
+        break;
+      case FONT_COLOR::CHARACTER:
+        SDL_SetTextureColorMod(_sprite->texture, 15, 200, 15);
+        break;
+      default:
+        SDL_SetTextureColorMod(_sprite->texture, 255, 255, 255);
+        break;
+    }
+  }
+
   void drawGlyph(v2i glyph, v2i position) {
+    SDL_Texture* texture = _sprite->texture;
     SDL_Rect sdl_sr = {
       glyph.x,
       glyph.y,
@@ -109,7 +88,9 @@ private:
       GLYPH_HEIGHT
     };
 
-    SDL_RenderCopyEx(_renderer, _texture, &sdl_sr, &sdl_dr, 0, 0, SDL_FLIP_NONE);
+    //SDL_SetTextureColorMod(texture, 255, 0, 0);
+
+    SDL_RenderCopyEx(_renderer->getSdlRenderer(), texture, &sdl_sr, &sdl_dr, 0, 0, SDL_FLIP_NONE);
   }
 
 };

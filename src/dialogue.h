@@ -1,15 +1,20 @@
 #pragma once
 #include <string>
 #include "SDL.h"
+#include "globals.h"
 #include "font.h"
 #include "math.h"
 #include "timer.h"
+#include "renderer.h"
 
+#define DIALOGUE_BOX_HEIGHT 70
+
+// We got the sprite font here:
 // https://opengameart.org/content/bitmap-font
 
 class Dialogue {
 public:
-  Dialogue(SDL_Renderer* renderer) {
+  Dialogue(Renderer* renderer) {
     _renderer = renderer;
     _font = new Font(_renderer);
     _timer = Timer();
@@ -22,7 +27,7 @@ public:
       return false;
     }
 
-    _frameTexture = SDL_CreateTextureFromSurface(_renderer, surface);
+    _frameTexture = SDL_CreateTextureFromSurface(_renderer->getSdlRenderer(), surface);
 
     if (_frameTexture == NULL) {
       printf("Failed to create texture\n");
@@ -59,50 +64,69 @@ public:
       return;
     }
 
-    drawFrame();
-    _font->drawString(_displayingMessage.c_str(), {16,16}, _currentCharacterIdx);
+    _renderer->renderRectTexture(BOUNDS, _frameTexture, FRAME_WIDTH);
+
+    int x = BOUNDS.x + PADDING;
+    int y = BOUNDS.y + PADDING;
+
+    const int GLYPH_WIDTH = _font->getGlyphWidth();
+    const int GLYPH_HEIGHT = _font->getGlyphHeight();
+
+    char prevChar = '0';
+    for (int i = 0; _displayingMessage[i] != '\0'; i++) {
+      if (i >= _currentCharacterIdx) {
+        break;
+      }
+
+      if (_displayingMessage[i] == '\n') {
+        y += GLYPH_HEIGHT;
+        x = BOUNDS.x + PADDING;
+        continue;
+      }
+
+      if (i < 11) {
+        _font->drawLetter(_displayingMessage[i], { x, y }, FONT_COLOR::CHARACTER);
+      }
+      else {
+        _font->drawLetter(_displayingMessage[i], { x, y });
+      }
+
+      // Check if next word causes an overflow
+      // We only wanna do this in the beginning of a word
+      int wordWidth = 0;
+      if (_displayingMessage[i] == ' ') {
+        for (int j = i + 1; _displayingMessage[j] != '\0' && _displayingMessage[j] != ' '; j++) {
+          wordWidth += GLYPH_WIDTH;
+        }
+      }
+
+      bool overflowing = x + wordWidth > BOUNDS.x + BOUNDS.w - (PADDING * 2);
+
+      if (!overflowing) {
+        x = x + GLYPH_WIDTH;
+      }
+      else {
+        y += GLYPH_HEIGHT;
+        x = BOUNDS.x + PADDING;
+        
+        // Remove next space if there's is one when moving to next line.
+        if (_displayingMessage[i] != '\n' && _displayingMessage[i + 1] == ' ') {
+          i ++;
+        }
+      }
+    }
   }
 
 
 private:
-  void drawCorner(const int x, const int y, const SDL_RendererFlip flip) {
-    const int sr_x = flip & SDL_FLIP_HORIZONTAL ? 16 : 0;
-    const int sr_y = flip & SDL_FLIP_VERTICAL & SDL_FLIP_VERTICAL ? 16 : 0;
-
-    SDL_Rect sdl_sr = {
-      sr_x,
-      sr_y,
-      16,
-      16,
-    };
-
-    SDL_Rect sdl_dr = {
-      x,
-      y,
-      16,
-      16
-    };
-
-    SDL_RenderCopyEx(_renderer, _frameTexture, &sdl_sr, &sdl_dr, 0, 0, SDL_FLIP_NONE);
-  }
-
-  void drawFrame() {
-    /*
-    drawCorner(BOUNDS.x,      BOUNDS.y,      SDL_FLIP_NONE);
-    drawCorner(BOUNDS.x + BOUNDS.w - 16, BOUNDS.y,      SDL_FLIP_HORIZONTAL);
-    drawCorner(BOUNDS.x,      BOUNDS.y + BOUNDS.h - 16, SDL_FLIP_VERTICAL);
-    drawCorner(BOUNDS.x + BOUNDS.w - 16, BOUNDS.y + BOUNDS.h - 16, (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL));
-    */
-  }
-
-
-  const int LETTER_PAUSE = 100;
-
-  const Rect BOUNDS = { 0, 0, 200, 300 };
+  const int LETTER_PAUSE = 65;
+  const int FRAME_WIDTH = 16;
+  const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) - DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
+  const int PADDING = 8;
   const char* FRAME_TEXTURE_PATH = "assets/dialogue.png";
   std::string _displayingMessage;
   SDL_Texture* _frameTexture;
-  SDL_Renderer* _renderer;
+  Renderer* _renderer;
   Timer _timer;
   int _currentCharacterIdx = 0;
   Font* _font;

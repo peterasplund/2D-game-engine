@@ -25,10 +25,10 @@ public: Game() {
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* sdl_renderer = window.getRenderer();
     Renderer* renderer = new Renderer(sdl_renderer);
-    Dialogue* dialogue = new Dialogue(sdl_renderer);
+    Dialogue* dialogue = new Dialogue(renderer);
 
     dialogue->init();
-    dialogue->message("Hello world! This is a very long string that will likely cause the text to wrap. If it doesn't then we've got a problem.");
+    dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
 
     AssetManager::Instance()->init(sdl_renderer);
 
@@ -77,9 +77,8 @@ public: Game() {
       }
       */
 
-      //_sceneManager->update(deltaTime);
-      //_sceneManager->draw(renderer);
-      //font->drawString("Hello world!", {10, 10});
+      _sceneManager->update(deltaTime);
+      _sceneManager->draw(renderer);
       dialogue->update();
       dialogue->draw();
 
