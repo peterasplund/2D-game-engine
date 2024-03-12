@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "SDL.h"
 #include "globals.h"
 #include "font.h"
@@ -8,6 +9,21 @@
 #include "renderer.h"
 
 #define DIALOGUE_BOX_HEIGHT 70
+
+enum class TagType {
+  COLOR,
+};
+
+struct MsgTag {
+  TagType type;
+  int start;
+  int length;
+};
+
+struct Message {
+  std::vector<MsgTag> tags;
+  std::string msg;
+};
 
 // We got the sprite font here:
 // https://opengameart.org/content/bitmap-font
@@ -41,6 +57,34 @@ public:
     SDL_FreeSurface(surface); 
 
     return _font->init();
+  }
+
+  Message parseMessage(std::string s) {
+    std::vector<MsgTag> tags;
+    std::string msg = "";
+    msg.resize(s.length());
+
+    int msgIdx = 0;
+    bool inTag = false;
+    for (int i = 0; i < s.length(); i++) {
+      msg[msgIdx] = s[i];
+
+      if (s[i] == '<') {
+        if (!inTag) {
+          inTag = true;
+        }
+        else {
+          inTag = false;
+        }
+      }
+      
+      msgIdx ++;
+    }
+
+    return {
+      tags,
+      msg,
+    };
   }
 
   void message(std::string msg) {
@@ -121,7 +165,8 @@ public:
 private:
   const int LETTER_PAUSE = 65;
   const int FRAME_WIDTH = 16;
-  const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) - DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
+  //const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) - DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
+  const Rect BOUNDS = { 0, 0, 300, 100};
   const int PADDING = 8;
   const char* FRAME_TEXTURE_PATH = "assets/dialogue.png";
   std::string _displayingMessage;
