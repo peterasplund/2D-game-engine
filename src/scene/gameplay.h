@@ -5,7 +5,6 @@
 #include "../obj/player.h"
 #include "../obj/door.h"
 #include "../scene.h"
-#include "../tiledParser.h"
 #include "../bg.h"
 #include "../entityManager.h"
 #include "../debugPrinter.h"

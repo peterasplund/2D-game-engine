@@ -1,3 +1,4 @@
+/*
 #include "tiledParser.h"
 
 Tilemap* tiled_load_map(const char* mapFile) {
@@ -121,3 +122,4 @@ Tilemap* tiled_load_map(const char* mapFile) {
     std::move(objects)
   );
 }
+*/

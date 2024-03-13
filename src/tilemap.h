@@ -95,16 +95,6 @@ class Tilemap
       return _tileset.getTileData(id - _firstGID);
     }
 
-    /*
-    std::vector<std::pair<int, TileData*>> getTileData(int idx) {
-      std::vector<std::pair<int, TileData*>> tiles;
-      for(int i = 0; i < _layers.size(); i ++) {
-        tiles.push_back(std::pair { i, getTileData(idx, i) } );
-      }
-      return tiles;
-    }
-    */
-
     Tileset* getTileset() {
       return &_tileset;
     }

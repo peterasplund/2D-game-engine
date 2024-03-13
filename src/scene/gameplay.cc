@@ -23,10 +23,11 @@ void GameplayScene::init() {
   }
   */
 
-  char levelName[32];
-  sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
+  //char levelName[32];
+  //sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
+  /*
 
-  tilemap = tiled_load_map(levelName);
+  //tilemap = tiled_load_map(levelName);
   EntityManager::Instance()->setTileMap(tilemap);
 
   _camera = camera();
@@ -71,17 +72,21 @@ void GameplayScene::init() {
   _camera.follow(player->getRectPointer());
   _renderer->setOffsetPtr(&_camera.pos);
   loaded = true;
+  */
 }
 
 void GameplayScene::update(float dt) {
+  /*
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     obj->update(dt);
   }
 
   _camera.update();
+  */
 }
 
 void GameplayScene::draw(Renderer* renderer) {
+  /*
   RectF camera = _camera.getRect();
   v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
@@ -132,4 +137,5 @@ void GameplayScene::draw(Renderer* renderer) {
   hud->draw(renderer->getSdlRenderer());
   
   DebugPrinter::Instance()->draw(renderer);
+  */
 }

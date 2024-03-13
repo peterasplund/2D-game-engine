@@ -1,5 +1,20 @@
 #include "tileset.h"
 
+Tileset::Tileset(
+    SDL_Texture* texture, 
+    std::map<int, TileData> tiles,
+    int tileSize,
+    int tileCount,
+    int columns
+) {
+  _texture = texture;
+  _tiles = tiles;
+  _tileCount = tileCount;
+  _tileWidth = tileSize;
+  _tileHeight = tileSize;
+  _columns = columns;
+}
+
 bool Tileset::load(std::string filename) {
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_file(filename.c_str());

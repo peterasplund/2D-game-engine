@@ -28,8 +28,14 @@ struct TileData {
 
 class Tileset {
   public:
-    Tileset() {
-    }
+    Tileset() {};
+    Tileset(
+        SDL_Texture* texture, 
+        std::map<int, TileData> _tiles,
+        int _tileSize,
+        int _tileCount,
+        int _columns
+    );
 
     bool load(std::string filename);
 

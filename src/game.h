@@ -10,6 +10,7 @@
 #include "timer.h"
 #include "renderer.h"
 #include "dialogue.h"
+#include "LDtkParser.h"
 
 class Game
 {
@@ -27,8 +28,12 @@ public: Game() {
     Renderer* renderer = new Renderer(sdl_renderer);
     Dialogue* dialogue = new Dialogue(renderer);
 
-    dialogue->init();
-    dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
+    Project ldtkProject;
+    ldtkProject.load("assets/maps/LDtk_test.ldtk");
+
+
+    //dialogue->init();
+    //dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
 
     AssetManager::Instance()->init(sdl_renderer);
 
