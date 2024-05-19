@@ -12,6 +12,7 @@ class AssetManager
 private:
   std::map<std::string, SDL_Texture*> _textures;
   SDL_Renderer* _renderer;
+  bool initialized = false;
 
   AssetManager() {
   }
@@ -70,23 +71,24 @@ public:
     if (_instance == nullptr) {
       _instance = new AssetManager();
     }
-    else {
-      if (_instance->_renderer == nullptr) {
-        printf("ERROR: AssetManager is not initialized\n");
-      }
-    }
 
     return _instance;
   }
 
   void init(SDL_Renderer* renderer) {
     this->_renderer = renderer;
+    this->initialized = true;
   }
 
   static void release() {
   }
 
   SDL_Texture* getTexture(std::string filename) {
+    if (!this->initialized) {
+      printf("ERROR: AssetManager is not initialized\n");
+      exit(1);
+    }
+
     std::string fullPath = SDL_GetBasePath();
     fullPath.append(filename);
 

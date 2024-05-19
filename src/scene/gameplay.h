@@ -10,6 +10,7 @@
 #include "../debugPrinter.h"
 #include "../components/camera.h"
 #include "../hud.h"
+#include "../LDtkParser.h"
 
 class GameplayScene : public Scene
 {
@@ -21,13 +22,15 @@ private:
   Hud* hud;
   Tilemap* tilemap;
   std::string _level;
+  Project* _ldtkProject;
   bool loaded = false;
   std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
 public:
-  GameplayScene(Renderer* renderer, std::string level) : Scene(renderer) {
+  GameplayScene(Renderer* renderer, Project* ldtkProject, std::string level) : Scene(renderer) {
     _renderer = renderer;
     _level = level;
+    _ldtkProject = ldtkProject;
   }
 
   void init();

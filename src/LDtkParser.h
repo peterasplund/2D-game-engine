@@ -4,6 +4,7 @@
 #include "math.h"
 #include "SDL.h"
 #include <vector>
+#include <map>
 #include <string>
 
 enum class LDTK_Entity_Field_Tag { Integer, Float, String };
@@ -44,6 +45,9 @@ struct LDTK_Level {
 
   int tilesWide;
   int tilesTall;
+
+  std::vector<LDTK_Level_Layer> layers;
+  std::vector<LDTK_Level_Entity> entities;
 };
 
 struct EnumTag {
@@ -74,7 +78,7 @@ struct Project {
   std::vector<LDTK_Entity> entitites;
   std::vector<LDTK_Layer> layers;
   std::vector<LDTK_Tileset> tilesets;
-  std::vector<LDTK_Level> levels;
+  std::map<std::string, LDTK_Level> levels;
 };
 
 Project load_ldtk_project(const char* file) ;

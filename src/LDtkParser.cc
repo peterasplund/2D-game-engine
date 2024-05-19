@@ -92,6 +92,8 @@ LDTK_Level parse_level(int tileSize, json data) {
       }
       */
     }
+
+    level.layers.push_back(layer);
   }
 
   return level;
@@ -155,8 +157,8 @@ void Project::load(const std::string filePath) {
     std::string identifier = x["identifier"];
 
     if (identifier != "Internal_Icons") {
-      printf("> > parse tileset %s \n", identifier.c_str());
-      tilesets.push_back(parse_tileset(projectPath, x));
+      LDTK_Tileset tileset = parse_tileset(projectPath, x);
+      tilesets.push_back(tileset);
     }
   }
 
@@ -167,7 +169,7 @@ void Project::load(const std::string filePath) {
   for(json x : data["levels"]) {
     std::string identifier = x["identifier"];
     printf("> > parse level %s \n", identifier.c_str());
-    levels.push_back(parse_level(defaultGridSize, x));
+    levels[identifier] = parse_level(defaultGridSize, x);
   }
 }
 

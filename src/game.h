@@ -25,22 +25,23 @@ public: Game() {
 
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* sdl_renderer = window.getRenderer();
+    AssetManager::Instance()->init(sdl_renderer);
+
     Renderer* renderer = new Renderer(sdl_renderer);
     Dialogue* dialogue = new Dialogue(renderer);
+
 
     Project ldtkProject;
     ldtkProject.load("assets/maps/LDtk_test.ldtk");
 
-
     //dialogue->init();
     //dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
 
-    AssetManager::Instance()->init(sdl_renderer);
 
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, "dungeon");
+    GameplayScene* _gameplayScene = new GameplayScene(renderer, &ldtkProject, "Level_0");
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);

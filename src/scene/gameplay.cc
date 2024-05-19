@@ -17,21 +17,15 @@ std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OB
 }
 
 void GameplayScene::init() {
-  /*
-  if (tilemap != nullptr) {
-    delete tilemap;
-  }
-  */
+  // _ldtkProject->levels[_level].layers
 
-  //char levelName[32];
-  //sprintf(levelName, "assets/maps/maps/%s.tmx", _level.c_str());
-  /*
-
-  //tilemap = tiled_load_map(levelName);
-  EntityManager::Instance()->setTileMap(tilemap);
+  //EntityManager::Instance()->setTileMap(tilemap);
 
   _camera = camera();
-  _camera.setBounds({ tilemap->getWidthInPixels(), tilemap->getHeightInPixels() });
+  _camera.setBounds({ 
+    _ldtkProject->levels[_level].tilesWide * 16,
+    _ldtkProject->levels[_level].tilesTall * 16,
+  });
 
   if (loaded) {
     return;
@@ -46,6 +40,7 @@ void GameplayScene::init() {
   bg2 = new Bg("assets/bgs/houses.png", { 480, 270 });
   hud = new Hud();
 
+  /*
   std::vector<TiledObject> objects = tilemap->getObjects();
   for (TiledObject o : objects) {
     if (!gameObjects.count(o.name)) {
@@ -60,29 +55,29 @@ void GameplayScene::init() {
     object->init();
     EntityManager::Instance()->addEntity(std::move(object));
   }
+  */
 
+  /*
   obj::Enemy enemy;
   auto enemyPtr = std::make_shared<obj::Enemy>(enemy);
   enemyPtr->_position.x = 400;
   enemyPtr->_position.y = 50;
   enemyPtr->init();
   EntityManager::Instance()->addEntity(enemyPtr);
+  */
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
   _camera.follow(player->getRectPointer());
   _renderer->setOffsetPtr(&_camera.pos);
   loaded = true;
-  */
 }
 
 void GameplayScene::update(float dt) {
-  /*
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     obj->update(dt);
   }
 
   _camera.update();
-  */
 }
 
 void GameplayScene::draw(Renderer* renderer) {
