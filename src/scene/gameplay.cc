@@ -3,7 +3,7 @@
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
-  std::shared_ptr<AbstractGameObject> o;
+  std::shared_ptr<AbstractGameObject> o = nullptr;
   switch (obj) {
     case GAME_OBJECT::PLAYER:
       o = std::make_shared<obj::Player>();
@@ -33,13 +33,16 @@ void GameplayScene::init() {
 
     // Init entities
     for(auto e : layer.entities) {
-      printf("entity: %s\t pos: %d\t%d\n", e.identifier.c_str(), e.position.x, e.position.y);
       auto entity = _ldtkProject->entitites[e.identifier];
 
-      GAME_OBJECT objType = gameObjects.find(entity.identifier)->second;
+      auto it = gameObjects.find(entity.identifier);
 
-      auto object = instantiateGameObject(objType);
-      if (object) {
+      if (it == gameObjects.end()) {
+        continue;
+      }
+
+      auto object = instantiateGameObject(it->second);
+      if (object != nullptr) {
         object->_position = { (float)e.position.x, (float)e.position.y };
         object->init();
 
