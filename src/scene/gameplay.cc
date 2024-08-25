@@ -66,8 +66,8 @@ void GameplayScene::init() {
   hud = new Hud();
 
   auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
-  //_camera.follow(player->getRectPointer());
-  //_renderer->setOffsetPtr(&_camera.pos);
+  _camera.follow(player->getRectPointer());
+  _renderer->setOffsetPtr(&_camera.pos);
   loaded = true;
 }
 
@@ -76,12 +76,12 @@ void GameplayScene::update(float dt) {
     //obj->update(dt);
   }
 
-  //_camera.update();
+  _camera.update();
 }
 
 void GameplayScene::draw(Renderer* renderer) {
-  //RectF camera = _camera.getRect();
-  //v2f cameraOffset = { (float)camera.x, (float)camera.y };
+  RectF camera = _camera.getRect();
+  v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
   //bg1->draw(renderer->getSdlRenderer(), 0);
   //bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
