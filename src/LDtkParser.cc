@@ -5,6 +5,20 @@
 
 using json = nlohmann::json;
 
+LayerType strToLayerType(const char* str) {
+  if (strcmp(str, "Entities") == 0) {
+    return LayerType::ENTITIES;
+  }
+  else if (strcmp(str, "IntGrid") == 0) {
+    return LayerType::INT_GRID;
+  }
+  else if (strcmp(str, "Tiles") == 0) {
+    return LayerType::TILES;
+  }
+
+  return LayerType::TILES;
+}
+
 json loadProjectFile(const char* filename) {
   std::ifstream f(filename);
 
@@ -63,34 +77,57 @@ LDTK_Level parse_level(int tileSize, json data) {
   for(json layerJson : data["layerInstances"]) {
     LDTK_Level_Layer layer;
 
-    layer.type = layerJson["__type"];
+    std::string type = layerJson["__type"];
+    layer.type = strToLayerType(type.c_str());
     layer.identifier = layerJson["__identifier"];
 
-    if (layer.type == "IntGrid") {
+    if (layer.type == LayerType::INT_GRID) {
       // @TODO: just allocate the whole array at once
-      layer.tiles.resize(layerJson["intGridCsv"].size());
-      for(json x : layerJson["intGridCsv"]) {
-        //@TODO: what to do about auto layer tiles?
-        layer.tiles.push_back(x);
+      layer.tiles.data.resize(layerJson["autoLayerTiles"].size());
+      layer.tiles.tilesetId = layerJson["__tilesetDefUid"];
+
+      int i = 0;
+      int gridSize = (int)layerJson["__gridSize"];
+      
+      for(json tile : layerJson["autoLayerTiles"]) {
+        int txX = tile["src"][0];
+        int txY = tile["src"][1];
+        int x = (int)tile["px"][0];
+        int y = (int)tile["px"][1];
+        int id = tile["t"];
+        TileTextureFlip flip = tile["f"];
+
+        layer.tiles.data[i] = { true, x, y, txX, txY, id, flip };
+        i ++;
       }
-    } else if (layer.type == "Entities") {
-      // @TODO: parse entities
-    } else if (layer.type == "Tiles") {
-      layer.entities.resize(layerJson["intGridCsv"].size());
-      for(json x : layerJson["entityInstances"]) {
+    } else if (layer.type == LayerType::ENTITIES) {
+      for(json instance : layerJson["entityInstances"]) {
         LDTK_Level_Entity entity;
-        entity.identifier = x["__identifier"];
-        // @TODO: add all fieldInstances
+
+        entity.identifier = instance["__identifier"];
+        entity.position = { instance["px"][0], instance["px"][1] };
 
         layer.entities.push_back(entity);
       }
-      // @TODO: just allocate the whole array at once
-      /*
-      layer.tiles.resize(layerJson["gridTiles"].size());
-      for(json x : layerJson["tiles"]) {
-        layer.tiles.push_back(x);
+    } else if (layer.type == LayerType::TILES) {
+      layer.tiles.data.resize(layerJson["intGridCsv"].size());
+      layer.tiles.tilesetId = layerJson["__tilesetDefUid"];
+
+      layer.tiles.data.resize(layerJson["gridTiles"].size());
+
+      int i = 0;
+      for(json tile : layerJson["gridTiles"]) {
+        int x = tile["px"][0];
+        int y = tile["px"][1];
+
+        int txX = tile["src"][0];
+        int txY = tile["src"][1];
+        int id = tile["t"];
+        TileTextureFlip flip = tile["f"];
+
+        layer.tiles.data[i] = { true, x, y, txX, txY, id, flip };
+        i ++;
       }
-      */
     }
 
     level.layers.push_back(layer);
@@ -105,6 +142,7 @@ LDTK_Tileset parse_tileset(std::string projectPath, json data) {
   int tileSize = data["tileGridSize"];
   int spacing = data["spacing"];
   int imageWidth = data["pxWid"];
+  int id = data["uid"];
   std::string relPath = data["relPath"];
 
   std::string path = projectPath + relPath;
@@ -127,7 +165,12 @@ LDTK_Tileset parse_tileset(std::string projectPath, json data) {
     tags.push_back({ id, tileIds });
   }
 
-  LDTK_Tileset tileset = LDTK_Tileset(tileSize, imageWidth, tags, texture);
+  LDTK_Tileset tileset;
+  tileset._uid = id;
+  tileset._imageWidth = imageWidth;
+  tileset._tilesize = tileSize;
+  tileset._texture = texture;
+  tileset._tags = tags;
 
   return tileset;
 }
@@ -149,7 +192,8 @@ void Project::load(const std::string filePath) {
 
   printf("> parsing entities\n");
   for(json x : data["defs"]["entities"]) {
-    entitites.push_back(parse_entity(x));
+    auto entity = parse_entity(x);
+    this->entitites[entity.identifier] = entity;
   }
 
   printf("> parsing tilesets\n");
@@ -158,7 +202,7 @@ void Project::load(const std::string filePath) {
 
     if (identifier != "Internal_Icons") {
       LDTK_Tileset tileset = parse_tileset(projectPath, x);
-      tilesets.push_back(tileset);
+      this->tilesets.insert({ tileset._uid, tileset });
     }
   }
 
@@ -168,6 +212,12 @@ void Project::load(const std::string filePath) {
 
   for(json x : data["levels"]) {
     std::string identifier = x["identifier"];
+
+    // @Temp: skip all but first level
+    if (strcmp(identifier.c_str(), "Level_0") != 0) {
+      continue;
+    }
+
     printf("> > parse level %s \n", identifier.c_str());
     levels[identifier] = parse_level(defaultGridSize, x);
   }

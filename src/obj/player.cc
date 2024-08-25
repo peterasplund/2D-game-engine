@@ -14,6 +14,7 @@ void obj::Player::init() {
   AbstractGameObject::init();
 
   _tag = OBJECT_TAG::PLAYER;
+  _type = GAME_OBJECT::PLAYER;
 
   this->_collidable.boundingBox = { 
     18, 15, 

@@ -1,5 +1,6 @@
 #include "tileset.h"
 
+/*
 Tileset::Tileset(
     SDL_Texture* texture, 
     std::map<int, TileData> tiles,
@@ -112,3 +113,4 @@ Rect Tileset::getTileTextureRect(int id) {
 
   return { x, y, _tileWidth, _tileHeight };
 }
+*/

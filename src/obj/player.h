@@ -63,7 +63,6 @@ namespace obj {
       /// This is how long we should act like it's not solid for.
       const int ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW = 100;
 
-      GAME_OBJECT _type = GAME_OBJECT::PLAYER;
       Animator _animator;
       std::string direction = "right";
       State state = State::IDLE;

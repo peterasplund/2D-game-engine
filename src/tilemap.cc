@@ -61,3 +61,21 @@ std::vector<int> Tilemap::getIndicesWithinRect(RectF r, int layer) {
 
   return indices;
 }
+
+/*
+Tilemap::Tilemap(LDTK_Level ldtkLevel) {
+  LDTK_Level level;
+
+  TileLayer layer;
+  Tileset tileset;
+
+  for(auto layer : ldtkLevel.layers) {
+    for(auto tile : layer.tiles.data) {
+      Tile t;
+    }
+  }
+
+
+  _layers = layers;
+}
+*/

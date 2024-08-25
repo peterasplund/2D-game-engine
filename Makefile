@@ -4,7 +4,7 @@ CC = g++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/pugixml/src -L./lib/imgui/include
 OPT=-O0
 INCDIRS=-I/usr/include/SDL2 -I./lib/pugixml/src/ -I./lib/imgui/include/
-CFLAGS = -Wwrite-strings -std=c++17 -MD -I/usr/local/include $(INCDIRS) $(OPT)
+CFLAGS = -Wwrite-strings -std=c++17 -MD -I/usr/local/include $(INCDIRS) $(OPT) -g
 SRC=./src
 LIB=./lib
 BIN=./bin

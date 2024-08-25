@@ -229,6 +229,10 @@ struct Rectangle {
   void debug() {
     printf("(x: %f\ty: %f\tw: %f\th: %f)\n", x, y, w, h);
   }
+
+  void debugInt() {
+    printf("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
+  }
 };
 
 typedef v2<int> v2i;

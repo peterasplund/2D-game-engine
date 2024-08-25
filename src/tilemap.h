@@ -10,8 +10,24 @@
 #include "math.h"
 #include "pugixml.hpp"
 #include <cassert>
+#include "LDtkParser.h"
 
 typedef std::map<std::string, std::string> TiledLayer;
+
+struct TilesetTile {
+  Rect textureRect;
+  // @TODO: put custom properties here
+};
+
+/*
+class Tileset {
+  std::vector<TilesetTile> _tiles;
+  SDL_Texture* _texture;
+public:
+  int getTileWidth();
+  int getTileHeight();
+};
+*/
 
 // Rename this to TileObject. Not Tiled specific
 struct TiledObject {
@@ -26,6 +42,19 @@ struct TiledObject {
   std::map<std::string, std::string> propertiesString;
 };
 
+/*
+class Tile {
+  v2i position;
+};
+
+// @TODO: create these in z-order
+class TileLayer {
+  public:
+    /// nullptr means no tile
+    std::vector<Tile*> tiles;
+}r
+*/
+
 // @TODO: create these in z-order
 class TileLayer {
   public:
@@ -39,6 +68,8 @@ class Tilemap
 
   public:
     Tilemap(int firstGID, int tilesWide, int tilesTall, Tileset tileset, std::vector<TileLayer> layers, std::vector<TiledObject> objects);
+
+    //Tilemap(LDTK_Level ldtkLevel);
 
     ~Tilemap() {
     }
