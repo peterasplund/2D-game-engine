@@ -24,12 +24,9 @@ void GameplayScene::init() {
 
   for(auto layer : _ldtkProject->levels[_level].layers) {
     // Init tiles
-    /*
-    for(auto t : layer.tiles) {
-      auto tile = _ldtkProject->tilesets[t];
-      EntityManager::Instance()->setTileMap(tilemap);
+    for(auto t : layer.tiles.data) {
+      EntityManager::Instance()->setTileMap(&_ldtkProject->levels[_level]);
     }
-    */
 
     // Init entities
     for(auto e : layer.entities) {
@@ -73,7 +70,7 @@ void GameplayScene::init() {
 
 void GameplayScene::update(float dt) {
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
-    //obj->update(dt);
+    obj->update(dt);
   }
 
   _camera.update();

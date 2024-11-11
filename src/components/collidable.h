@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../math.h"
-#include "../tilemap.h"
+#include "../LDtkParser.h"
 #include "../entityManager.h"
 #include "velocity.h"
 #include <algorithm>
@@ -25,8 +25,9 @@ struct CollisionResponse {
 };
 
 struct TileExistsAtResponse {
-  int layer;
+  int layerId;
   int tileId;
+  LDTK_TileData* tile;
   RectF rect;
 };
 
@@ -37,7 +38,7 @@ class collidable {
 
     collidable();
     collidable(v2f position, Rect boundingBox);
-    bool checkCollision(Rect* r, Tilemap* tilemap, Rect* outRect);
+    bool checkCollision(Rect* r, LDTK_Level* tilemap, Rect* outRect);
     std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
     std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(Rect rect);
     RectF addBoundingBox(v2f p);

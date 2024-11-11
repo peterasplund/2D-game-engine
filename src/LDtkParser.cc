@@ -65,7 +65,7 @@ LDTK_Layer parse_layer(json data) {
   return layer;
 }
 
-LDTK_Level parse_level(int tileSize, json data) {
+LDTK_Level parse_level(int tileSize, json data, std::map<int, LDTK_Tileset> tilesets) {
   LDTK_Level level;
 
   level.uid = data["uid"];
@@ -76,17 +76,20 @@ LDTK_Level parse_level(int tileSize, json data) {
 
   for(json layerJson : data["layerInstances"]) {
     LDTK_Level_Layer layer;
+    layer.tiles.tilesetId = -1;
 
     std::string type = layerJson["__type"];
     layer.type = strToLayerType(type.c_str());
     layer.identifier = layerJson["__identifier"];
 
     if (layer.type == LayerType::INT_GRID) {
-      // @TODO: just allocate the whole array at once
       layer.tiles.data.resize(layerJson["autoLayerTiles"].size());
-      layer.tiles.tilesetId = layerJson["__tilesetDefUid"];
+      int uuid = layerJson["__tilesetDefUid"];
+      layer.tiles.tilesetId = uuid;
 
-      int i = 0;
+      int maxSize = level.tilesTall * level.tilesWide;
+      layer.tiles.data.resize(maxSize);
+
       int gridSize = (int)layerJson["__gridSize"];
       
       for(json tile : layerJson["autoLayerTiles"]) {
@@ -95,10 +98,10 @@ LDTK_Level parse_level(int tileSize, json data) {
         int x = (int)tile["px"][0];
         int y = (int)tile["px"][1];
         int id = tile["t"];
+        int idx = (level.tilesWide * (y / 16)) + (x / 16);
         TileTextureFlip flip = tile["f"];
 
-        layer.tiles.data[i] = { true, x, y, txX, txY, id, flip };
-        i ++;
+        layer.tiles.data[idx] = { true, x, y, txX, txY, id, flip };
       }
     } else if (layer.type == LayerType::ENTITIES) {
       for(json instance : layerJson["entityInstances"]) {
@@ -111,22 +114,25 @@ LDTK_Level parse_level(int tileSize, json data) {
       }
     } else if (layer.type == LayerType::TILES) {
       layer.tiles.data.resize(layerJson["intGridCsv"].size());
-      layer.tiles.tilesetId = layerJson["__tilesetDefUid"];
 
-      layer.tiles.data.resize(layerJson["gridTiles"].size());
+      int uuid = layerJson["__tilesetDefUid"];
+      layer.tiles.tilesetId = uuid;
+      int maxSize = level.tilesTall * level.tilesWide;
+      layer.tiles.data.resize(maxSize);
 
-      int i = 0;
-      for(json tile : layerJson["gridTiles"]) {
+
+      for (int i = 0; i < layerJson["gridTiles"].size(); i++) {
+        json tile = layerJson["gridTiles"][i];
         int x = tile["px"][0];
         int y = tile["px"][1];
 
+        int idx = (level.tilesWide * (y / 16)) + (x / 16);
         int txX = tile["src"][0];
         int txY = tile["src"][1];
         int id = tile["t"];
         TileTextureFlip flip = tile["f"];
 
-        layer.tiles.data[i] = { true, x, y, txX, txY, id, flip };
-        i ++;
+        layer.tiles.data[idx] = { true, x, y, txX, txY, id, flip };
       }
     }
 
@@ -142,7 +148,6 @@ LDTK_Tileset parse_tileset(std::string projectPath, json data) {
   int tileSize = data["tileGridSize"];
   int spacing = data["spacing"];
   int imageWidth = data["pxWid"];
-  int id = data["uid"];
   std::string relPath = data["relPath"];
 
   std::string path = projectPath + relPath;
@@ -155,18 +160,18 @@ LDTK_Tileset parse_tileset(std::string projectPath, json data) {
   std::vector<EnumTag> tags;
 
   for(json tag : data["enumTags"]) {
-    std::string id = tag["enumValueId"];
+    std::string enumName = tag["enumValueId"];
     std::vector<int> tileIds;
 
     for(int id : tag["tileIds"]) {
       tileIds.push_back(id);
     }
 
-    tags.push_back({ id, tileIds });
+    tags.push_back({ enumName, tileIds });
   }
 
   LDTK_Tileset tileset;
-  tileset._uid = id;
+  tileset._uid = data["uid"];
   tileset._imageWidth = imageWidth;
   tileset._tilesize = tileSize;
   tileset._texture = texture;
@@ -187,6 +192,8 @@ void Project::load(const std::string filePath) {
   
   printf("> parsing layers\n");
   for(json x : data["defs"]["layers"]) {
+    auto layer = parse_layer(x);
+    layer.project = this;
     layers.push_back(parse_layer(x));
   }
 
@@ -202,7 +209,7 @@ void Project::load(const std::string filePath) {
 
     if (identifier != "Internal_Icons") {
       LDTK_Tileset tileset = parse_tileset(projectPath, x);
-      this->tilesets.insert({ tileset._uid, tileset });
+      this->tilesets.insert(std::pair(tileset._uid, tileset));
     }
   }
 
@@ -219,7 +226,9 @@ void Project::load(const std::string filePath) {
     }
 
     printf("> > parse level %s \n", identifier.c_str());
-    levels[identifier] = parse_level(defaultGridSize, x);
+    auto level = parse_level(defaultGridSize, x, this->tilesets);
+    level.project = this;
+    this->levels[identifier] = level;
   }
 }
 
@@ -246,4 +255,51 @@ std::vector<EnumTag*> LDTK_Tileset::getTagsByTile(int tileId) {
   }
 
   return results;
+}
+
+int LDTK_Level::getIdxFromPoint(int x, int y, int layer) {
+  int tilesetId = this->layers[layer].tiles.tilesetId;
+
+  int x_coord = x / 16;
+  int y_coord = y / 16;
+
+  if (x_coord > tilesWide) {
+    return -1;
+  }
+
+  if (y_coord > tilesTall) {
+    return -1;
+  }
+  
+  int idx = (y_coord * tilesWide) + x_coord;
+  if (idx >= layers.at(layer).tiles.data.size()) {
+    return -1;
+  }
+
+  auto tile = layers.at(layer).tiles.data.at(idx);
+
+  if (!tile.active) {
+    return -1;
+  }
+
+  return (tile.x / 16) + ((tile.y / 16) * tilesWide);
+}
+
+
+// Not OK?
+std::vector<int> LDTK_Level::getIndicesWithinRect(RectF r, int layer) {
+  int tileWidth = 16;
+  int tileHeight = 16;
+  std::vector<int> indices;
+
+  for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
+    for (int x = floor((r.left() - 1) / tileWidth) * tileWidth; x <= ceil(r.right() / tileWidth) * tileWidth; x += tileWidth) {
+      int idx = getIdxFromPoint(x, y, layer);
+      if (idx != -1) {
+        indices.push_back(idx);
+      }
+    }
+  }
+
+  return indices;
 }

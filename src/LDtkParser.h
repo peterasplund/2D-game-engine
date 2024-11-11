@@ -9,6 +9,7 @@
 
 enum class LDTK_Entity_Field_Tag { Integer, Float, String };
 struct LDTK_Tileset;
+struct Project;
 
 struct LDTK_Entity_Field {
   int uid;
@@ -25,6 +26,7 @@ struct LDTK_Entity {
 struct LDTK_Layer {
   int uid;
   std::string identifier;
+  Project* project;
 };
 
 struct LDTK_Level_Entity {
@@ -55,6 +57,7 @@ struct LDTK_TileData {
 struct LDTK_Level_Layer_Tiles {
   int tilesetId;
   std::vector<LDTK_TileData> data;
+  LDTK_Layer* layer;
 };
 
 enum LayerType {
@@ -75,11 +78,31 @@ struct LDTK_Level_EntityFields {}; // Maybe remove this
 struct LDTK_Level {
   int uid;
   std::string identifier;
+  Project* project;
 
   int tilesWide;
   int tilesTall;
 
   std::vector<LDTK_Level_Layer> layers;
+
+  // This is correct
+  Rect getTileRect(int layerIdx, int idx) {
+    int x = 0;
+    int y = 0;
+
+    int TILE_HEIGHT = 16;
+    int TILE_WIDTH = 16;
+
+    if (idx > 0) {
+      x = (idx % tilesWide) * TILE_WIDTH;
+      y = (idx / tilesWide) * TILE_HEIGHT;
+    }
+
+    return { x, y, TILE_WIDTH, TILE_HEIGHT };
+  }
+
+  int getIdxFromPoint(int x, int y, int layer);
+  std::vector<int> getIndicesWithinRect(RectF r, int layer);
 };
 
 struct EnumTag {
@@ -88,15 +111,6 @@ struct EnumTag {
 };
 
 struct LDTK_Tileset {
-  /*
-  LDTK_Tileset(int uid, int tileSize, int imageWidth, std::vector<EnumTag> tags, SDL_Texture* texture) {
-    _uid = uid;
-    _tilesize = tileSize;
-    _imageWidth = imageWidth;
-    _tags = tags;
-    _texture = texture;
-  }
-  */
   int _uid;
   int _tilesize;
   int _imageWidth;

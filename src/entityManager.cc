@@ -18,7 +18,7 @@ void EntityManager::addEntity(std::shared_ptr<AbstractGameObject> x) {
   _entities.push_back(std::move(x));
 }
 
-void EntityManager::setTileMap(Tilemap* x) {
+void EntityManager::setTileMap(LDTK_Level* x) {
 _tilemap = x;
 }
 
@@ -52,7 +52,7 @@ std::vector<std::shared_ptr<AbstractGameObject>> EntityManager::getEntitiesByTag
 }
 */
 
-Tilemap* EntityManager::getTilemap() {
+LDTK_Level* EntityManager::getTilemap() {
   return _tilemap;
 }
 

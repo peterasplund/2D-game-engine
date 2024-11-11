@@ -44,12 +44,12 @@ void obj::Player::init() {
   Animation* animClimb = new Animation(texture);
   Animation* animDie = new Animation(texture, false);
 
-  animIdle->addFrame({ tw * 0, th * 0, tw, th }, 500);
-  animIdle->addFrame({ tw * 1, th * 0, tw, th }, 500);
-  animIdle->addFrame({ tw * 2, th * 0, tw, th }, 500);
-  animIdle->addFrame({ tw * 3, th * 0, tw, th }, 500);
-  animIdle->addFrame({ tw * 4, th * 0, tw, th }, 500);
-  animIdle->addFrame({ tw * 5, th * 0, tw, th }, 500);
+  animIdle->addFrame({ tw * 0, th * 0, tw, th }, 400);
+  animIdle->addFrame({ tw * 1, th * 0, tw, th }, 400);
+  animIdle->addFrame({ tw * 2, th * 0, tw, th }, 400);
+  animIdle->addFrame({ tw * 3, th * 0, tw, th }, 400);
+  animIdle->addFrame({ tw * 4, th * 0, tw, th }, 400);
+  animIdle->addFrame({ tw * 5, th * 0, tw, th }, 400);
 
   animCrouch->addFrame({ tw * 4, th * 10, tw, th }, 500);
   animCrouch->addFrame({ tw * 5, th * 10, tw, th }, 500);
@@ -144,21 +144,14 @@ void obj::Player::init() {
   _normalGravity = _gravity.entityGravity;
 }
 
-TileData* obj::Player::tileAt(RectF rect, std::string property = "") {
+LDTK_TileData* obj::Player::tileAt(RectF rect, std::string property = "") {
   auto tilesAbove = _collidable.tileExistsAt(rect);
 
   if (tilesAbove.size() > 0) {
     for(auto tile : tilesAbove) {
-      TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
-      if (property == "") {
-        return tileData;
-      }
-
-      auto it = tileData->propertiesBool.find(property);
-      if (it != tileData->propertiesBool.end()) {
-        if (it->second) {
-          return tileData;
-        }
+      LDTK_Level_Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
+      if (layer->identifier == property) {
+          return &layer->tiles.data.at(tile.tileId);
       }
     }
   }
@@ -179,12 +172,15 @@ void obj::Player::update(float dt) {
     return;
   }
 
-  TileData* ladderAbove = tileAt({
+  /*
+  LDTK_TileData* ladderAbove = tileAt({
     round(_collidable.rect.x),
     _collidable.rect.y - _collidable.rect.h / 2,
     floor(_collidable.rect.w),
     _collidable.rect.h / 2
   }, "ladder");
+  return;
+  */
 
   if (state == State::CLIMBING) {
     _velocity.v.y = -0.0f;
@@ -198,6 +194,7 @@ void obj::Player::update(float dt) {
 
     _velocity.v.x = 0.0f;
 
+    /*
     if (!ladderAbove) {
       //_animator.setAnimation("crouch");
     }
@@ -205,6 +202,7 @@ void obj::Player::update(float dt) {
       _animator.setAnimation("climb");
       _animator.stop();
     }
+    */
 
     if (_velocity.v.y < -0.001f) {
       if (!_animator.isPlaying()) {
@@ -233,7 +231,7 @@ void obj::Player::update(float dt) {
       _collidable.rect.h
     });
 
-    TileData* onLadder = tileAt({
+    LDTK_TileData* onLadder = tileAt({
       round(_collidable.rect.x),
       _collidable.rect.y,
       floor(_collidable.rect.w),
@@ -364,6 +362,7 @@ void obj::Player::update(float dt) {
     _collidable.rect.h
   });
 
+  /*
   // Climb onto ladder
   if (tilesWithin.size() > 0) {
     for(auto tile : tilesWithin) {
@@ -385,6 +384,7 @@ void obj::Player::update(float dt) {
       }
     }
   }
+  */
 
   auto tilesBelow = _collidable.tileExistsAt({
     round(_collidable.rect.x),
@@ -397,16 +397,20 @@ void obj::Player::update(float dt) {
   onOneWayPlatform = false;
   if (tilesBelow.size() > 0) {
     for(auto tile : tilesBelow) {
-      TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
+      LDTK_Level_Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
 
-      if (tileData->solid) {
+      if (layer->identifier == "Collision") {
+
+      //if (tile.tileId) {
         _jumpHold = false;
         _gravity.onFloor = true;
+      //}
       }
       else {
+        /*
         if (onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
-          if (tileData->propertiesBool.find("oneway") != tileData->propertiesBool.end()) {
-            if (tileData->propertiesBool.at("oneway") && _velocity.v.y >= 0.f && _collidable.rect.bottom() <= tile.rect.y + ONEWAY_PLATFORM_GRACE) {
+          if (tileData->layer->identifier == "oneway") {
+            if (_velocity.v.y >= 0.f && _collidable.rect.bottom() <= tile.rect.y + ONEWAY_PLATFORM_GRACE) {
               onOneWayPlatform = true;
               _jumpHold = false;
               _gravity.onFloor = true;
@@ -415,6 +419,7 @@ void obj::Player::update(float dt) {
             }
           }
         }
+        */
       }
     }
   }

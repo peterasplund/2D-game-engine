@@ -106,27 +106,32 @@ bool dynamicRectVsRect(
 
 std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
   std::vector<TileExistsAtResponse> response;
-  Tilemap* t = EntityManager::Instance()->getTilemap();
-  for(int layerId = 0; layerId < t->getLayers()->size(); layerId++) {
+  LDTK_Level * t = EntityManager::Instance()->getTilemap();
+  
+  for(int layerId = 0; layerId < t->layers.size(); layerId++) {
     std::vector<int> tiles = t->getIndicesWithinRect(rect, layerId);
     for(int possibleIdx : tiles) {
-      int tileId = 0;
-      tileId = t->getLayers()->at(layerId).tiles.at(possibleIdx);
-      Rect r = t->getTileRect(layerId, possibleIdx);
+      auto tile = t->layers[layerId].tiles.data[possibleIdx];
 
-      RectF rF = {
-        (float)r.x,
-        (float)r.y,
-        (float)r.w,
-        (float)r.h
-      };
+      if (tile.active) {
+        int tileId = possibleIdx;
+        Rect r = t->getTileRect(layerId, possibleIdx);
 
-      if (rect.hasIntersection(&rF)) {
-        response.push_back(TileExistsAtResponse {
-          layerId,
-          tileId,
-          rF,
-        });
+        RectF rF = {
+          (float)r.x,
+          (float)r.y,
+          (float)r.w,
+          (float)r.h
+        };
+
+        if (rect.hasIntersection(&rF)) {
+          response.push_back(TileExistsAtResponse {
+            layerId,
+            tileId,
+            &tile,
+            rF,
+          });
+        }
       }
     }
   }
@@ -166,24 +171,18 @@ void collidable::update(v2f position) {
 }
 
 Rect getCollisionAt(RectF r) {
-  bool collided = false;
+  LDTK_Level* tilemap = EntityManager::Instance()->getTilemap();
 
-  Tilemap* tilemap = EntityManager::Instance()->getTilemap();
-  auto layers = tilemap->getLayers();
-
-  for (int layer = 0; layer < layers->size(); layer++) {
+  for (int layer = 0; layer < tilemap->layers.size(); layer++) {
     std::vector<int> possibleIndices = tilemap->getIndicesWithinRect(r, layer);
     for (int possibleIdx : possibleIndices) {
-      int tileId = 0;
-      tileId = layers->at(layer).tiles.at(possibleIdx);
-
-      if (tileId == 0) {
+      if (tilemap->layers[layer].identifier != "Collision") {
         continue;
       }
 
-      TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tileId);
+      auto tile = tilemap->layers[layer].tiles.data[possibleIdx];
 
-      if (!tileData->solid) {
+      if (!tile.active) {
         continue;
       }
 
@@ -205,8 +204,7 @@ CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, fl
   CollisionResponse respnse = { false, false, false, false };
   v2 newPos = *position + velocity->v * dt;
 
-  Tilemap* tilemap = EntityManager::Instance()->getTilemap();
-  auto layers = tilemap->getLayers();
+  LDTK_Level* tilemap = EntityManager::Instance()->getTilemap();
   Rect collidedWith;
 
   if (velocity->v.y != 0) {

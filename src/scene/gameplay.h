@@ -20,7 +20,7 @@ private:
   Bg* bg1;
   Bg* bg2;
   Hud* hud;
-  Tilemap* tilemap;
+  //Tilemap* tilemap;
   std::string _level;
   Project* _ldtkProject;
   bool loaded = false;

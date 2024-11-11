@@ -5,6 +5,7 @@
 #include "../assetManager.h"
 #include "../inputHandler.h"
 #include "../renderer.h"
+#include "../LDtkParser.h"
 
 namespace obj {
   enum class State {
@@ -27,7 +28,7 @@ namespace obj {
       void jump();
       void attack();
       void slide();
-      TileData* tileAt(RectF rect, std::string property);
+      LDTK_TileData* tileAt(RectF rect, std::string property);
       void onInputPressed(int button) override;
       void onInputReleased(int button) override;
       void draw(Renderer* renderer) override;
