@@ -1,28 +1,34 @@
 #include "map.h"
 
 v2i Tileset::getTileTexturePos(int id) {
+    int widthInTiles = textureWidth / tileSize;
+    int x = id % widthInTiles;
+    int y = id / widthInTiles;
+
     return {
-      (id * tileSize) % textureWidth,
-      (id * tileSize) / textureWidth 
+      x * tileSize,
+      y * tileSize
     };
   }
 
 v2i Level::idxToPoint(int idx) {
   return {
-    (idx % tilesWide),
-    (idx / tilesWide)
+    (idx % tilesWide) * tileSize,
+    (idx / tilesWide) * tileSize
   };
 }
 
 int Level::getIdxFromPoint(v2i point) {
-  return (point.x / 16) + ((point.y / 16) * tilesWide);
+  return (point.x / tileSize) + ((point.y / tileSize) * tilesWide);
 }
 
 v2i Layer::getTilePos(int id) {
+  int tileSize = this->level->tileSize;
+
   int i = 0;
   while (i < tiles.size()) {
     if (i == id) {
-      return level->idxToPoint(i) * 16;
+      return level->idxToPoint(i) * tileSize;
     }
 
     i ++;
@@ -32,8 +38,8 @@ v2i Layer::getTilePos(int id) {
 }
 
 std::vector<int> Level::getIndicesWithinRect(Rect r) {
-  int tileWidth = 16;
-  int tileHeight = 16;
+  int tileWidth = this->tileSize;
+  int tileHeight = this->tileSize;
   std::vector<int> indices;
 
   for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
@@ -46,4 +52,14 @@ std::vector<int> Level::getIndicesWithinRect(Rect r) {
   }
 
   return indices;
+}
+
+Rect Level::getTileRect(int tileIdx) {
+  v2i point = idxToPoint(tileIdx);
+  return {
+    point.x,
+    point.y,
+    this->tileSize,
+    this->tileSize
+  };
 }

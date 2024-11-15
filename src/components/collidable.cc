@@ -115,6 +115,10 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
   });
   
   for(int layerId = 0; layerId < t->layers.size(); layerId++) {
+    if (t->layers[layerId].tiles.size() == 0) {
+      continue;
+    }
+
     for(int possibleIdx : tiles) {
       Tile tile = t->layers[layerId].tiles[possibleIdx];
 
@@ -179,13 +183,14 @@ Rect getCollisionAt(RectF r) {
 
   for (int layer = 0; layer < tilemap->layers.size(); layer++) {
     for (int possibleIdx : possibleIndices) {
-      if (tilemap->layers[layer].def->identifier != "Collision") {
+      auto layerDef = tilemap->layers[layer].def;
+      if (layerDef->type != LayerType::TILES && layerDef->type != LayerType::INT_GRID) {
         continue;
       }
 
       auto tile = tilemap->layers[layer].tiles[possibleIdx];
 
-      if (!tile.getActive() || !!tile.getSolid()) {
+      if (!tile.getActive() || !tile.getSolid()) {
         continue;
       }
 

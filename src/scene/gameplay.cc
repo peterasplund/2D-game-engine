@@ -22,17 +22,19 @@ void GameplayScene::init() {
     { "door", GAME_OBJECT::DOOR },
   };
 
-  for(auto layer : _ldtkProject->levels[_level].layers) {
+  Level* level = &_ldtkProject->levels[this->_level];
+
+  for(auto layer : level->layers) {
     // Init tiles
     for(auto t : layer.tiles) {
-      EntityManager::Instance()->setTileMap(&_ldtkProject->levels[_level]);
+      EntityManager::Instance()->setTileMap(level);
     }
 
     // Init entities
     for(auto e : layer.entities) {
-      auto entity = _ldtkProject->entityDefs[e.identifier];
+      auto entityDef = _ldtkProject->entityDefs[e.uid];
 
-      auto it = gameObjects.find(entity.identifier);
+      auto it = gameObjects.find(entityDef.identifier);
 
       if (it == gameObjects.end()) {
         continue;
@@ -50,8 +52,8 @@ void GameplayScene::init() {
 
   _camera = camera();
   _camera.setBounds({ 
-    _ldtkProject->levels[_level].tilesWide * 16,
-    _ldtkProject->levels[_level].tilesTall * 16,
+    level->tilesWide * level->tileSize,
+    level->tilesTall * level->tileSize,
   });
 
   if (loaded) {
@@ -79,13 +81,12 @@ void GameplayScene::update(float dt) {
 void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
   v2f cameraOffset = { (float)camera.x, (float)camera.y };
+  Level* level = &_ldtkProject->levels[this->_level];
 
   //bg1->draw(renderer->getSdlRenderer(), 0);
   //bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
-  int tilesWide = _ldtkProject->levels[_level].tilesWide;
-
-  for(auto layer : _ldtkProject->levels[_level].layers) {
+  for(auto layer : level->layers) {
     if (layer.def->type == LayerType::ENTITIES) {
       continue;
     }
@@ -99,11 +100,13 @@ void GameplayScene::draw(Renderer* renderer) {
         continue;
       }
 
-      auto texturePos = tileset.getTileTexturePos(tile.getTilesetId());
+      auto texturePos = tileset.getTileTexturePos(tile.getTileId());
 
-      v2i pos = _ldtkProject->levels[_level].idxToPoint(i);
-      Rect dr = { pos.x, pos.y, 16, 16 };
-      Rect sr = { texturePos.x, texturePos.y, 16, 16 };
+      v2i pos = level->idxToPoint(i);
+      int tileSize = level->tileSize;
+
+      Rect dr = { pos.x, pos.y, tileSize, tileSize };
+      Rect sr = { texturePos.x, texturePos.y, tileSize, tileSize };
 
       renderer->renderTexture(tileset.texture, &sr, &dr, (SDL_RendererFlip)tile.getFlip(), false);
     }

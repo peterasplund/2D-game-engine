@@ -22,58 +22,48 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
   Layer layer;
 
   int layerDefId = layerJson["layerDefUid"];
+  layer.uid = layerDefId;
+  layer.def = &world->layerDefs[layerDefId];
+  layer.level = level;
 
-  LayerDef* layerDef = &world->layerDefs[layerDefId];
-  
-  layer.def = layerDef;
-  
-  // layer.tilesetId = -1;
+  int tileSize = layer.level->tileSize;
 
-  // layer.type = strToLayerType(type.c_str());
-  // layer.identifier = layerJson["__identifier"];
-
-  if (layerDef->type == LayerType::INT_GRID || layerDef->type == LayerType::TILES) {
+  bool solid = layer.def->identifier == "Collision";
+  if (layer.def->type == LayerType::INT_GRID) {
     layer.tiles.resize(level->tilesTall * level->tilesWide);
-    layerDef->tilesetId = layerJson["__tilesetDefUid"];
-  }
-
-  if (layerDef->type == LayerType::INT_GRID) {
-    /*
     for(json tile : layerJson["autoLayerTiles"]) {
-      int txX = tile["src"][0];
-      int txY = tile["src"][1];
       int x = (int)tile["px"][0];
       int y = (int)tile["px"][1];
       int id = tile["t"];
-      int idx = (level->tilesWide * (y / 16)) + (x / 16);
-      SDL_RendererFlip flip = tile["f"];
+      int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
 
-      layer.tiles[idx] = Tile(id, flip, layer.identifier == "Collision");
+      Tile layerTile(id, tile["f"], true, solid);
+      layer.tiles[idx] = layerTile;
     }
-    */
   } 
-  else if (layerDef->type == LayerType::TILES) {
+  else if (layer.def->type == LayerType::TILES) {
+    layer.tiles.resize(level->tilesTall * level->tilesWide);
     for (int i = 0; i < layerJson["gridTiles"].size(); i++) {
       json tile = layerJson["gridTiles"][i];
       int x = tile["px"][0];
       int y = tile["px"][1];
 
-      int idx = (level->tilesWide * (y / 16)) + (x / 16);
-      int txX = tile["src"][0];
-      int txY = tile["src"][1];
       uint16_t id = tile["t"];
-      SDL_RendererFlip flip = tile["f"];
-      Tile layerTile( id, flip, true, layerDef->identifier == "Collision");
+      int textureWidth = world->tilesetDefs[layer.def->tilesetId].textureWidth;
 
+      int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
+
+      Tile layerTile(id, tile["f"], true, solid);
       layer.tiles[idx] = layerTile;
     }
   }
-  else if (layerDef->type == LayerType::ENTITIES) {
-    for(json instance : layerJson["entityInstances"]) {
+  else if (layer.def->type == LayerType::ENTITIES) {
+    for(json entityInstanceJson : layerJson["entityInstances"]) {
       Entity entity;
 
-      entity.identifier = instance["__identifier"];
-      entity.position = { instance["px"][0], instance["px"][1] };
+      entity.uid = entityInstanceJson["defUid"];
+      entity.identifier = entityInstanceJson["__identifier"]; // remove this?
+      entity.position = { entityInstanceJson["px"][0], entityInstanceJson["px"][1] };
 
       layer.entities.push_back(entity);
     }
@@ -120,8 +110,8 @@ Tileset parse_tileset(std::string projectPath, json data) {
   return tileset;
 }
 
-Entity parse_entity(json data) {
-  Entity entity;
+EntityDef parse_entity_def(json data) {
+  EntityDef entity;
 
   entity.uid = data["uid"];
   entity.identifier = data["identifier"];
@@ -164,44 +154,44 @@ World createWorld(std::string filePath) {
 
 
   printf("> parsing tileset defs\n");
-  for(json x : data["defs"]["tilesets"]) {
-    std::string identifier = x["identifier"];
+  for(json tilesetDefJson : data["defs"]["tilesets"]) {
+    std::string identifier = tilesetDefJson["identifier"];
 
     if (identifier != "Internal_Icons") {
-      Tileset tileset = parse_tileset(projectPath, x);
+      Tileset tileset = parse_tileset(projectPath, tilesetDefJson);
       world.tilesetDefs[tileset.id] = tileset;
     }
   }
 
+  printf("> parsing entity defs\n");
+  for(json entityDefJson : data["defs"]["entities"]) {
+    EntityDef entity = parse_entity_def(entityDefJson);
+    world.entityDefs[entity.uid] = entity;
+  }
+
   printf("> parsing layer defs\n");
-  for(json x : data["defs"]["layers"]) {
-    std::string type = x["type"];
+  for(json layerDefJson : data["defs"]["layers"]) {
+    std::string type = layerDefJson["type"];
 
     LayerDef layerDef;
-    layerDef.uid = x["uid"];
-    layerDef.identifier = x["identifier"];
-    layerDef.tilesetId = x["tilesetDefUid"].is_null() ? -1 : (int)x["tilesetDefUid"];
+    layerDef.uid = layerDefJson["uid"];
+    layerDef.identifier = layerDefJson["identifier"];
+    layerDef.tilesetId = layerDefJson["tilesetDefUid"].is_null() ? -1 : (int)layerDefJson["tilesetDefUid"];
     layerDef.type = strToLayerType(type.c_str());
 
     // @TODO: implement tiles and auto tiles
 
-    world.layerDefs[x["uid"]] = layerDef;
-  }
-
-  printf("> parsing entity defs\n");
-  for(json x : data["defs"]["entities"]) {
-    auto entity = parse_entity(x);
-    world.entityDefs[entity.identifier] = entity;
+    world.layerDefs[layerDefJson["uid"]] = layerDef;
   }
 
   printf("> parsing levels\n");
-  for(json x : data["levels"]) {
+  for(json levelJson : data["levels"]) {
     Level level;
 
-    std::string identifier = x["identifier"];
+    std::string identifier = levelJson["identifier"];
     int tileSize = data["defaultGridSize"];
-    level.tilesWide = (int)x["pxWid"] / tileSize;
-    level.tilesTall = (int)x["pxHei"] / tileSize;
+    level.tilesWide = (int)levelJson["pxWid"] / tileSize;
+    level.tilesTall = (int)levelJson["pxHei"] / tileSize;
     level.tileSize = tileSize;
 
     // @Temp: skip all but first level
@@ -209,23 +199,15 @@ World createWorld(std::string filePath) {
       continue;
     }
 
-    printf("> parsing level %s layer instances\n", identifier.c_str());
-    /*
-    for(json layerJson : x["layerInstances"]) {
-      Layer layer;
-      layer.uid = layerJson["layerDefUid"];
-      exit(0);
-      
-      int tilesetUid = layerJson["__tilesetDefUid"];
-      if (tmpTilesetMap.count(tilesetUid) == 0) {
-        printf("Couldn't get tileset by uid %d", tilesetUid);
-        exit(1);
-      }
+    // @TODO: parse level entities
 
-      layer.tilesetId = tmpTilesetMap[tilesetUid];
-      level.layers.push_back(parse_layer_instance(&world, &level, x));
+    printf("> parsing level %s layer instances\n", identifier.c_str());
+    for(json layerJson : levelJson["layerInstances"]) {
+      Layer layer;
+
+      // layer.tilesetId = tilesetUid;
+      level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
-    */
   
     world.levels[identifier] = level;
   }

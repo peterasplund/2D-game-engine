@@ -23,20 +23,18 @@ struct Entity_Field {
   Entity_Field_Tag type;
 };
 
-struct Entity {
+struct EntityDef {
   int uid;
   std::string identifier;
   std::vector<Entity_Field> fields;
   v2i position;
 };
 
-/*
-struct TileResponse {
-  Rect rect;
-  Rect textureRect;
-  SDL_Texture* texture;
+struct Entity {
+  int uid;
+  std::string identifier;
+  v2i position;
 };
-*/
 
 struct TilesetTag {
   std::string id;
@@ -51,19 +49,19 @@ struct Tileset {
   std::vector<TilesetTag> tags;
 
   v2i getTileTexturePos(int id);
-  // TileResponse getTile(int id);
 };
+
 #define TILE_SOLID 0x8000
 #define TILE_FLIP_H 0x2000
 #define TILE_FLIP_V 0x4000
 #define TILE_ACTIVE 0x1000
-#define TILE_TILESET_ID_MASK 0x0FFF
+#define TILE_TILE_ID_MASK 0x0FFF
 
 struct Tile {
   uint16_t data;
 
   Tile() : data(0) {}
-  Tile(uint16_t tilesetTileId, SDL_RendererFlip flip, bool active, bool solid) {
+  Tile(uint16_t tileId, SDL_RendererFlip flip, bool active, bool solid) {
     data = 0;
 
     if (flip == SDL_FLIP_VERTICAL) {
@@ -79,13 +77,13 @@ struct Tile {
       data |= TILE_SOLID;
     }
 
-    data |= (tilesetTileId & TILE_TILESET_ID_MASK);
+    data |= (tileId & TILE_TILE_ID_MASK);
   }
 
   bool getSolid() { return (data & TILE_SOLID) != 0; }
   bool getActive() { return (data & TILE_ACTIVE) != 0; }
   SDL_RendererFlip getFlip() { return (SDL_RendererFlip)((data >> 13) & 3); }
-  uint16_t getTilesetId() { return data & TILE_TILESET_ID_MASK; }
+  uint16_t getTileId() { return data & TILE_TILE_ID_MASK; }
 };
 
 class Layer {
@@ -112,15 +110,7 @@ struct Level {
   v2i idxToPoint(int idx);
   std::vector<int> getIndicesWithinRect(Rect r);
 
-  Rect getTileRect(int tileIdx) {
-    v2i point = idxToPoint(tileIdx);
-    return {
-      point.x,
-      point.y,
-      16,
-      16
-    };
-  }
+  Rect getTileRect(int tileIdx);
 };
 
 struct LayerDef {
@@ -134,7 +124,6 @@ struct LayerDef {
 struct World {
   std::map<std::string, Level> levels;
   std::map<int, LayerDef> layerDefs;
-  std::map<std::string, Entity> entityDefs;
+  std::map<int, EntityDef> entityDefs;
   std::map<int, Tileset> tilesetDefs;
 };
-// getIndicesWithinRect
