@@ -24,13 +24,13 @@ void GameplayScene::init() {
 
   for(auto layer : _ldtkProject->levels[_level].layers) {
     // Init tiles
-    for(auto t : layer.tiles.data) {
+    for(auto t : layer.tiles) {
       EntityManager::Instance()->setTileMap(&_ldtkProject->levels[_level]);
     }
 
     // Init entities
     for(auto e : layer.entities) {
-      auto entity = _ldtkProject->entitites[e.identifier];
+      auto entity = _ldtkProject->entityDefs[e.identifier];
 
       auto it = gameObjects.find(entity.identifier);
 
@@ -86,21 +86,26 @@ void GameplayScene::draw(Renderer* renderer) {
   int tilesWide = _ldtkProject->levels[_level].tilesWide;
 
   for(auto layer : _ldtkProject->levels[_level].layers) {
-    if (layer.type == LayerType::ENTITIES) {
+    if (layer.def->type == LayerType::ENTITIES) {
       continue;
     }
 
-    LDTK_Tileset tileset = _ldtkProject->tilesets[layer.tiles.tilesetId];
+    Tileset tileset = _ldtkProject->tilesetDefs[layer.def->tilesetId];
 
-    for(LDTK_TileData tile : layer.tiles.data) {
-      if (!tile.active) {
+    for(int i = 0; i < layer.tiles.size(); i ++) {
+      Tile tile = layer.tiles[i];
+
+      if (!tile.getActive()) {
         continue;
       }
 
-      Rect dr = { tile.x, tile.y, 16, 16 };
-      Rect sr = { tile.txX, tile.txY, 16, 16 };
+      auto texturePos = tileset.getTileTexturePos(tile.getTilesetId());
 
-      renderer->renderTexture(tileset._texture, &sr, &dr, (SDL_RendererFlip)tile.flip, false);
+      v2i pos = _ldtkProject->levels[_level].idxToPoint(i);
+      Rect dr = { pos.x, pos.y, 16, 16 };
+      Rect sr = { texturePos.x, texturePos.y, 16, 16 };
+
+      renderer->renderTexture(tileset.texture, &sr, &dr, (SDL_RendererFlip)tile.getFlip(), false);
     }
   }
 

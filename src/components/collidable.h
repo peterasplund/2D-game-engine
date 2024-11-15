@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../math.h"
-#include "../LDtkParser.h"
+#include "../map.h"
 #include "../entityManager.h"
 #include "velocity.h"
-#include <algorithm>
 
 // @TODO: use bitfield instead?
 /// Each direction corresponds to the ID of the tile it collided with. -1 means no collision.
@@ -27,8 +26,8 @@ struct CollisionResponse {
 struct TileExistsAtResponse {
   int layerId;
   int tileId;
-  LDTK_TileData* tile;
-  RectF rect;
+  Tile tile;
+  Rect rect;
 };
 
 class collidable {
@@ -38,7 +37,7 @@ class collidable {
 
     collidable();
     collidable(v2f position, Rect boundingBox);
-    bool checkCollision(Rect* r, LDTK_Level* tilemap, Rect* outRect);
+    bool checkCollision(Rect* r, Level* tilemap, Rect* outRect);
     std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
     std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(Rect rect);
     RectF addBoundingBox(v2f p);

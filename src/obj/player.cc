@@ -144,19 +144,19 @@ void obj::Player::init() {
   _normalGravity = _gravity.entityGravity;
 }
 
-LDTK_TileData* obj::Player::tileAt(RectF rect, std::string property = "") {
+Tile obj::Player::tileAt(RectF rect, std::string property = "") {
   auto tilesAbove = _collidable.tileExistsAt(rect);
 
   if (tilesAbove.size() > 0) {
     for(auto tile : tilesAbove) {
-      LDTK_Level_Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
-      if (layer->identifier == property) {
-          return &layer->tiles.data.at(tile.tileId);
+      Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
+      if (layer->def->identifier == property) {
+          return layer->tiles.at(tile.tileId);
       }
     }
   }
 
-  return nullptr;
+  return Tile(0, SDL_FLIP_NONE, false, false);
 }
 
 void obj::Player::update(float dt) {
@@ -231,7 +231,8 @@ void obj::Player::update(float dt) {
       _collidable.rect.h
     });
 
-    LDTK_TileData* onLadder = tileAt({
+    /*
+    Tile onLadder = tileAt({
       round(_collidable.rect.x),
       _collidable.rect.y,
       floor(_collidable.rect.w),
@@ -241,6 +242,7 @@ void obj::Player::update(float dt) {
     if (!onLadder) {
       state = State::IDLE;
     }
+    */
 
     return;
   }
@@ -397,9 +399,9 @@ void obj::Player::update(float dt) {
   onOneWayPlatform = false;
   if (tilesBelow.size() > 0) {
     for(auto tile : tilesBelow) {
-      LDTK_Level_Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
+      Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
 
-      if (layer->identifier == "Collision") {
+      if (layer->def->identifier == "Collision") {
 
       //if (tile.tileId) {
         _jumpHold = false;

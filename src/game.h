@@ -10,7 +10,7 @@
 #include "timer.h"
 #include "renderer.h"
 #include "dialogue.h"
-#include "LDtkParser.h"
+#include "ldtk.h"
 
 class Game
 {
@@ -31,8 +31,7 @@ public: Game() {
     Dialogue* dialogue = new Dialogue(renderer);
 
 
-    Project ldtkProject;
-    ldtkProject.load("assets/maps/LDtk_test.ldtk");
+    World world = createWorld("assets/maps/LDtk_test.ldtk");
 
     //dialogue->init();
     //dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
@@ -41,7 +40,7 @@ public: Game() {
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, &ldtkProject, "Level_0");
+    GameplayScene* _gameplayScene = new GameplayScene(renderer, &world, "Level_0");
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
