@@ -1,5 +1,24 @@
 #include "map.h"
 
+NeighBourDirection neighbourDirectionFromLetter(std::string c) {
+  switch (c[0]) {
+    case 'n':
+      return NeighBourDirection::N;
+    case 'e':
+      return NeighBourDirection::E;
+    case 's':
+      return NeighBourDirection::S;
+    case 'w':
+      return NeighBourDirection::W;
+    case 'o':
+      printf("Error: One or more  level is overlapping\n");
+      exit(1);
+    default:
+      printf("Error: \"%c\" not a direction\n", c[0]);
+      exit(1);
+  }
+}
+
 v2i Tileset::getTileTexturePos(int id) {
     int widthInTiles = textureWidth / tileSize;
     int x = id % widthInTiles;

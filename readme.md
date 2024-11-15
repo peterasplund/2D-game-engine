@@ -2,12 +2,19 @@ SDL Game engine
 
 TODO:
 
+Tile map:
+- render flipped both H and V tiles correctly
+- Entity position seems bugged
+
+Gameplay:
+- Clear entities on level transition
+- Level transition
+- Fix fall-through bug on level transition
+
+
 - Slopes
-- Move out Tiled based logic for loading Tileset. The same way as with the tilemap.
 - Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
-- Render bitmap fonts
 - Dialogue system
-- Migrate from Tiled to LDtk
 - Map manager with transition
 - Decided to use grid-based or free movement in overworld
 

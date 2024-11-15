@@ -9,6 +9,7 @@ const float MAX_DELTA_TIME = 7;
 enum class GAME_OBJECT {
   PLAYER,
   DOOR,
+  NPC,
 };
 
 enum class OBJECT_TAG {

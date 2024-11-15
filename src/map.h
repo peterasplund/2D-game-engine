@@ -17,23 +17,40 @@ enum LayerType {
 
 enum class Entity_Field_Tag { Integer, Float, String };
 
+struct NPC {
+  char* name;
+  char* dialogue;
+  // style npcStyle;
+};
+
 struct Entity_Field {
   int uid;
   std::string identifier;
   Entity_Field_Tag type;
+  
+  Entity_Field() {
+    uid = -1;
+  }
 };
 
 struct EntityDef {
   int uid;
   std::string identifier;
-  std::vector<Entity_Field> fields;
+  std::map<int, Entity_Field> fields;
   v2i position;
+};
+
+struct EntityFieldValue {
+  Entity_Field* field;
+  std::string identifier;
+  std::string value;
 };
 
 struct Entity {
   int uid;
   std::string identifier;
   v2i position;
+  std::vector<EntityFieldValue> fieldValues;
 };
 
 struct TilesetTag {
@@ -99,6 +116,10 @@ public:
   v2i getTilePos(int id);
 };
 
+enum NeighBourDirection { N, E, S, W };
+
+NeighBourDirection neighbourDirectionFromLetter(std::string c);
+
 struct Level {
   std::vector<Layer> layers;
 
@@ -111,6 +132,9 @@ struct Level {
   std::vector<int> getIndicesWithinRect(Rect r);
 
   Rect getTileRect(int tileIdx);
+
+  // NeighBourDirection, level id (the long kind)
+  std::map<NeighBourDirection, std::vector<std::string>> neighbours;
 };
 
 struct LayerDef {

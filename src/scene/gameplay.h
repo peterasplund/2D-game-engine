@@ -17,6 +17,7 @@ class GameplayScene : public Scene
 private:
   Renderer* _renderer;
   camera _camera;
+  std::shared_ptr<AbstractGameObject> _player;
   Bg* bg1;
   Bg* bg2;
   Hud* hud;
@@ -36,4 +37,6 @@ public:
   void init();
   void update(float dt);
   void draw(Renderer* renderer);
+
+  void switchLevel(std::string level);
 };

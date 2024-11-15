@@ -71,3 +71,7 @@ GAME_OBJECT AbstractGameObject::getType() {
 OBJECT_TAG AbstractGameObject::getTag() {
   return _tag;
 }
+
+void AbstractGameObject::setPosition(v2f p) {
+  this->_position = p;
+}

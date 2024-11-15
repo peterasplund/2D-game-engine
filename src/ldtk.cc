@@ -65,6 +65,19 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       entity.identifier = entityInstanceJson["__identifier"]; // remove this?
       entity.position = { entityInstanceJson["px"][0], entityInstanceJson["px"][1] };
 
+      for(auto field : entityInstanceJson["fieldInstances"]) {
+        EntityFieldValue fieldValue;
+        int defUid = field["defUid"];;
+        fieldValue.field = &world->entityDefs[entity.uid].fields[defUid];
+        switch (fieldValue.field->type) {
+          case Entity_Field_Tag::String:
+            fieldValue.identifier = field["__identifier"];
+            fieldValue.value = field["__value"];
+            entity.fieldValues.push_back(fieldValue);
+            break;
+          // @TODO: implement the rest of the field types
+        }
+      }
       layer.entities.push_back(entity);
     }
   }
@@ -129,7 +142,7 @@ EntityDef parse_entity_def(json data) {
     }
     // @TODO: add more field types
 
-    entity.fields.push_back(field);
+    entity.fields[field.uid] = field;
   }
 
   return entity;
@@ -179,8 +192,6 @@ World createWorld(std::string filePath) {
     layerDef.tilesetId = layerDefJson["tilesetDefUid"].is_null() ? -1 : (int)layerDefJson["tilesetDefUid"];
     layerDef.type = strToLayerType(type.c_str());
 
-    // @TODO: implement tiles and auto tiles
-
     world.layerDefs[layerDefJson["uid"]] = layerDef;
   }
 
@@ -189,28 +200,28 @@ World createWorld(std::string filePath) {
     Level level;
 
     std::string identifier = levelJson["identifier"];
+    std::string iid = levelJson["iid"];
     int tileSize = data["defaultGridSize"];
     level.tilesWide = (int)levelJson["pxWid"] / tileSize;
     level.tilesTall = (int)levelJson["pxHei"] / tileSize;
     level.tileSize = tileSize;
 
-    // @Temp: skip all but first level
-    if (strcmp(identifier.c_str(), "Level_0") != 0) {
-      continue;
-    }
-
-    // @TODO: parse level entities
-
     printf("> parsing level %s layer instances\n", identifier.c_str());
     for(json layerJson : levelJson["layerInstances"]) {
-      Layer layer;
-
-      // layer.tilesetId = tilesetUid;
       level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
-  
-    world.levels[identifier] = level;
+
+    // neighbours
+    for(json neighbourJson : levelJson["__neighbours"]) {
+      std::string iid = neighbourJson["levelIid"];
+      NeighBourDirection dir = neighbourDirectionFromLetter(neighbourJson["dir"]);
+      level.neighbours[dir].push_back(iid);
+    }
+
+    world.levels[iid] = level;
   }
+
+  printf("Successfully loaded the world map\n\n");
 
   return world;
 }

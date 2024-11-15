@@ -39,6 +39,7 @@ class AbstractGameObject {
       };
     }
     v2f getPosition();
+    void setPosition(v2f p);
     v2f* getPositionPointer();
     bool getListensForCollisions();
     GAME_OBJECT getType();
