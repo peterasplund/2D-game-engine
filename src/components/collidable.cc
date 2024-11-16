@@ -127,9 +127,12 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
         Rect r = t->getTileRect(possibleIdx);
 
         if (rect.hasIntersection(&r)) {
+          int tilesetId = t->layers[layerId].def->tilesetId;
+
           response.push_back(TileExistsAtResponse {
             layerId,
             tileId,
+            tilesetId,
             tile,
             r,
           });

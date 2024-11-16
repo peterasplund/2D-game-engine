@@ -26,6 +26,7 @@ struct CollisionResponse {
 struct TileExistsAtResponse {
   int layerId;
   int tileId;
+  int tilesetId;
   Tile tile;
   Rect rect;
 };

@@ -28,7 +28,7 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
 
   int tileSize = layer.level->tileSize;
 
-  bool solid = layer.def->identifier == "Collision";
+
   if (layer.def->type == LayerType::INT_GRID) {
     layer.tiles.resize(level->tilesTall * level->tilesWide);
     for(json tile : layerJson["autoLayerTiles"]) {
@@ -36,6 +36,7 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       int y = (int)tile["px"][1];
       int id = tile["t"];
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
+      bool solid = world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
       SDL_RendererFlip flip = tile["f"];
 
       Tile layerTile(id, flip, true, solid);
@@ -48,10 +49,9 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       json tile = layerJson["gridTiles"][i];
       int x = tile["px"][0];
       int y = tile["px"][1];
-
       uint16_t id = tile["t"];
-
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
+      bool solid = world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
       SDL_RendererFlip flip = tile["f"];
 
       Tile layerTile(id, flip, true, solid);
@@ -107,7 +107,7 @@ Tileset parse_tileset(std::string projectPath, json data) {
     printf("ERROR: Failed to load the tileset texture at: %s\n", path.c_str());
   }
 
-  std::vector<TilesetTag> tags;
+  std::map<std::string, std::vector<int>> tags;
 
   for(json tag : data["enumTags"]) {
     std::string enumName = tag["enumValueId"];
@@ -117,7 +117,10 @@ Tileset parse_tileset(std::string projectPath, json data) {
       tileIds.push_back(id);
     }
 
-    tags.push_back({ enumName, tileIds });
+    // Sort the ids so we can do a binary search later on
+    std::sort(tileIds.begin(), tileIds.end());
+
+    tags[enumName] =  tileIds;
   }
 
   Tileset tileset;
@@ -224,6 +227,8 @@ World createWorld(std::string filePath) {
       NeighBourDirection dir = neighbourDirectionFromLetter(neighbourJson["dir"]);
       level.neighbours[dir].push_back(iid);
     }
+
+    level.world = &world;
 
     world.levels[iid] = level;
   }

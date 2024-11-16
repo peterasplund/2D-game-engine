@@ -27,7 +27,7 @@ namespace obj {
       void jump();
       void attack();
       void slide();
-      Tile tileAt(RectF rect, std::string property);
+      Tile* tileAt(RectF rect, std::string property);
       void onInputPressed(int button) override;
       void onInputReleased(int button) override;
       void draw(Renderer* renderer) override;

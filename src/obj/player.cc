@@ -144,19 +144,21 @@ void obj::Player::init() {
   _normalGravity = _gravity.entityGravity;
 }
 
-Tile obj::Player::tileAt(RectF rect, std::string property = "") {
+Tile* obj::Player::tileAt(RectF rect, std::string property) {
   auto tilesAbove = _collidable.tileExistsAt(rect);
 
   if (tilesAbove.size() > 0) {
     for(auto tile : tilesAbove) {
-      Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
-      if (layer->def->identifier == property) {
-          return layer->tiles.at(tile.tileId);
+      auto tileset = &EntityManager::Instance()->getTilemap()->world->tilesetDefs[tile.tilesetId];
+
+      if (tileset->tileHasTag(tile.tile.getTileId(), property)) {
+        Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
+        return &layer->tiles.at(tile.tileId);
       }
     }
   }
 
-  return Tile(0, SDL_FLIP_NONE, false, false);
+  return nullptr;
 }
 
 void obj::Player::update(float dt) {
@@ -172,15 +174,12 @@ void obj::Player::update(float dt) {
     return;
   }
 
-  /*
-  LDTK_TileData* ladderAbove = tileAt({
+  Tile* ladderAbove = tileAt({
     round(_collidable.rect.x),
     _collidable.rect.y - _collidable.rect.h / 2,
     floor(_collidable.rect.w),
     _collidable.rect.h / 2
-  }, "ladder");
-  return;
-  */
+  }, "Ladder");
 
   if (state == State::CLIMBING) {
     _velocity.v.y = -0.0f;
@@ -194,7 +193,6 @@ void obj::Player::update(float dt) {
 
     _velocity.v.x = 0.0f;
 
-    /*
     if (!ladderAbove) {
       //_animator.setAnimation("crouch");
     }
@@ -202,7 +200,6 @@ void obj::Player::update(float dt) {
       _animator.setAnimation("climb");
       _animator.stop();
     }
-    */
 
     if (_velocity.v.y < -0.001f) {
       if (!_animator.isPlaying()) {
@@ -231,18 +228,16 @@ void obj::Player::update(float dt) {
       _collidable.rect.h
     });
 
-    /*
-    Tile onLadder = tileAt({
+    Tile* onLadder = tileAt({
       round(_collidable.rect.x),
       _collidable.rect.y,
       floor(_collidable.rect.w),
       _collidable.rect.h
-    }, "ladder");
+    }, "Ladder");
 
-    if (!onLadder) {
+    if (onLadder == nullptr) {
       state = State::IDLE;
     }
-    */
 
     return;
   }
@@ -364,7 +359,6 @@ void obj::Player::update(float dt) {
     _collidable.rect.h
   });
 
-  /*
   // Climb onto ladder
   if (tilesWithin.size() > 0) {
     for(auto tile : tilesWithin) {
@@ -372,21 +366,17 @@ void obj::Player::update(float dt) {
       int playerCenter = _collidable.rect.x + _collidable.rect.w / 2;
       if (playerCenter > tileCenter - LADDER_X_DEADZONE && playerCenter < tileCenter + LADDER_X_DEADZONE) { 
         if (inputHandler->isHeld(BUTTON::UP)) {
-          TileData* tileData = EntityManager::Instance()->getTilemap()->getTileData(tile.tileId);
-          if (tileData->propertiesBool.find("ladder") != tileData->propertiesBool.end()) {
-            if (tileData->propertiesBool.at("ladder")) {
-              // @TODO: something is wrong with the tile rect or something
-              _position.x = tile.rect.x - 23;
-              //_position.y = tile.rect.y - _collidable.rect.y;
-              state = State::CLIMBING;
-              return;
-            }
+          auto tileset = &EntityManager::Instance()->getTilemap()->world->tilesetDefs[tile.tilesetId];
+
+          if (tileset->tileHasTag(tile.tile.getTileId(), "Ladder")) {
+            _position.x = tile.rect.x - 23;
+            state = State::CLIMBING;
+            return;
           }
         }
       }
     }
   }
-  */
 
   auto tilesBelow = _collidable.tileExistsAt({
     round(_collidable.rect.x),
@@ -399,19 +389,15 @@ void obj::Player::update(float dt) {
   onOneWayPlatform = false;
   if (tilesBelow.size() > 0) {
     for(auto tile : tilesBelow) {
-      Layer* layer = &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
-
-      if (layer->def->identifier == "Collision") {
-
-      //if (tile.tileId) {
+      if (tile.tile.getSolid()) {
         _jumpHold = false;
         _gravity.onFloor = true;
-      //}
       }
       else {
-        /*
+        auto tileset = &EntityManager::Instance()->getTilemap()->world->tilesetDefs[tile.tilesetId];
+
         if (onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
-          if (tileData->layer->identifier == "oneway") {
+          if (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) {
             if (_velocity.v.y >= 0.f && _collidable.rect.bottom() <= tile.rect.y + ONEWAY_PLATFORM_GRACE) {
               onOneWayPlatform = true;
               _jumpHold = false;
@@ -421,7 +407,6 @@ void obj::Player::update(float dt) {
             }
           }
         }
-        */
       }
     }
   }

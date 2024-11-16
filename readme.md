@@ -3,6 +3,7 @@ SDL Game engine
 TODO:
 
 Tile map:
+- Use tile properties for ladders and such
 - Entity position seems bugged
 
 Gameplay:

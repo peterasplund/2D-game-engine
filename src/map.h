@@ -5,9 +5,11 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <algorithm>
 
 struct Level;
 struct LayerDef;
+struct World;
 
 enum LayerType {
   ENTITIES,
@@ -58,14 +60,40 @@ struct TilesetTag {
   std::vector<int> tileIds;
 };
 
+
+/*
+"enumTags": [
+  {
+    "enumValueId": "Solid",
+    "tileIds": [34,35,38,51,55,68,72,85,86,89,112,113,129,130,136,137,140,153,157,170,174,187,188,191,238,239,242,255,259,272,276,289,290,293,340,341,344,357,361,374,378,391,392,395]
+  }, 
+  { 
+    "enumValueId": "Ladder",
+    "tileIds": [731,732,733,748,749,750,765,766,767]
+  },
+  { 
+    "enumValueId": "Oneway",
+    "tileIds": [143,144,145,146,179,180,181,323,324,408,409]
+  } 
+],
+*/
 struct Tileset {
   int id;
   SDL_Texture *texture;
   int textureWidth;
   int tileSize;
-  std::vector<TilesetTag> tags;
+  std::map<std::string, std::vector<int>> tags;
 
   v2i getTileTexturePos(int id);
+
+  bool tileHasTag(int tileIdx, std::string tag) {
+    auto ids = tags[tag];
+    if (std::binary_search(ids.begin(), ids.end(), tileIdx)) {
+      return true;
+    }
+
+    return false;
+  }
 };
 
 #define TILE_SOLID 0x8000
@@ -121,6 +149,7 @@ enum NeighBourDirection { N, E, S, W };
 NeighBourDirection neighbourDirectionFromLetter(std::string c);
 
 struct Level {
+  World* world;
   std::vector<Layer> layers;
 
   int tilesWide;
