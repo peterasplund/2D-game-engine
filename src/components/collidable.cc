@@ -106,7 +106,7 @@ bool dynamicRectVsRect(
 
 std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
   std::vector<TileExistsAtResponse> response;
-  Level * t = EntityManager::Instance()->getTilemap();
+  Level* t = EntityManager::Instance()->getTilemap();
   std::vector<int> tiles = t->getIndicesWithinRect({ 
     (int)round(rect.x),
     (int)round(rect.y),
@@ -114,7 +114,7 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
     (int)round(rect.h)
   });
   
-  for(int layerId = 0; layerId < t->layers.size(); layerId++) {
+  for(uint32_t layerId = 0; layerId < t->layers.size(); layerId++) {
     if (t->layers[layerId].tiles.size() == 0) {
       continue;
     }
@@ -130,7 +130,7 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
           int tilesetId = t->layers[layerId].def->tilesetId;
 
           response.push_back(TileExistsAtResponse {
-            layerId,
+            (int)layerId,
             tileId,
             tilesetId,
             tile,
@@ -184,7 +184,7 @@ Rect getCollisionAt(RectF r) {
     (int)round(r.h)
   });
 
-  for (int layer = 0; layer < tilemap->layers.size(); layer++) {
+  for (uint32_t layer = 0; layer < tilemap->layers.size(); layer++) {
     for (int possibleIdx : possibleIndices) {
       auto layerDef = tilemap->layers[layer].def;
       if (layerDef->type != LayerType::TILES && layerDef->type != LayerType::INT_GRID) {
@@ -214,8 +214,6 @@ Rect getCollisionAt(RectF r) {
 CollisionResponse collidable::moveAndSlide(v2f* position, velocity* velocity, float dt) {
   CollisionResponse respnse = { false, false, false, false };
   v2 newPos = *position + velocity->v * dt;
-
-  Level* tilemap = EntityManager::Instance()->getTilemap();
   Rect collidedWith;
 
   if (velocity->v.y != 0) {

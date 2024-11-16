@@ -41,10 +41,10 @@ int Level::getIdxFromPoint(v2i point) {
   return (point.x / tileSize) + ((point.y / tileSize) * tilesWide);
 }
 
-v2i Layer::getTilePos(int id) {
+v2i Layer::getTilePos(uint32_t id) {
   int tileSize = this->level->tileSize;
 
-  int i = 0;
+  uint32_t i = 0;
   while (i < tiles.size()) {
     if (i == id) {
       return level->idxToPoint(i) * tileSize;

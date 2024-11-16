@@ -66,7 +66,7 @@ public:
 
     int msgIdx = 0;
     bool inTag = false;
-    for (int i = 0; i < s.length(); i++) {
+    for (uint32_t i = 0; i < s.length(); i++) {
       msg[msgIdx] = s[i];
 
       if (s[i] == '<') {
@@ -116,8 +116,7 @@ public:
     const int GLYPH_WIDTH = _font->getGlyphWidth();
     const int GLYPH_HEIGHT = _font->getGlyphHeight();
 
-    char prevChar = '0';
-    for (int i = 0; _displayingMessage[i] != '\0'; i++) {
+    for (uint32_t i = 0; _displayingMessage[i] != '\0'; i++) {
       if (i >= _currentCharacterIdx) {
         break;
       }
@@ -163,7 +162,7 @@ public:
 
 
 private:
-  const int LETTER_PAUSE = 65;
+  const uint32_t LETTER_PAUSE = 65;
   const int FRAME_WIDTH = 16;
   //const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) - DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
   const Rect BOUNDS = { 0, 0, 300, 100};
@@ -173,6 +172,6 @@ private:
   SDL_Texture* _frameTexture;
   Renderer* _renderer;
   Timer _timer;
-  int _currentCharacterIdx = 0;
+  uint32_t _currentCharacterIdx = 0;
   Font* _font;
 };

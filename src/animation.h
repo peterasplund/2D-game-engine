@@ -85,6 +85,6 @@ class Animation
     bool looping = true;
     std::vector<Frame> frames;
     unsigned int ellapsedMS = 0;
-    int currentFrame = 0;
+    uint32_t currentFrame = 0;
     SDL_Texture* texture;
 };

@@ -108,8 +108,6 @@ void GameplayScene::update(float dt) {
   }
 
   Level lvl = _ldtkProject->levels[this->_level];
-
-  Rect objRect = _player->getRect();
   RectF playerRect = _player->_collidable.addBoundingBox(_player->_position);
 
   // @TODO: move this out and refactor
@@ -162,11 +160,11 @@ void GameplayScene::update(float dt) {
 
 void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
-  v2f cameraOffset = { (float)camera.x, (float)camera.y };
+  // v2f cameraOffset = { (float)camera.x, (float)camera.y };
   Level* level = &_ldtkProject->levels[this->_level];
 
-  //bg1->draw(renderer->getSdlRenderer(), 0);
-  //bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
+  // bg1->draw(renderer->getSdlRenderer(), 0);
+  // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
   for(auto layer : level->layers) {
     if (layer.def->type == LayerType::ENTITIES) {
@@ -175,7 +173,7 @@ void GameplayScene::draw(Renderer* renderer) {
 
     Tileset tileset = _ldtkProject->tilesetDefs[layer.def->tilesetId];
 
-    for(int i = 0; i < layer.tiles.size(); i ++) {
+    for(uint16_t i = 0; i < layer.tiles.size(); i ++) {
       Tile tile = layer.tiles[i];
 
       if (!tile.getActive()) {
@@ -198,9 +196,9 @@ void GameplayScene::draw(Renderer* renderer) {
   // Draw objects
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     Rect objRect = obj->getTextureRect();
-    //if (objRect.hasIntersection(&camera)) {
+    if (objRect.hasIntersection(&camera)) {
       obj->draw(renderer);
-    //}
+    }
   }
 
   hud->draw(renderer->getSdlRenderer());

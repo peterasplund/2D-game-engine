@@ -141,7 +141,7 @@ public:
   std::vector<Tile> tiles;
   std::vector<Entity> entities;
 
-  v2i getTilePos(int id);
+  v2i getTilePos(uint32_t id);
 };
 
 enum NeighBourDirection { N, E, S, W };
@@ -170,7 +170,7 @@ struct LayerDef {
   int uid;
 
   int tilesetId; // Maps to idx in World::tilesetDefs
-  std::string identifier; // ?
+  std::string identifier;
   LayerType type;
 };
 

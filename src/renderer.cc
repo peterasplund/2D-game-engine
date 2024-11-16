@@ -10,8 +10,6 @@ void Renderer::renderSprite(Sprite* sprite, v2i position, bool useOffset) {
   int y = round(position.y);
   SDL_Rect dr = { x, y, sr.w, sr.h };
 
-  SDL_Rect r = useOffset ? getOffsetRect(&dr) : dr;
-
   if (sprite->textureFlip == SDL_FLIP_HORIZONTAL) {
     dr.x -= sprite->spriteOffset.x;
   }
@@ -38,13 +36,6 @@ void Renderer::renderRectFilled(Rect* rectangle, bool useOffset) {
 
 void Renderer::renderRectTexture(Rect rectangle, SDL_Texture* texture, int tileWidth) {
   int framePadding = (tileWidth / 2);
-
-  SDL_Rect r = {
-    rectangle.x + (tileWidth / 2),
-    rectangle.y + (tileWidth / 2),
-    rectangle.w - tileWidth,
-    rectangle.h - tileWidth,
-  };
 
   drawSide(SIDE::TOP, tileWidth, rectangle, texture);
   drawSide(SIDE::LEFT, tileWidth, rectangle, texture);

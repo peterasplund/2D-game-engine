@@ -412,10 +412,6 @@ void obj::Player::update(float dt) {
   }
 
   previouslyOnFloor = _gravity.onFloor;
-
-  auto &v = _velocity;
-  auto &p = _position;
-
   _gravity.entityGravity = _jumpHold && _velocity.v.y < -0.3f ? JUMP_SHORT_GRAVITY : _normalGravity;
 
   if (!isMoving) {

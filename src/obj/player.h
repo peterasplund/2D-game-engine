@@ -52,7 +52,7 @@ namespace obj {
       /// How fast to get to a stop
       const float SLIDE_DEACCELERATION = 0.004f;
       /// Jump buffer window in MS
-      const int JUMP_BUFFER_WINDOW = 100; 
+      const uint32_t JUMP_BUFFER_WINDOW = 100; 
       /// Error margin to land on one-way platform. How many pixels below we can be and still snap on top of it.
       const int ONEWAY_PLATFORM_GRACE = 3;
       
@@ -61,7 +61,7 @@ namespace obj {
 
       /// When couching and pressing jump on top of a one-way platform we let the player go through it.
       /// This is how long we should act like it's not solid for.
-      const int ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW = 100;
+      const uint32_t ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW = 100;
 
       Animator _animator;
       std::string direction = "right";

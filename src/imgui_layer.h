@@ -88,8 +88,8 @@ public:
       for(const auto &obj : entities) {
         sprintf(nodeName, "- Object ID: %d -", i);
         if (ImGui::TreeNode(nodeName)) {
-          ImGui::Text("Tag: %d", obj->getTag());
-          ImGui::Text("Type: %d", obj->getType());
+          ImGui::Text("Tag: %d", (int)obj->getTag());
+          ImGui::Text("Type: %d", (int)obj->getType());
           ImGui::Text("position: (%f\t%f)", obj->getPosition().x, obj->getPosition().y);
           ImGui::TreePop();
         }

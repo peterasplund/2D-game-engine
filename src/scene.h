@@ -11,7 +11,7 @@ public:
     _renderer = renderer;
   }
 
-  ~Scene() {}
+  virtual ~Scene() {}
 
   virtual void init() {}
   virtual void update(float dt) {}

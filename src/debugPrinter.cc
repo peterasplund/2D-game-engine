@@ -27,7 +27,6 @@ void DebugPrinter::draw(Renderer* renderer) {
 
   if (*debugRectangles) {
     for(const auto &obj : EntityManager::Instance()->getEntities()) {
-      Rect objRect = obj->getRect();
       RectF r = obj->_collidable.addBoundingBox(obj->_position);
       SDL_Rect hitbox = r.to_sdl_rect();
       Rect rect = { 
