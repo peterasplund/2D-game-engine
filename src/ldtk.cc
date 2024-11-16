@@ -36,8 +36,9 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       int y = (int)tile["px"][1];
       int id = tile["t"];
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
+      SDL_RendererFlip flip = tile["f"];
 
-      Tile layerTile(id, tile["f"], true, solid);
+      Tile layerTile(id, flip, true, solid);
       layer.tiles[idx] = layerTile;
     }
   } 
@@ -52,8 +53,9 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       int textureWidth = world->tilesetDefs[layer.def->tilesetId].textureWidth;
 
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
+      SDL_RendererFlip flip = tile["f"];
 
-      Tile layerTile(id, tile["f"], true, solid);
+      Tile layerTile(id, flip, true, solid);
       layer.tiles[idx] = layerTile;
     }
   }

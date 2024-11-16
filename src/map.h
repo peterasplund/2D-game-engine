@@ -81,10 +81,10 @@ struct Tile {
   Tile(uint16_t tileId, SDL_RendererFlip flip, bool active, bool solid) {
     data = 0;
 
-    if (flip == SDL_FLIP_VERTICAL) {
+    if (flip & SDL_FLIP_VERTICAL) {
       data |= TILE_FLIP_V;
     }
-    if (flip == SDL_FLIP_HORIZONTAL) {
+    if (flip & SDL_FLIP_HORIZONTAL) {
       data |= TILE_FLIP_H;
     }
     if (active) {

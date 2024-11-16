@@ -3,7 +3,6 @@ SDL Game engine
 TODO:
 
 Tile map:
-- render flipped both H and V tiles correctly
 - Entity position seems bugged
 
 Gameplay:
