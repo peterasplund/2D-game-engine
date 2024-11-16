@@ -44,13 +44,12 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
   } 
   else if (layer.def->type == LayerType::TILES) {
     layer.tiles.resize(level->tilesTall * level->tilesWide);
-    for (int i = 0; i < layerJson["gridTiles"].size(); i++) {
+    for (uint16_t i = 0; i < layerJson["gridTiles"].size(); i++) {
       json tile = layerJson["gridTiles"][i];
       int x = tile["px"][0];
       int y = tile["px"][1];
 
       uint16_t id = tile["t"];
-      int textureWidth = world->tilesetDefs[layer.def->tilesetId].textureWidth;
 
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
       SDL_RendererFlip flip = tile["f"];
@@ -77,7 +76,12 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
             fieldValue.value = field["__value"];
             entity.fieldValues.push_back(fieldValue);
             break;
-          // @TODO: implement the rest of the field types
+          case Entity_Field_Tag::Integer:
+            // @TODO: implement when needed
+            break;
+          case Entity_Field_Tag::Float:
+            // @TODO: implement when needed
+            break;
         }
       }
       layer.entities.push_back(entity);
@@ -91,7 +95,8 @@ Tileset parse_tileset(std::string projectPath, json data) {
   // https://ldtk.io/json/#ldtk-TilesetDefJson
 
   int tileSize = data["tileGridSize"];
-  int spacing = data["spacing"];
+  // @TODO: handle spacing in tilesets?
+  // int spacing = data["spacing"];
   int imageWidth = data["pxWid"];
   std::string relPath = data["relPath"];
 
