@@ -11,6 +11,7 @@
 #include "../components/camera.h"
 #include "../hud.h"
 #include "../map.h"
+#include "../map-hud.h"
 
 const int LEVEL_FADE_SPEED = 14;
 
@@ -28,6 +29,7 @@ private:
   Bg* bg1;
   Bg* bg2;
   Hud* hud;
+  MapHud* mapHud;
   //Tilemap* tilemap;
   std::string _level;
   World* _ldtkProject;

@@ -246,6 +246,10 @@ World createWorld(std::string filePath) {
     world.levels[iid] = level;
   }
 
+  world.tileSize = data["defaultGridSize"];
+  world.worldCellWidth = (int)data["worldGridWidth"] / world.tileSize;
+  world.worldCellHeight = (int)data["worldGridHeight"] / world.tileSize;
+
   printf("Successfully loaded the world map\n\n");
 
   return world;

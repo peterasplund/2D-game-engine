@@ -4,11 +4,11 @@ TODO:
 
 Tile map:
 - Entity position seems bugged
+- Handle multiple neighbours at the same direction. We need this since some rooms can be taller/wider
 
 Gameplay:
 - Clear entities on level transition (Rewrite entity system?)
 
-- Draw map (in a second window? Could be interesting)
 - Slopes
 - Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
 - Finish Dialogue system

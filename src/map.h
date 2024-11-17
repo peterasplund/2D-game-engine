@@ -181,4 +181,8 @@ struct World {
   std::map<int, LayerDef> layerDefs;
   std::map<int, EntityDef> entityDefs;
   std::map<int, Tileset> tilesetDefs;
+
+  int tileSize;
+  int worldCellWidth;
+  int worldCellHeight;
 };
