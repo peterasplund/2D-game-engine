@@ -161,12 +161,12 @@ void GameplayScene::update(float dt) {
   std::string* iid = nullptr;
   v2f newPlayerPos = _player->getPosition();
 
-  if (playerRect.left() - 1 >= lvl.tilesWide * lvl.tileSize) {
+  if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
       dir = 'e';
       iid = &lvl.neighbours[NeighBourDirection::E][0];
 
-      newPlayerPos.x = -(playerRect.w-1);
+      newPlayerPos.x = -playerRect.w - (playerRect.w / 2);
     }
   }
   else if (playerRect.right() <= 1) {
@@ -176,15 +176,15 @@ void GameplayScene::update(float dt) {
 
       int tilesWide = _ldtkProject->levels[*iid].tilesWide;
 
-      newPlayerPos.x = (tilesWide * lvl.tileSize) - playerRect.w;
+      newPlayerPos.x = (tilesWide * lvl.tileSize) - playerRect.w - (playerRect.w / 2);
     }
   }
-  else if (playerRect.top() >= lvl.tilesTall * lvl.tileSize) {
+  else if (playerRect.top() + 1 >= lvl.tilesTall * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
       dir = 's';
       iid = &lvl.neighbours[NeighBourDirection::S][0];
 
-      newPlayerPos.y = (-playerRect.h) + 1;
+      newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
     }
   }
   else if (playerRect.bottom() <= 1) {
@@ -194,7 +194,7 @@ void GameplayScene::update(float dt) {
 
       int tilesTall = _ldtkProject->levels[*iid].tilesTall;
 
-      newPlayerPos.y = (tilesTall * lvl.tileSize) - playerRect.h;
+      newPlayerPos.y = (tilesTall * lvl.tileSize) - playerRect.h - (playerRect.h / 2);
     }
   }
 
@@ -203,7 +203,6 @@ void GameplayScene::update(float dt) {
     printf("move dir(%c): %s\n", dir, id.c_str());
     v2i oldWorldPosition = _ldtkProject->levels[this->_level].worldPosition;
     v2i newWorldPosition = _ldtkProject->levels[id].worldPosition;
-    // switchLevel(this->_level);
 
     v2i diff = newWorldPosition - oldWorldPosition;
 

@@ -6,14 +6,13 @@ Tile map:
 - Entity position seems bugged
 
 Gameplay:
-- Clear entities on level transition
-- Level transition
-- Fix fall-through bug on level transition
+- Clear entities on level transition (Rewrite entity system?)
 
-
+- Draw map (in a second window? Could be interesting)
 - Slopes
 - Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
-- Dialogue system
+- Finish Dialogue system
+- Separate Font drawing from dialogue system to be able to print menus and such
 - Map manager with transition
 - Decided to use grid-based or free movement in overworld
 
