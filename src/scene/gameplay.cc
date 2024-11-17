@@ -20,6 +20,20 @@ std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OB
   return o;
 }
 
+int min(int a, int b);
+int max(int a, int b);
+
+void GameplayScene::drawFade() {
+  if  (pendingLevel.iid != "") {
+    int fade = max(min(transitionTimer, 255), 0);
+    //int fade = transitionTimer < 0 ? 0 : transitionTimer > 255 ? 255 : 0;
+    Rect fadeRect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    _renderer->setColor(0, 0, 0, fade);
+    _renderer->renderRectFilled(&fadeRect, false);
+  }
+}
+
 void GameplayScene::init() {
   gameObjects = {
     { "Player", GAME_OBJECT::PLAYER },
@@ -96,12 +110,45 @@ void GameplayScene::init() {
   loaded = true;
 }
 
-void GameplayScene::switchLevel(std::string level) {
-  Level* lvl = &_ldtkProject->levels[level];
+void GameplayScene::switchLevel(LevelTransition level) {
+  this->_level = level.iid;
+  Level* lvl = &_ldtkProject->levels[this->_level];
+  //EntityManager::Instance()->clearAllButConstantEntities();
   EntityManager::Instance()->setTileMap(lvl);
+
+  _player->setPosition(pendingLevel.playerPosition);
+  _player->_collidable.update(_player->_position);
+
+  _camera.setBounds({
+    lvl->tilesWide * lvl->tileSize,
+    lvl->tilesTall * lvl->tileSize
+  });
 }
 
 void GameplayScene::update(float dt) {
+  if (pendingLevel.iid != "") {
+    if (!isFadingIn) {
+      transitionTimer += LEVEL_FADE_SPEED;
+      if (transitionTimer >= 255) {
+        isFadingIn = true;
+        switchLevel(pendingLevel);
+      }
+    }
+    else {
+      transitionTimer -= LEVEL_FADE_SPEED;
+      if (transitionTimer <= 0) {
+        isFadingIn = false;
+        pendingLevel = { "", {0,0} };
+      }
+    }
+
+    // update fade values
+    transitionTimer ++;
+
+    if (!isFadingIn) {
+      return;
+    }
+  }
 
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
     obj->update(dt);
@@ -110,49 +157,64 @@ void GameplayScene::update(float dt) {
   Level lvl = _ldtkProject->levels[this->_level];
   RectF playerRect = _player->_collidable.addBoundingBox(_player->_position);
 
-  // @TODO: move this out and refactor
+  char dir = '-';
+  std::string* iid = nullptr;
+  v2f newPlayerPos = _player->getPosition();
+
   if (playerRect.left() - 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
-      std::string iid = lvl.neighbours[NeighBourDirection::E][0];
-      printf("next level: %s\n", iid.c_str());
+      dir = 'e';
+      iid = &lvl.neighbours[NeighBourDirection::E][0];
 
-      this->_level = iid;
-      switchLevel(this->_level);
-
-      v2f p = _player->getPosition();
-      p.x = -(playerRect.w-1);
-      _player->setPosition(p);
-      _player->_collidable.update(_player->_position);
-
-      Level* lvl = &_ldtkProject->levels[this->_level];
-
-      _camera.setBounds({
-        lvl->tilesWide * lvl->tileSize,
-        lvl->tilesTall * lvl->tileSize
-      });
+      newPlayerPos.x = -(playerRect.w-1);
     }
   }
   else if (playerRect.right() <= 1) {
     if (lvl.neighbours[NeighBourDirection::W].size() > 0) {
-      std::string iid = lvl.neighbours[NeighBourDirection::W][0];
-      printf("prev level: %s\n", iid.c_str());
+      dir = 'w';
+      iid = &lvl.neighbours[NeighBourDirection::W][0];
 
-      this->_level = iid;
-      lvl = _ldtkProject->levels[this->_level];
-      switchLevel(this->_level);
+      int tilesWide = _ldtkProject->levels[*iid].tilesWide;
 
-      v2f p = _player->getPosition();
-      p.x = (lvl.tilesWide * lvl.tileSize) - playerRect.w;
-      _player->setPosition(p);
-      _player->_collidable.update(_player->_position);
-
-      Level* lvl = &_ldtkProject->levels[this->_level];
-
-      _camera.setBounds({
-        lvl->tilesWide * lvl->tileSize,
-        lvl->tilesTall * lvl->tileSize
-      });
+      newPlayerPos.x = (tilesWide * lvl.tileSize) - playerRect.w;
     }
+  }
+  else if (playerRect.top() >= lvl.tilesTall * lvl.tileSize) {
+    if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
+      dir = 's';
+      iid = &lvl.neighbours[NeighBourDirection::S][0];
+
+      newPlayerPos.y = (-playerRect.h) + 1;
+    }
+  }
+  else if (playerRect.bottom() <= 1) {
+    if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
+      dir = 'n';
+      iid = &lvl.neighbours[NeighBourDirection::N][0];
+
+      int tilesTall = _ldtkProject->levels[*iid].tilesTall;
+
+      newPlayerPos.y = (tilesTall * lvl.tileSize) - playerRect.h;
+    }
+  }
+
+  if (iid != nullptr) {
+    std::string id = *iid;
+    printf("move dir(%c): %s\n", dir, id.c_str());
+    v2i oldWorldPosition = _ldtkProject->levels[this->_level].worldPosition;
+    v2i newWorldPosition = _ldtkProject->levels[id].worldPosition;
+    // switchLevel(this->_level);
+
+    v2i diff = newWorldPosition - oldWorldPosition;
+
+    if (dir == 'e' || dir == 'w') {
+      newPlayerPos.y -= diff.y;
+    }
+    else if (dir == 's' || dir == 'n') {
+      newPlayerPos.x -= diff.x;
+    }
+
+    pendingLevel = { id, newPlayerPos };
   }
 
   _camera.update();
@@ -204,4 +266,6 @@ void GameplayScene::draw(Renderer* renderer) {
   hud->draw(renderer->getSdlRenderer());
   
   DebugPrinter::Instance()->draw(renderer);
+
+  this->drawFade();
 }

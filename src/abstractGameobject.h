@@ -14,6 +14,7 @@ class AbstractGameObject {
     v2f _position;
     velocity _velocity;
     gravity _gravity;
+    bool _persist = false;
 
     virtual void init();
     virtual void update(float dt);

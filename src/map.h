@@ -156,6 +156,8 @@ struct Level {
   int tilesTall;
   int tileSize;
 
+  v2i worldPosition;
+
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
   std::vector<int> getIndicesWithinRect(Rect r);

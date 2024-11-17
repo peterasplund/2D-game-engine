@@ -1,4 +1,4 @@
-TARGET = main
+TARGET = peterspelmotor
 #CC = clang++
 CC = g++
 LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/pugixml/src -L./lib/imgui/include

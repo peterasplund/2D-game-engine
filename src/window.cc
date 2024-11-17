@@ -7,6 +7,9 @@ bool Window::init() {
     return 0;
   }
 
+  _width = WINDOW_WIDTH;
+  _height = WINDOW_HEIGHT;
+
   _window = SDL_CreateWindow(
     _title.c_str(),
     SDL_WINDOWPOS_CENTERED,

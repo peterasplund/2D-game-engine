@@ -12,6 +12,13 @@
 #include "../hud.h"
 #include "../map.h"
 
+const int LEVEL_FADE_SPEED = 14;
+
+struct LevelTransition {
+  std::string iid;
+  v2f playerPosition;
+};
+
 class GameplayScene : public Scene
 {
 private:
@@ -27,6 +34,10 @@ private:
   bool loaded = false;
   std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
+  int transitionTimer = 0;
+  bool isFadingIn = false;
+  LevelTransition pendingLevel = { "", {0,0} };
+  void drawFade();
 public:
   GameplayScene(Renderer* renderer, World* ldtkProject, std::string level) : Scene(renderer) {
     _renderer = renderer;
@@ -38,5 +49,5 @@ public:
   void update(float dt);
   void draw(Renderer* renderer);
 
-  void switchLevel(std::string level);
+  void switchLevel(LevelTransition level);
 };

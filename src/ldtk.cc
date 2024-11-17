@@ -221,10 +221,23 @@ World createWorld(std::string filePath) {
       level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
 
+    // Save global world position
+    level.worldPosition = {
+      levelJson["worldX"],
+      levelJson["worldY"],
+    };
+
     // neighbours
     for(json neighbourJson : levelJson["__neighbours"]) {
+      std::string dirString = neighbourJson["dir"];
       std::string iid = neighbourJson["levelIid"];
-      NeighBourDirection dir = neighbourDirectionFromLetter(neighbourJson["dir"]);
+
+      // Skip diagonals. We probably won't use them anyway
+      if (dirString.length() > 1) {
+        continue;
+      }
+
+      NeighBourDirection dir = neighbourDirectionFromLetter(dirString);
       level.neighbours[dir].push_back(iid);
     }
 

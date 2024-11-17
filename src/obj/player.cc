@@ -15,6 +15,7 @@ void obj::Player::init() {
 
   _tag = OBJECT_TAG::PLAYER;
   _type = GAME_OBJECT::PLAYER;
+  _persist = true;
 
   this->_collidable.boundingBox = { 
     18, 15, 
@@ -342,9 +343,11 @@ void obj::Player::update(float dt) {
 
 
   // die and respawn when falling of level
+  /*
   if (_position.y > 370.0f) {
     _position.y = -(float)_renderable.textureRect.h;
   }
+  */
 
   auto resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
   

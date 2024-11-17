@@ -12,6 +12,7 @@ namespace obj {
       void init() override {
         AbstractGameObject::init();
 
+        this->_persist = false;
         this->_collidable.boundingBox = { 
           35, 20, 
           60,

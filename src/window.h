@@ -27,8 +27,8 @@ private:
   bool init();
 
   std::string _title;
-  int _width = 640 * 2;
-  int _height = 480 * 2;
+  int _width;
+  int _height;
   bool _closed = false;
   SDL_Window *_window = nullptr;
   SDL_Renderer *_renderer = nullptr;

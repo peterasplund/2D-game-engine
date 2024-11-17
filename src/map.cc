@@ -46,8 +46,10 @@ v2i Layer::getTilePos(uint32_t id) {
 
   uint32_t i = 0;
   while (i < tiles.size()) {
-    if (i == id) {
-      return level->idxToPoint(i) * tileSize;
+    if (i <= level->tilesWide * level->tilesTall) {
+      if (i == id) {
+        return level->idxToPoint(i) * tileSize;
+      }
     }
 
     i ++;
@@ -59,13 +61,16 @@ v2i Layer::getTilePos(uint32_t id) {
 std::vector<int> Level::getIndicesWithinRect(Rect r) {
   int tileWidth = this->tileSize;
   int tileHeight = this->tileSize;
+  int maxTileId = tilesWide * tilesTall;
   std::vector<int> indices;
 
   for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
     for (int x = floor((r.left() - 1) / tileWidth) * tileWidth; x <= ceil(r.right() / tileWidth) * tileWidth; x += tileWidth) {
-      int idx = this->getIdxFromPoint({x, y});
-      if (idx != -1) {
-        indices.push_back(idx);
+      if (x < tileWidth * tilesWide && y < tileWidth * tilesTall) {
+        int idx = this->getIdxFromPoint({x, y});
+        if (idx != -1 && idx >= 0 && idx <= maxTileId) {
+          indices.push_back(idx);
+        }
       }
     }
   }
@@ -74,6 +79,11 @@ std::vector<int> Level::getIndicesWithinRect(Rect r) {
 }
 
 Rect Level::getTileRect(int tileIdx) {
+  if (tileIdx > (tilesWide * tilesTall)) {
+    printf("Error: Checking tiles out of bounds\n");
+    exit(1);
+  }
+
   v2i point = idxToPoint(tileIdx);
   return {
     point.x,
