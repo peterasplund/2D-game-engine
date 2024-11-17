@@ -13,18 +13,15 @@ MapHud::MapHud(Renderer* renderer, World* world, v2i position) {
   int tilesInCellY = world->worldCellHeight;
 
   for(auto level : world->levels) {
-    x = (level.second.worldPosition.x / tilesInCellX) / level.second.tileSize;
-    y = (level.second.worldPosition.y / tilesInCellY) / level.second.tileSize;
-
-    w = level.second.tilesWide / tilesInCellX;
-    h = level.second.tilesTall / tilesInCellY;
-
     MapCell cell;
     
     cell.iid = level.first;
-    cell.position = {x, y};
-    cell.size = {w, h};
     cell.type = CellType::Normal;
+    cell.position = level.second.cellPosition;
+    cell.size = {
+      level.second.tilesWide / tilesInCellX,
+      level.second.tilesTall / tilesInCellY,
+    };
 
     if (level.second.neighbours[NeighBourDirection::N].size() == 0) { cell.north = BorderValue::Wall; }
     if (level.second.neighbours[NeighBourDirection::E].size() == 0) { cell.east = BorderValue::Wall; }
@@ -70,7 +67,6 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
         (playerTilePosition.x / _worldCellWidth),
         (playerTilePosition.y / _worldCellHeight),
       };
-      //printf("x: %d\ttile pos x: %d\n", playerTilePosition.x / _worldCellWidth, currentCell.x);
 
       Rect playerMarker = { 
         ((innerRect.x + (MAP_HUD_CELL_WIDTH - 2) / 2) - (playerMarkerSize / 2)) + (currentCell.x * MAP_HUD_CELL_WIDTH),

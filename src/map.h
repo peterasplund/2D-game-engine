@@ -156,7 +156,10 @@ struct Level {
   int tilesTall;
   int tileSize;
 
-  v2i worldPosition;
+  std::string iid;
+  v2i cellPosition;
+  v2i cellPositionPx;
+  v2i cellSize; // How many cells the level takes up
 
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
@@ -178,6 +181,7 @@ struct LayerDef {
 
 struct World {
   std::map<std::string, Level> levels;
+  std::map<int, std::map<int, Level*>> levelsByCells;
   std::map<int, LayerDef> layerDefs;
   std::map<int, EntityDef> entityDefs;
   std::map<int, Tileset> tilesetDefs;
@@ -185,4 +189,6 @@ struct World {
   int tileSize;
   int worldCellWidth;
   int worldCellHeight;
+
+  Level* getLevelByCell(v2i cellPosition);
 };

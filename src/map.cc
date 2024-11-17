@@ -92,3 +92,7 @@ Rect Level::getTileRect(int tileIdx) {
     this->tileSize
   };
 }
+
+Level* World::getLevelByCell(v2i cellPosition) {
+  return levelsByCells[cellPosition.x][cellPosition.y];
+}

@@ -160,30 +160,28 @@ void GameplayScene::update(float dt) {
   RectF playerRect = _player->_collidable.addBoundingBox(_player->_position);
 
   char dir = '-';
-  std::string iid = "";
+  Level* nextLevel = nullptr;
   v2f newPlayerPos = _player->getPosition();
 
   v2i playerTilePosition = (_player->_position / _ldtkProject->tileSize);
-  v2i currentPlayerWorldCell = {
-      (playerTilePosition.x / _ldtkProject->worldCellWidth) + ((lvl.worldPosition.x / _ldtkProject->worldCellWidth) / _ldtkProject->tileSize),
-      (playerTilePosition.y / _ldtkProject->worldCellHeight),
+  v2i playerCellGlobal = {
+      (playerTilePosition.x / _ldtkProject->worldCellWidth) + lvl.cellPosition.x,
+      (playerTilePosition.y / _ldtkProject->worldCellHeight) + lvl.cellPosition.y,
   };
 
   if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
       dir = 'e';
-
-      iid = lvl.neighbours[NeighBourDirection::E][0];
-
+      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x + 1, playerCellGlobal.y });
       newPlayerPos.x = -playerRect.w - (playerRect.w / 2);
     }
   }
   else if (playerRect.right() <= 1) {
     if (lvl.neighbours[NeighBourDirection::W].size() > 0) {
       dir = 'w';
-      iid = lvl.neighbours[NeighBourDirection::W][0];
+      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x - 1, playerCellGlobal.y });
 
-      int tilesWide = _ldtkProject->levels[iid].tilesWide;
+      int tilesWide = _ldtkProject->levels[nextLevel->iid].tilesWide;
 
       newPlayerPos.x = (tilesWide * lvl.tileSize) - playerRect.w - (playerRect.w / 2);
     }
@@ -192,37 +190,26 @@ void GameplayScene::update(float dt) {
     if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
       dir = 's';
 
-      for(auto neighbour : lvl.neighbours[NeighBourDirection::S]) {
-
-        Level* level = &_ldtkProject->levels[neighbour];
-        int tilesInCellX = _ldtkProject->worldCellWidth;
-        int worldX = (level->worldPosition.x / tilesInCellX) / level->tileSize;
-        if (worldX == currentPlayerWorldCell.x) {
-           iid = neighbour;
-        }
-      }
-
+      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x, playerCellGlobal.y + 1 });
       newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
     }
   }
   else if (playerRect.bottom() <= 1) {
     if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
       dir = 'n';
-      iid = lvl.neighbours[NeighBourDirection::N][0];
 
-      int tilesTall = _ldtkProject->levels[iid].tilesTall;
+      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x, playerCellGlobal.y - 1 });
+
+      int tilesTall = _ldtkProject->levels[nextLevel->iid].tilesTall;
 
       newPlayerPos.y = (tilesTall * lvl.tileSize) - playerRect.h - (playerRect.h / 2);
     }
   }
 
-
-  if (iid != "") {
-    printf("iid: %s", iid.c_str());
-    std::string id = iid;
-    printf("move dir(%c): %s\n", dir, id.c_str());
-    v2i oldWorldPosition = _ldtkProject->levels[this->_level].worldPosition;
-    v2i newWorldPosition = _ldtkProject->levels[id].worldPosition;
+  if (nextLevel != nullptr) {
+    std::string id = nextLevel->iid;
+    v2i oldWorldPosition = _ldtkProject->levels[this->_level].cellPositionPx;
+    v2i newWorldPosition = _ldtkProject->levels[id].cellPositionPx;
 
     v2i diff = newWorldPosition - oldWorldPosition;
 

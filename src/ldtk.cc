@@ -175,6 +175,9 @@ World createWorld(std::string filePath) {
   json data = loadProjectFile(filePath.c_str());
   World world;
 
+  world.tileSize = data["defaultGridSize"];
+  world.worldCellWidth = (int)data["worldGridWidth"] / world.tileSize;
+  world.worldCellHeight = (int)data["worldGridHeight"] / world.tileSize;
 
   printf("> parsing tileset defs\n");
   for(json tilesetDefJson : data["defs"]["tilesets"]) {
@@ -210,7 +213,7 @@ World createWorld(std::string filePath) {
     Level level;
 
     std::string identifier = levelJson["identifier"];
-    std::string iid = levelJson["iid"];
+    level.iid = levelJson["iid"];
     int tileSize = data["defaultGridSize"];
     level.tilesWide = (int)levelJson["pxWid"] / tileSize;
     level.tilesTall = (int)levelJson["pxHei"] / tileSize;
@@ -221,10 +224,21 @@ World createWorld(std::string filePath) {
       level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
 
+    level.cellPositionPx = {
+      (int)levelJson["worldX"],
+      (int)levelJson["worldY"],
+    };
+
     // Save global world position
-    level.worldPosition = {
-      levelJson["worldX"],
-      levelJson["worldY"],
+    level.cellPosition = {
+      (level.cellPositionPx.x / world.worldCellWidth) / world.tileSize,
+      (level.cellPositionPx.y / world.worldCellHeight) / world.tileSize,
+    };
+
+    // Save global world position
+    level.cellSize = {
+      level.tilesWide / world.worldCellWidth,
+      level.tilesTall / world.worldCellHeight,
     };
 
     // neighbours
@@ -243,12 +257,15 @@ World createWorld(std::string filePath) {
 
     level.world = &world;
 
-    world.levels[iid] = level;
-  }
+    world.levels[level.iid] = level;
 
-  world.tileSize = data["defaultGridSize"];
-  world.worldCellWidth = (int)data["worldGridWidth"] / world.tileSize;
-  world.worldCellHeight = (int)data["worldGridHeight"] / world.tileSize;
+    for (int x = 0; x < level.cellSize.x; x ++) {
+      for (int y = 0; y < level.cellSize.y; y ++) {
+        printf("insert at: (%d, %d): %s\n", level.cellPosition.x + x, level.cellPosition.y + y, level.iid.c_str());
+        world.levelsByCells[level.cellPosition.x + x][level.cellPosition.y + y] = &world.levels[level.iid];
+      }
+    }
+  }
 
   printf("Successfully loaded the world map\n\n");
 

@@ -4,7 +4,6 @@ TODO:
 
 Tile map:
 - Entity position seems bugged
-- Handle multiple neighbours at the same direction. We need this since some rooms can be taller/wider
 
 Gameplay:
 - Clear entities on level transition (Rewrite entity system?)
