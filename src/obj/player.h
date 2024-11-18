@@ -71,9 +71,11 @@ namespace obj {
       Timer hurtTimer;
       Timer jumpBufferTimer;
       Timer onwayPlatformFallThroughTimer;
+      Timer _infiniteTimer; // Never to be reset. Just use for animations and such
       float _normalGravity;
       bool _jumpHold = false;
       bool _justJumped = false;
+      bool _canInteract = false;
       float backDashSpeed = 1.5f;
       float attackDelay = 280.0f;
       float slideDelay = 400.0f;

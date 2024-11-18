@@ -31,18 +31,21 @@ void GameplayScene::instantiateEntitites(Level* level) {
 
         npc->_position = { (float)e.position.x, (float)e.position.y };
 
+        npc->init();
+
         std::string name;
+        std::string dialogue;
         for(auto field : e.fieldValues) {
-          // @TODO: set fields on NPC
           if (field.identifier == "name") {
-            printf("Got name: %s\n", field.value.c_str());
+            name = field.value;
           }
           if (field.identifier == "dialogue") {
-            printf("Got dialogue: %s\n", field.value.c_str());
+            dialogue = field.value;
           }
         }
 
-        npc->init();
+        ((obj::Npc*)npc)->setProperties(name, dialogue);
+
         EntityManager::Instance()->addEntity(npc);
       }
       else {

@@ -1,4 +1,5 @@
 #include "player.h"
+#include <cmath>
 
 float calcFriction(float v, float friction) {
   if (std::abs(v) > 0.01) {
@@ -167,6 +168,19 @@ void obj::Player::update(float dt) {
   AbstractGameObject::update(dt);
   InputHandler* inputHandler = InputHandler::Instance();
   isMoving = false;
+
+  auto entitiesTouching = _collidable.objectExistsAt(_collidable.rect);
+
+  _canInteract = false;
+  for(auto entity : entitiesTouching) {
+    if (entity->getType() == GAME_OBJECT::NPC && _gravity.onFloor) {
+      _canInteract = true;
+    }
+  }
+
+  if (_canInteract) {
+    printf("can interact\n");
+  }
 
   if (dead) {
     _animator.setAnimation("die");
@@ -513,11 +527,20 @@ void obj::Player::onInputReleased(int button) {
 void obj::Player::draw(Renderer* renderer) {
   _renderable.textureRect = _animator.getFrame();
   _renderable.texture = _animator.getTexture();
-  
-  Rect sr = {0,0,4,12};
-  Rect dr = {(int)_position.x, (int)-_position.y,4,12};
-
-  renderer->renderTexture(_interactableTexture,&sr, &dr, SDL_FLIP_NONE);
-
   AbstractGameObject::draw(renderer);
+
+  // Draw interactable
+  if (_canInteract) {
+    int yAdded = sin(_infiniteTimer.elapsed() / 100) * 2;
+    Rect sr = {0,0,6,14};
+    //Rect dr = {(int)_collidable.boundingBox.x, (int)_position.y - 12 ,4,12};
+    RectF playerR = _collidable.addBoundingBox(_position);
+    Rect dr = { 
+      (int)(playerR.x + playerR.w / 2) - 2 - (direction == "left" ? 1 : 0),
+      (int)(playerR.y - 22) + yAdded,
+      sr.w,
+      sr.h 
+    };
+    renderer->renderTexture(_interactableTexture,&sr, &dr, SDL_FLIP_NONE);
+  }
 }
