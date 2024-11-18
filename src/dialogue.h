@@ -36,6 +36,10 @@ public:
     _timer = Timer();
   }
 
+  ~Dialogue() {
+    delete _font;
+  }
+
   bool init() {
     SDL_Surface* surface = IMG_Load(FRAME_TEXTURE_PATH);
     if (surface == NULL) {

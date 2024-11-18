@@ -72,7 +72,7 @@ public:
     return &debugRectangles;
   }
 
-  void debugEntities(const std::vector<std::shared_ptr<AbstractGameObject>>& entities) {
+  void debugEntities(const std::list<AbstractGameObject*>& entities) {
     if (!imguiVisible) {
       return;
     }

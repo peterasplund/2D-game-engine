@@ -1,7 +1,7 @@
 #include "map.h"
 
-NeighBourDirection neighbourDirectionFromLetter(std::string c) {
-  switch (c[0]) {
+NeighBourDirection neighbourDirectionFromLetter(char c) {
+  switch (c) {
     case 'n':
       return NeighBourDirection::N;
     case 'e':
@@ -14,7 +14,7 @@ NeighBourDirection neighbourDirectionFromLetter(std::string c) {
       printf("Error: One or more  level is overlapping\n");
       exit(1);
     default:
-      printf("Error: \"%c\" not a direction\n", c[0]);
+      printf("Error: \"%c\" not a direction\n", c);
       exit(1);
   }
 }

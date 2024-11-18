@@ -14,7 +14,7 @@ namespace obj {
 
         this->_persist = false;
         this->_collidable.boundingBox = { 
-          35, 20, 
+          35, 112, 
           60,
           112 - 50
         };
@@ -27,6 +27,9 @@ namespace obj {
         */
         int tw = 75;
         int th = 75;
+
+        _position.y = _position.y - th + 16;
+        _position.x = _position.x - (int)(tw / 2);
 
         SDL_Texture* texture = AssetManager::Instance()->getTexture("assets/sprites/fruktkungen.png");
 
@@ -51,8 +54,6 @@ namespace obj {
         _animator.setAnimation("idle");
 
         this->_renderable.texture = texture;
-        _position.x = 255;
-        _position.y = 198;
       }
 
       void update(float dt) override {

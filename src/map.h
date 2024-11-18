@@ -146,7 +146,7 @@ public:
 
 enum NeighBourDirection { N, E, S, W };
 
-NeighBourDirection neighbourDirectionFromLetter(std::string c);
+NeighBourDirection neighbourDirectionFromLetter(char c);
 
 struct Level {
   World* world;

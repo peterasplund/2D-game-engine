@@ -3,21 +3,70 @@
 #include "../obj/npc.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
-std::shared_ptr<AbstractGameObject> GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
-  std::shared_ptr<AbstractGameObject> o = nullptr;
+AbstractGameObject* GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
+  AbstractGameObject* o = nullptr;
   switch (obj) {
     case GAME_OBJECT::PLAYER:
-      o = std::make_shared<obj::Player>();
+      o = new obj::Player();
       break;
     case GAME_OBJECT::NPC:
-      o = std::make_shared<obj::Npc>();
+      o = new obj::Npc();
       break;
     case GAME_OBJECT::DOOR:
-      o = std::make_shared<obj::Door>();
+      o = new obj::Door();
       break;
   }
 
   return o;
+}
+
+void GameplayScene::instantiateEntitites(Level* level) {
+  // Init entities
+  for(auto layer : level->layers) {
+    for(auto e : layer.entities) {
+      auto entityDef = _ldtkProject->entityDefs[e.uid];
+
+      if (entityDef.identifier == "NPC") {
+        auto npc = instantiateGameObject(GAME_OBJECT::NPC);
+
+        npc->_position = { (float)e.position.x, (float)e.position.y };
+
+        std::string name;
+        for(auto field : e.fieldValues) {
+          // @TODO: set fields on NPC
+          if (field.identifier == "name") {
+            printf("Got name: %s\n", field.value.c_str());
+          }
+          if (field.identifier == "dialogue") {
+            printf("Got dialogue: %s\n", field.value.c_str());
+          }
+        }
+
+        npc->init();
+        EntityManager::Instance()->addEntity(npc);
+      }
+      else {
+        // Tmp solution
+        if (entityDef.identifier == "Player" && _player != nullptr) {
+          continue;
+        }
+
+        auto it = gameObjects.find(entityDef.identifier);
+
+        if (it == gameObjects.end()) {
+          continue;
+        }
+
+        auto object = instantiateGameObject(it->second);
+        if (object != nullptr) {
+          object->_position = { (float)e.position.x, (float)e.position.y };
+          object->init();
+
+          EntityManager::Instance()->addEntity(object);
+        }
+      }
+    }
+  }
 }
 
 int min(int a, int b);
@@ -44,51 +93,11 @@ void GameplayScene::init() {
 
   Level* level = &_ldtkProject->levels[this->_level];
 
+  instantiateEntitites(level);
+
   for(auto layer : level->layers) {
     // Init tiles
     EntityManager::Instance()->setTileMap(level);
-
-    // Init entities
-    for(auto e : layer.entities) {
-      auto entityDef = _ldtkProject->entityDefs[e.uid];
-
-      if (entityDef.identifier == "NPC") {
-        /*
-        auto npc = instantiateGameObject(GAME_OBJECT::NPC);
-
-        npc->_position = { (float)e.position.x, (float)e.position.y };
-
-        std::string name;
-        for(auto field : e.fieldValues) {
-          // @TODO: set fields on NPC
-          if (field.identifier == "name") {
-            printf("Got name: %s\n", field.value.c_str());
-          }
-          if (field.identifier == "dialogue") {
-            printf("Got dialogue: %s\n", field.value.c_str());
-          }
-        }
-
-        npc->init();
-        EntityManager::Instance()->addEntity(npc);
-        */
-      }
-      else {
-        auto it = gameObjects.find(entityDef.identifier);
-
-        if (it == gameObjects.end()) {
-          continue;
-        }
-
-        auto object = instantiateGameObject(it->second);
-        if (object != nullptr) {
-          object->_position = { (float)e.position.x, (float)e.position.y };
-          object->init();
-
-          EntityManager::Instance()->addEntity(object);
-        }
-      }
-    }
   }
 
   _camera = camera();
@@ -115,8 +124,18 @@ void GameplayScene::init() {
 void GameplayScene::switchLevel(LevelTransition level) {
   this->_level = level.iid;
   Level* lvl = &_ldtkProject->levels[this->_level];
+  std::list<AbstractGameObject*> entities = EntityManager::Instance()->_entities;
+
+  for(AbstractGameObject* entity : EntityManager::Instance()->_entities) {
+    if (!entity->_persist) {
+      entity->dead = true;
+    }
+  }
+
   //EntityManager::Instance()->clearAllButConstantEntities();
   EntityManager::Instance()->setTileMap(lvl);
+
+  instantiateEntitites(lvl);
 
   _player->setPosition(pendingLevel.playerPosition);
   _player->_collidable.update(_player->_position);
@@ -153,7 +172,9 @@ void GameplayScene::update(float dt) {
   }
 
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
-    obj->update(dt);
+    if (obj != nullptr) {
+      obj->update(dt);
+    }
   }
 
   Level lvl = _ldtkProject->levels[this->_level];
@@ -224,6 +245,8 @@ void GameplayScene::update(float dt) {
   }
 
   _camera.update();
+
+  EntityManager::Instance()->update();
 }
 
 void GameplayScene::draw(Renderer* renderer) {
@@ -263,9 +286,13 @@ void GameplayScene::draw(Renderer* renderer) {
   // @TODO: handle drawing some tiles after objects depending on their z-setting in the tmx-format
   // Draw objects
   for(const auto &obj : EntityManager::Instance()->getEntities()) {
-    Rect objRect = obj->getTextureRect();
-    if (objRect.hasIntersection(&camera)) {
-      obj->draw(renderer);
+    if (obj != nullptr) {
+      Rect objRect = obj->getTextureRect();
+      if (objRect.hasIntersection(&camera)) {
+        if (obj != nullptr) {
+          obj->draw(renderer);
+        }
+      }
     }
   }
 

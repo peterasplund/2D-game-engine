@@ -12,7 +12,6 @@ Gameplay:
 - Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
 - Finish Dialogue system
 - Separate Font drawing from dialogue system to be able to print menus and such
-- Map manager with transition
 - Decided to use grid-based or free movement in overworld
 
 deps:

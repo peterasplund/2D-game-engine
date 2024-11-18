@@ -144,9 +144,9 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
   return response;
 }
 
-std::vector<std::shared_ptr<AbstractGameObject>> objectExistsAt(RectF rect) {
+std::vector<AbstractGameObject*> collidable::objectExistsAt(RectF rect) {
   auto entities = EntityManager::Instance()->getEntities();
-  std::vector<std::shared_ptr<AbstractGameObject>> response;
+  std::vector<AbstractGameObject*> response;
 
   for(const auto &entity : entities) {
     if (rect.hasIntersection(&entity->_collidable.rect)) {

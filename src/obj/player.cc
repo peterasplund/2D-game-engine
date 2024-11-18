@@ -12,7 +12,6 @@ float calcFriction(float v, float friction) {
 
 void obj::Player::init() {
   AbstractGameObject::init();
-
   _tag = OBJECT_TAG::PLAYER;
   _type = GAME_OBJECT::PLAYER;
   _persist = true;
@@ -143,6 +142,8 @@ void obj::Player::init() {
   this->_renderable.texture = texture;
   
   _normalGravity = _gravity.entityGravity;
+
+  _interactableTexture = AssetManager::Instance()->getTexture("assets/sprites/interactable.png");
 }
 
 Tile* obj::Player::tileAt(RectF rect, std::string property) {
@@ -512,6 +513,11 @@ void obj::Player::onInputReleased(int button) {
 void obj::Player::draw(Renderer* renderer) {
   _renderable.textureRect = _animator.getFrame();
   _renderable.texture = _animator.getTexture();
+  
+  Rect sr = {0,0,4,12};
+  Rect dr = {(int)_position.x, (int)-_position.y,4,12};
+
+  renderer->renderTexture(_interactableTexture,&sr, &dr, SDL_FLIP_NONE);
 
   AbstractGameObject::draw(renderer);
 }

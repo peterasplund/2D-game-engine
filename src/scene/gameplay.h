@@ -25,7 +25,7 @@ class GameplayScene : public Scene
 private:
   Renderer* _renderer;
   camera _camera;
-  std::shared_ptr<AbstractGameObject> _player;
+  AbstractGameObject* _player;
   Bg* bg1;
   Bg* bg2;
   Hud* hud;
@@ -34,13 +34,20 @@ private:
   std::string _level;
   World* _ldtkProject;
   bool loaded = false;
-  std::shared_ptr<AbstractGameObject> instantiateGameObject(GAME_OBJECT);
+  AbstractGameObject* instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
   int transitionTimer = 0;
   bool isFadingIn = false;
   LevelTransition pendingLevel = { "", {0,0} };
   void drawFade();
+  void instantiateEntitites(Level* level);
 public:
+  ~GameplayScene() {
+    delete bg1;
+    delete bg2;
+    delete hud;
+    delete mapHud;
+  }
   GameplayScene(Renderer* renderer, World* ldtkProject, std::string level) : Scene(renderer) {
     _renderer = renderer;
     _level = level;

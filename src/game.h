@@ -5,7 +5,6 @@
 #include "window.h"
 #include "inputHandler.h"
 #include "sceneManager.h"
-#include "scene.h"
 #include "scene/gameplay.h"
 #include "timer.h"
 #include "renderer.h"
@@ -35,7 +34,6 @@ public: Game() {
 
     //dialogue->init();
     //dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
-
 
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
@@ -100,8 +98,12 @@ public: Game() {
         // comment out for now since we're using VSYNC
         //SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
       //}
-
     }
+
+    delete _gameplayScene;
+    delete _sceneManager;
+    delete dialogue;
+    EntityManager::release();
   }
 
   ~Game() {

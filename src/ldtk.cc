@@ -1,6 +1,9 @@
 #include "ldtk.h"
 #include "assetManager.h"
 #include <fstream>
+#include <algorithm>
+#include <vector>
+#include <iostream>
 
 using json = nlohmann::json;
 
@@ -85,6 +88,10 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
         }
       }
       layer.entities.push_back(entity);
+
+       std::sort(begin(layer.entities), end(layer.entities), [](const Entity &a, const Entity &b) {
+        return a.identifier == "Player" ? 1 : -1;
+      });
     }
   }
 
@@ -248,11 +255,13 @@ World createWorld(std::string filePath) {
 
       // Skip diagonals. We probably won't use them anyway
       if (dirString.length() > 1) {
-        continue;
+        //continue;
       }
 
-      NeighBourDirection dir = neighbourDirectionFromLetter(dirString);
-      level.neighbours[dir].push_back(iid);
+      for(char d : dirString) {
+        NeighBourDirection dir = neighbourDirectionFromLetter(d);
+        level.neighbours[dir].push_back(iid);
+      }
     }
 
     level.world = &world;

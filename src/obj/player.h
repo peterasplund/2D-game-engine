@@ -83,5 +83,6 @@ namespace obj {
       bool isMoving = false;
       bool onOneWayPlatform = false;
       bool dead = false;
+      SDL_Texture* _interactableTexture;
   };
 }
