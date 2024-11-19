@@ -16,7 +16,7 @@
 const int LEVEL_FADE_SPEED = 14;
 
 struct LevelTransition {
-  std::string iid;
+  int iid;
   v2f playerPosition;
 };
 
@@ -25,20 +25,20 @@ class GameplayScene : public Scene
 private:
   Renderer* _renderer;
   camera _camera;
-  AbstractGameObject* _player;
+  AbstractGameObject* _player = nullptr;
   Bg* bg1;
   Bg* bg2;
   Hud* hud;
   MapHud* mapHud;
   //Tilemap* tilemap;
-  std::string _level;
+  int _level;
   World* _ldtkProject;
   bool loaded = false;
   AbstractGameObject* instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
   int transitionTimer = 0;
   bool isFadingIn = false;
-  LevelTransition pendingLevel = { "", {0,0} };
+  LevelTransition pendingLevel = { -1, {0,0} };
   void drawFade();
   void instantiateEntitites(Level* level);
 public:
@@ -48,10 +48,25 @@ public:
     delete hud;
     delete mapHud;
   }
-  GameplayScene(Renderer* renderer, World* ldtkProject, std::string level) : Scene(renderer) {
+  GameplayScene(Renderer* renderer, World* world) : Scene(renderer) {
     _renderer = renderer;
-    _level = level;
-    _ldtkProject = ldtkProject;
+    _ldtkProject = world;
+
+    // find player in levels
+    for(auto lvl : _ldtkProject->levels) {
+      for(auto layer : lvl.layers) {
+        for(auto entity : layer.entities) {
+          if (entity.identifier == "Player") {
+            this->_level = lvl.iid;
+          }
+        }
+      }
+    }
+
+    if (_level == -1) {
+      printf("Couldn't find start position for player\n");
+      exit(1);
+    }
   }
 
   void init();

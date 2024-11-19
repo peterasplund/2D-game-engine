@@ -15,18 +15,18 @@ MapHud::MapHud(Renderer* renderer, World* world, v2i position) {
   for(auto level : world->levels) {
     MapCell cell;
     
-    cell.iid = level.first;
+    cell.iid = level.iid;
     cell.type = CellType::Normal;
-    cell.position = level.second.cellPosition;
+    cell.position = level.cellPosition;
     cell.size = {
-      level.second.tilesWide / tilesInCellX,
-      level.second.tilesTall / tilesInCellY,
+      level.tilesWide / tilesInCellX,
+      level.tilesTall / tilesInCellY,
     };
 
-    if (level.second.neighbours[NeighBourDirection::N].size() == 0) { cell.north = BorderValue::Wall; }
-    if (level.second.neighbours[NeighBourDirection::E].size() == 0) { cell.east = BorderValue::Wall; }
-    if (level.second.neighbours[NeighBourDirection::S].size() == 0) { cell.south = BorderValue::Wall; }
-    if (level.second.neighbours[NeighBourDirection::W].size() == 0) { cell.west = BorderValue::Wall; }
+    if (level.neighbours[NeighBourDirection::N].size() == 0) { cell.north = BorderValue::Wall; }
+    if (level.neighbours[NeighBourDirection::E].size() == 0) { cell.east = BorderValue::Wall; }
+    if (level.neighbours[NeighBourDirection::S].size() == 0) { cell.south = BorderValue::Wall; }
+    if (level.neighbours[NeighBourDirection::W].size() == 0) { cell.west = BorderValue::Wall; }
 
     _cells.push_back(cell);
   }
@@ -126,7 +126,7 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
   }
 }
 
-void MapHud::draw(std::string currentLevel, v2i playerTilePosition) {
+void MapHud::draw(int currentLevel, v2i playerTilePosition) {
   for(auto cell : _cells) {
     Marker marker = currentLevel ==  cell.iid ? Marker::Player : Marker::None;
 

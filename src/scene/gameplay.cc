@@ -21,7 +21,6 @@ AbstractGameObject* GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
 }
 
 void GameplayScene::instantiateEntitites(Level* level) {
-  // Init entities
   for(auto layer : level->layers) {
     for(auto e : layer.entities) {
       auto entityDef = _ldtkProject->entityDefs[e.uid];
@@ -76,7 +75,7 @@ int min(int a, int b);
 int max(int a, int b);
 
 void GameplayScene::drawFade() {
-  if  (pendingLevel.iid != "") {
+  if  (pendingLevel.iid != -1) {
     int fade = max(min(transitionTimer, 255), 0);
     //int fade = transitionTimer < 0 ? 0 : transitionTimer > 255 ? 255 : 0;
     Rect fadeRect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
@@ -150,7 +149,7 @@ void GameplayScene::switchLevel(LevelTransition level) {
 }
 
 void GameplayScene::update(float dt) {
-  if (pendingLevel.iid != "") {
+  if (pendingLevel.iid != -1) {
     if (!isFadingIn) {
       transitionTimer += LEVEL_FADE_SPEED;
       if (transitionTimer >= 255) {
@@ -162,7 +161,7 @@ void GameplayScene::update(float dt) {
       transitionTimer -= LEVEL_FADE_SPEED;
       if (transitionTimer <= 0) {
         isFadingIn = false;
-        pendingLevel = { "", {0,0} };
+        pendingLevel = { -1, {0,0} };
       }
     }
 
@@ -231,7 +230,8 @@ void GameplayScene::update(float dt) {
   }
 
   if (nextLevel != nullptr) {
-    std::string id = nextLevel->iid;
+    int id = nextLevel->iid;
+    printf("goto: %d\n", nextLevel->iid);
     v2i oldWorldPosition = _ldtkProject->levels[this->_level].cellPositionPx;
     v2i newWorldPosition = _ldtkProject->levels[id].cellPositionPx;
 

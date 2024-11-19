@@ -38,7 +38,7 @@ public: Game() {
     SceneManager* _sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, &world, "58fd1e00-d7b0-11ee-a88e-07c07feef70f");
+    GameplayScene* _gameplayScene = new GameplayScene(renderer, &world);
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);

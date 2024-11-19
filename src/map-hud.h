@@ -34,7 +34,7 @@ struct MapCell {
   v2i size;
   CellType type;
 
-  std::string iid;
+  int iid;
 
   BorderValue north = BorderValue::Open;
   BorderValue east = BorderValue::Open;
@@ -53,5 +53,5 @@ private:
   int _worldCellHeight;
 public:
   MapHud(Renderer* renderer, World* world, v2i position);
-  void draw(std::string currentLevel, v2i playerTilePosition);
+  void draw(int currentLevel, v2i playerTilePosition);
 };

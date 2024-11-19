@@ -77,6 +77,11 @@ struct TilesetTag {
   } 
 ],
 */
+static std::map<int, int> tilesetUidMap;
+static std::map<int, int> entityUidMap;
+static std::map<int, int> layerDefUidMap;
+static std::map<std::string, int> levelUidMap;
+
 struct Tileset {
   int id;
   SDL_Texture *texture;
@@ -156,7 +161,7 @@ struct Level {
   int tilesTall;
   int tileSize;
 
-  std::string iid;
+  int iid;
   v2i cellPosition;
   v2i cellPositionPx;
   v2i cellSize; // How many cells the level takes up
@@ -180,11 +185,12 @@ struct LayerDef {
 };
 
 struct World {
-  std::map<std::string, Level> levels;
-  std::map<int, std::map<int, Level*>> levelsByCells;
-  std::map<int, LayerDef> layerDefs;
-  std::map<int, EntityDef> entityDefs;
-  std::map<int, Tileset> tilesetDefs;
+  std::vector<Level> levels;
+  std::vector<LayerDef> layerDefs;
+  std::vector<EntityDef> entityDefs;
+  std::vector<Tileset> tilesetDefs;
+
+  Level*** levelsByCells;
 
   int tileSize;
   int worldCellWidth;
