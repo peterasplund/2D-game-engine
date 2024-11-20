@@ -190,8 +190,9 @@ struct World {
   std::vector<EntityDef> entityDefs;
   std::vector<Tileset> tilesetDefs;
 
-  Level*** levelsByCells;
+  Level** levelsByCells;
 
+  v2i mapSizeInCells;
   int tileSize;
   int worldCellWidth;
   int worldCellHeight;

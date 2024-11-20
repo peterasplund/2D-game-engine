@@ -280,24 +280,26 @@ World createWorld(std::string filePath) {
     i ++;
   }
 
-  int xMax = 0;
-  int yMax = 0;
+  world.mapSizeInCells.x = 0;
+  world.mapSizeInCells.y = 0;
+
   for(auto level : world.levels) {
-    xMax = max(xMax, level.cellSize.x + level.cellPosition.x);
-    yMax = max(yMax, level.cellSize.y + level.cellPosition.y);
+    world.mapSizeInCells.x = max(world.mapSizeInCells.x, level.cellSize.x + level.cellPosition.x);
+    world.mapSizeInCells.y = max(world.mapSizeInCells.y, level.cellSize.y + level.cellPosition.y);
   }
 
+  int xMax = world.mapSizeInCells.x;
+  int yMax = world.mapSizeInCells.y;
+
   // Allocate for the levelsByCells lookup
-  world.levelsByCells = (Level ***)malloc(xMax * sizeof(Level**));
-  for (int i = 0; i < xMax; i++) {
-    world.levelsByCells[i] = (Level**)malloc(yMax * sizeof(Level*));
-  }
+  world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level*));
 
   for(Level level : world.levels) {
     for (int x = 0; x < level.cellSize.x; x ++) {
       for (int y = 0; y < level.cellSize.y; y ++) {
-        printf("insert at: (%d, %d): %d\n", level.cellPosition.x + x, level.cellPosition.y + y, level.iid);
-        world.levelsByCells[level.cellPosition.x + x][level.cellPosition.y + y] = &world.levels[level.iid];
+        int idx = (((level.cellPosition.y + y) * xMax) + level.cellPosition.x);
+
+        world.levelsByCells[idx] = &world.levels[level.iid];
       }
     }
   }
