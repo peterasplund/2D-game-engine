@@ -58,24 +58,24 @@ v2i Layer::getTilePos(uint32_t id) {
   return {-1, -1};
 }
 
-std::vector<int> Level::getIndicesWithinRect(Rect r) {
+void Level::getIndicesWithinRect(Rect r, std::vector<int>& out) {
   int tileWidth = this->tileSize;
   int tileHeight = this->tileSize;
   int maxTileId = tilesWide * tilesTall;
-  std::vector<int> indices;
 
-  for (int y = floor((r.top() - 1) / tileHeight) * tileHeight; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
-    for (int x = floor((r.left() - 1) / tileWidth) * tileWidth; x <= ceil(r.right() / tileWidth) * tileWidth; x += tileWidth) {
+  int yStart = floor((r.top() - 1) / tileHeight) * tileHeight;
+  int xStart = floor((r.left() - 1) / tileWidth) * tileWidth;
+
+  for (int y = yStart; y <= ceil(r.bottom() / tileHeight) * tileHeight; y += tileHeight) {
+    for (int x = xStart; x <= ceil(r.right() / tileWidth) * tileWidth; x += tileWidth) {
       if (x < tileWidth * tilesWide && y < tileWidth * tilesTall) {
         int idx = this->getIdxFromPoint({x, y});
         if (idx != -1 && idx >= 0 && idx <= maxTileId) {
-          indices.push_back(idx);
+          out.push_back(idx);
         }
       }
     }
   }
-
-  return indices;
 }
 
 Rect Level::getTileRect(int tileIdx) {
@@ -93,6 +93,19 @@ Rect Level::getTileRect(int tileIdx) {
   };
 }
 
+int Level::getTileSize() {
+  return this->world->tileSize;
+}
+
 Level* World::getLevelByCell(v2i cellPosition) {
-  return levelsByCells[(cellPosition.y * mapSizeInCells.x) + cellPosition.x];
+  return levelsByCells[(cellPosition.y * worldSizeInCells.x) + cellPosition.x];
+}
+
+v2i World::getCellByPx(v2i px, int levelId) {
+  v2i tilePos = (px / tileSize);
+  Level* lvl = &levels[levelId];
+  return {
+      (tilePos.x / cellSize.x) + lvl->cellPosition.x,
+      (tilePos.y / cellSize.y) + lvl->cellPosition.y,
+  };
 }

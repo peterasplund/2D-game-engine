@@ -2,6 +2,8 @@
 #include "../obj/enemy.h"
 #include "../obj/npc.h"
 
+GameState gameState;
+
 // Use some configuration place to specify all game objects. Maybe even glob the object directory (bad idea?)
 AbstractGameObject* GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
   AbstractGameObject* o = nullptr;
@@ -23,7 +25,7 @@ AbstractGameObject* GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
 void GameplayScene::instantiateEntitites(Level* level) {
   for(auto layer : level->layers) {
     for(auto e : layer.entities) {
-      auto entityDef = _ldtkProject->entityDefs[e.uid];
+      auto entityDef = world->entityDefs[e.uid];
 
       if (entityDef.identifier == "NPC") {
         auto npc = instantiateGameObject(GAME_OBJECT::NPC);
@@ -86,14 +88,25 @@ void GameplayScene::drawFade() {
 }
 
 void GameplayScene::init() {
-  mapHud = new MapHud(_renderer, _ldtkProject, { (WINDOW_WIDTH / 4) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5 ), 8 });
+  int numCells = 0;
+
+  for (int i = 0; i < world->levels.size(); i ++) {
+    numCells += world->levels[i].cellSize.x * world->levels[i].cellSize.y;
+  }
+
+  gameState.visited.resize(numCells);
+  for(int i = 0; i < numCells; i ++) {
+    gameState.visited[i] = false;
+  }
+
+  mapHud = new MapHud(_renderer, world, { (WINDOW_WIDTH / 4) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5 ), 8 });
 
   gameObjects = {
     { "Player", GAME_OBJECT::PLAYER },
     { "door", GAME_OBJECT::DOOR },
   };
 
-  Level* level = &_ldtkProject->levels[this->_level];
+  Level* level = &world->levels[this->_level];
 
   instantiateEntitites(level);
 
@@ -125,7 +138,7 @@ void GameplayScene::init() {
 
 void GameplayScene::switchLevel(LevelTransition level) {
   this->_level = level.iid;
-  Level* lvl = &_ldtkProject->levels[this->_level];
+  Level* lvl = &world->levels[this->_level];
   std::list<AbstractGameObject*> entities = EntityManager::Instance()->_entities;
 
   for(AbstractGameObject* entity : EntityManager::Instance()->_entities) {
@@ -179,32 +192,27 @@ void GameplayScene::update(float dt) {
     }
   }
 
-  Level lvl = _ldtkProject->levels[this->_level];
+  Level lvl = world->levels[this->_level];
   RectF playerRect = _player->_collidable.addBoundingBox(_player->_position);
 
   char dir = '-';
   Level* nextLevel = nullptr;
   v2f newPlayerPos = _player->getPosition();
-
-  v2i playerTilePosition = (_player->_position / _ldtkProject->tileSize);
-  v2i playerCellGlobal = {
-      (playerTilePosition.x / _ldtkProject->worldCellWidth) + lvl.cellPosition.x,
-      (playerTilePosition.y / _ldtkProject->worldCellHeight) + lvl.cellPosition.y,
-  };
+  v2i playerCellPos = world->getCellByPx(_player->_position,  this->_level);
 
   if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
       dir = 'e';
-      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x + 1, playerCellGlobal.y });
+      nextLevel = world->getLevelByCell({ playerCellPos.x + 1, playerCellPos.y });
       newPlayerPos.x = -playerRect.w - (playerRect.w / 2);
     }
   }
   else if (playerRect.right() <= 1) {
     if (lvl.neighbours[NeighBourDirection::W].size() > 0) {
       dir = 'w';
-      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x - 1, playerCellGlobal.y });
+      nextLevel = world->getLevelByCell({ playerCellPos.x - 1, playerCellPos.y });
 
-      int tilesWide = _ldtkProject->levels[nextLevel->iid].tilesWide;
+      int tilesWide = world->levels[nextLevel->iid].tilesWide;
 
       newPlayerPos.x = (tilesWide * lvl.tileSize) - playerRect.w - (playerRect.w / 2);
     }
@@ -213,7 +221,7 @@ void GameplayScene::update(float dt) {
     if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
       dir = 's';
 
-      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x, playerCellGlobal.y + 1 });
+      nextLevel = world->getLevelByCell({ playerCellPos.x, playerCellPos.y + 1 });
       newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
     }
   }
@@ -221,9 +229,9 @@ void GameplayScene::update(float dt) {
     if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
       dir = 'n';
 
-      nextLevel = _ldtkProject->getLevelByCell({ playerCellGlobal.x, playerCellGlobal.y - 1 });
+      nextLevel = world->getLevelByCell({ playerCellPos.x, playerCellPos.y - 1 });
 
-      int tilesTall = _ldtkProject->levels[nextLevel->iid].tilesTall;
+      int tilesTall = world->levels[nextLevel->iid].tilesTall;
 
       newPlayerPos.y = (tilesTall * lvl.tileSize) - playerRect.h - (playerRect.h / 2);
     }
@@ -232,8 +240,8 @@ void GameplayScene::update(float dt) {
   if (nextLevel != nullptr) {
     int id = nextLevel->iid;
     printf("goto: %d\n", nextLevel->iid);
-    v2i oldWorldPosition = _ldtkProject->levels[this->_level].cellPositionPx;
-    v2i newWorldPosition = _ldtkProject->levels[id].cellPositionPx;
+    v2i oldWorldPosition = world->levels[this->_level].cellPositionPx;
+    v2i newWorldPosition = world->levels[id].cellPositionPx;
 
     v2i diff = newWorldPosition - oldWorldPosition;
 
@@ -249,13 +257,17 @@ void GameplayScene::update(float dt) {
 
   _camera.update();
 
+  if (pendingLevel.iid == -1) {
+    gameState.visited[(playerCellPos.y * world->worldSizeInCells.x) + playerCellPos.x] = true;
+  }
+
   EntityManager::Instance()->update();
 }
 
 void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
   // v2f cameraOffset = { (float)camera.x, (float)camera.y };
-  Level* level = &_ldtkProject->levels[this->_level];
+  Level* level = &world->levels[this->_level];
 
   // bg1->draw(renderer->getSdlRenderer(), 0);
   // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
@@ -265,7 +277,7 @@ void GameplayScene::draw(Renderer* renderer) {
       continue;
     }
 
-    Tileset tileset = _ldtkProject->tilesetDefs[layer.def->tilesetId];
+    Tileset tileset = world->tilesetDefs[layer.def->tilesetId];
 
     for(uint16_t i = 0; i < layer.tiles.size(); i ++) {
       Tile tile = layer.tiles[i];
@@ -303,7 +315,7 @@ void GameplayScene::draw(Renderer* renderer) {
   
   DebugPrinter::Instance()->draw(renderer);
 
-  mapHud->draw(_level, _player->_position / level->tileSize);
+  mapHud->draw(_level, _player->_position);
 
   this->drawFade();
 }

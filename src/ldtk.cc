@@ -184,8 +184,10 @@ World createWorld(std::string filePath) {
   World world;
 
   world.tileSize = data["defaultGridSize"];
-  world.worldCellWidth = (int)data["worldGridWidth"] / world.tileSize;
-  world.worldCellHeight = (int)data["worldGridHeight"] / world.tileSize;
+  world.cellSize = {
+    (int)data["worldGridWidth"] / world.tileSize,
+    (int)data["worldGridHeight"] / world.tileSize,
+  };
 
   printf("> parsing tileset defs\n");
 
@@ -253,14 +255,14 @@ World createWorld(std::string filePath) {
 
     // Save global world position
     level.cellPosition = {
-      (level.cellPositionPx.x / world.worldCellWidth) / world.tileSize,
-      (level.cellPositionPx.y / world.worldCellHeight) / world.tileSize,
+      (level.cellPositionPx.x / world.cellSize.x) / world.tileSize,
+      (level.cellPositionPx.y / world.cellSize.y) / world.tileSize,
     };
 
     // Save global world position
     level.cellSize = {
-      level.tilesWide / world.worldCellWidth,
-      level.tilesTall / world.worldCellHeight,
+      level.tilesWide / world.cellSize.x,
+      level.tilesTall / world.cellSize.y,
     };
 
     // neighbours
@@ -280,16 +282,16 @@ World createWorld(std::string filePath) {
     i ++;
   }
 
-  world.mapSizeInCells.x = 0;
-  world.mapSizeInCells.y = 0;
+  world.worldSizeInCells.x = 0;
+  world.worldSizeInCells.y = 0;
 
   for(auto level : world.levels) {
-    world.mapSizeInCells.x = max(world.mapSizeInCells.x, level.cellSize.x + level.cellPosition.x);
-    world.mapSizeInCells.y = max(world.mapSizeInCells.y, level.cellSize.y + level.cellPosition.y);
+    world.worldSizeInCells.x = max(world.worldSizeInCells.x, level.cellSize.x + level.cellPosition.x);
+    world.worldSizeInCells.y = max(world.worldSizeInCells.y, level.cellSize.y + level.cellPosition.y);
   }
 
-  int xMax = world.mapSizeInCells.x;
-  int yMax = world.mapSizeInCells.y;
+  int xMax = world.worldSizeInCells.x;
+  int yMax = world.worldSizeInCells.y;
 
   // Allocate for the levelsByCells lookup
   world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level*));
@@ -303,6 +305,11 @@ World createWorld(std::string filePath) {
       }
     }
   }
+
+  tilesetUidMap.clear();
+  entityUidMap.clear();
+  layerDefUidMap.clear();
+  levelUidMap.clear();
 
   printf("Successfully loaded the world map\n\n");
 

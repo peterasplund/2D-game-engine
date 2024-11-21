@@ -31,7 +31,6 @@ enum class Marker {
 
 struct MapCell {
   v2i position;
-  v2i size;
   CellType type;
 
   int iid;
@@ -46,6 +45,8 @@ class MapHud {
 private:
   Renderer* _renderer;
   v2i _position;
+  v2i _mapSizeInCells;
+  World* world;
   std::vector<MapCell> _cells;
   void drawCell(MapCell cell, Marker marker, v2i playerTilePosition);
 
@@ -53,5 +54,5 @@ private:
   int _worldCellHeight;
 public:
   MapHud(Renderer* renderer, World* world, v2i position);
-  void draw(int currentLevel, v2i playerTilePosition);
+  void draw(int currentLevel, v2i playerPosition);
 };

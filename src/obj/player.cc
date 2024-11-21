@@ -246,9 +246,9 @@ void obj::Player::update(float dt) {
 
     Tile* onLadder = tileAt({
       round(_collidable.rect.x),
-      _collidable.rect.y,
+      _collidable.rect.y - 9,
       floor(_collidable.rect.w),
-      _collidable.rect.h
+      _collidable.rect.h - 9
     }, "Ladder");
 
     if (onLadder == nullptr) {
@@ -387,9 +387,11 @@ void obj::Player::update(float dt) {
           auto tileset = &EntityManager::Instance()->getTilemap()->world->tilesetDefs[tile.tilesetId];
 
           if (tileset->tileHasTag(tile.tile.getTileId(), "Ladder")) {
-            _position.x = tile.rect.x - 23;
-            state = State::CLIMBING;
-            return;
+            if (tile.rect.top() <= _collidable.rect.bottom() - 30) {
+              _position.x = tile.rect.x - 23;
+              state = State::CLIMBING;
+              return;
+            }
           }
         }
       }

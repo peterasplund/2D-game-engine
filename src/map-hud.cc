@@ -1,57 +1,76 @@
 #include "map-hud.h"
+#include "globals.h"
+
+extern GameState gameState;
 
 MapHud::MapHud(Renderer* renderer, World* world, v2i position) {
+
   _renderer = renderer;
   _position = position;
 
   int x, y, w, h;
 
-  _worldCellWidth = world->worldCellWidth;
-  _worldCellHeight = world->worldCellHeight;
+  _worldCellWidth = world->cellSize.x;
+  _worldCellHeight = world->cellSize.y;
 
-  int tilesInCellX = world->worldCellWidth;
-  int tilesInCellY = world->worldCellHeight;
+  _mapSizeInCells = world->worldSizeInCells;
+
+  int tilesInCellX = world->cellSize.x;
+  int tilesInCellY = world->cellSize.y;
 
   for(auto level : world->levels) {
-    MapCell cell;
-    
-    cell.iid = level.iid;
-    cell.type = CellType::Normal;
-    cell.position = level.cellPosition;
-    cell.size = {
-      level.tilesWide / tilesInCellX,
-      level.tilesTall / tilesInCellY,
-    };
+    int levelWidth = level.cellSize.x;
+    int levelHeight = level.cellSize.y;
 
-    if (level.neighbours[NeighBourDirection::N].size() == 0) { cell.north = BorderValue::Wall; }
-    if (level.neighbours[NeighBourDirection::E].size() == 0) { cell.east = BorderValue::Wall; }
-    if (level.neighbours[NeighBourDirection::S].size() == 0) { cell.south = BorderValue::Wall; }
-    if (level.neighbours[NeighBourDirection::W].size() == 0) { cell.west = BorderValue::Wall; }
+    for (int x = 0; x < levelWidth; x++) {
+      for (int y = 0; y < levelHeight; y++) {
+        MapCell cell;
 
-    _cells.push_back(cell);
+        cell.iid = level.iid;
+        cell.type = CellType::Normal;
+        cell.position = level.cellPosition;
+        cell.position.x += x;
+        cell.position.y += y;
+
+        if (level.neighbours[NeighBourDirection::N].size() == 0) { cell.north = BorderValue::Wall; }
+        if (level.neighbours[NeighBourDirection::E].size() == 0) { cell.east = BorderValue::Wall; }
+        if (level.neighbours[NeighBourDirection::S].size() == 0) { cell.south = BorderValue::Wall; }
+        if (level.neighbours[NeighBourDirection::W].size() == 0) { cell.west = BorderValue::Wall; }
+
+        _cells.push_back(cell);
+      }
+    }
   }
+
+  this->world = world;
 }
 
-void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
+void MapHud::drawCell(MapCell cell, Marker marker, v2i playerCellPos) {
   Rect rect = {
     _position.x + (cell.position.x * MAP_HUD_CELL_WIDTH),
     _position.y + (cell.position.y * MAP_HUD_CELL_HEIGHT),
-    MAP_HUD_CELL_WIDTH * cell.size.x,
-    MAP_HUD_CELL_HEIGHT * cell.size.y,
+    MAP_HUD_CELL_WIDTH,
+    MAP_HUD_CELL_HEIGHT,
   };
 
   Rect innerRect = { rect.x + 1, rect.y + 1, rect.w - 1, rect.h - 1 };
 
-  switch (cell.type) {
-    case CellType::Normal:
-      _renderer->setColor(20, 20, 240, 255);
-      break;
-    case CellType::Save:
-      _renderer->setColor(240, 20, 20, 255);
-      break;
-    case CellType::Teleport:
-      _renderer->setColor(240, 240, 20, 255);
-      break;
+  int x = cell.position.x;
+  int y = cell.position.y;
+
+  _renderer->setColor(40, 40, 40, 255);
+  if (gameState.visited[(cell.position.y * _mapSizeInCells.x) + cell.position.x]) {
+    switch (cell.type) {
+      case CellType::Normal:
+        _renderer->setColor(20, 20, 240, 255);
+        break;
+      case CellType::Save:
+        _renderer->setColor(240, 20, 20, 255);
+        break;
+      case CellType::Teleport:
+        _renderer->setColor(240, 240, 20, 255);
+        break;
+    }
   }
 
 
@@ -63,14 +82,10 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
       _renderer->setColor(80, 80, 240, 255);
       int playerMarkerSize = 4;
 
-      v2i currentCell = {
-        (playerTilePosition.x / _worldCellWidth),
-        (playerTilePosition.y / _worldCellHeight),
-      };
-
       Rect playerMarker = { 
-        ((innerRect.x + (MAP_HUD_CELL_WIDTH - 2) / 2) - (playerMarkerSize / 2)) + (currentCell.x * MAP_HUD_CELL_WIDTH),
-        ((innerRect.y + (MAP_HUD_CELL_HEIGHT - 2) / 2) - (playerMarkerSize / 2)) + (currentCell.y * MAP_HUD_CELL_HEIGHT),
+        // @TODO: fix
+        ((innerRect.x + (MAP_HUD_CELL_WIDTH - 2) / 2) - (playerMarkerSize / 2)) + (playerCellPos.x * MAP_HUD_CELL_WIDTH),
+        ((innerRect.y + (MAP_HUD_CELL_HEIGHT - 2) / 2) - (playerMarkerSize / 2)) + (playerCellPos.y * MAP_HUD_CELL_HEIGHT),
         playerMarkerSize,
         playerMarkerSize
       };
@@ -78,6 +93,7 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
       break;
   }
 
+  /*
   _renderer->setColor(255, 255, 255, 255);
 
   // Draw walls (Outlines)
@@ -124,12 +140,19 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerTilePosition) {
     _renderer->renderRectFilled(&wall1, false);
     _renderer->renderRectFilled(&wall2, false);
   }
+  */
 }
 
-void MapHud::draw(int currentLevel, v2i playerTilePosition) {
-  for(auto cell : _cells) {
-    Marker marker = currentLevel ==  cell.iid ? Marker::Player : Marker::None;
+void MapHud::draw(int currentLevel, v2i playerPosition) {
+  v2i playerCellPos = world->getCellByPx(playerPosition,  currentLevel);
 
-    drawCell(cell, marker, playerTilePosition);
+  for(auto cell : _cells) {
+    Marker marker = Marker::None;
+
+    if (playerCellPos == cell.position) {
+      marker = Marker::Player;
+    }
+
+    drawCell(cell, marker, playerCellPos);
   }
 }

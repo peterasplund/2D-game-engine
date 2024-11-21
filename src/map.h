@@ -60,23 +60,7 @@ struct TilesetTag {
   std::vector<int> tileIds;
 };
 
-
-/*
-"enumTags": [
-  {
-    "enumValueId": "Solid",
-    "tileIds": [34,35,38,51,55,68,72,85,86,89,112,113,129,130,136,137,140,153,157,170,174,187,188,191,238,239,242,255,259,272,276,289,290,293,340,341,344,357,361,374,378,391,392,395]
-  }, 
-  { 
-    "enumValueId": "Ladder",
-    "tileIds": [731,732,733,748,749,750,765,766,767]
-  },
-  { 
-    "enumValueId": "Oneway",
-    "tileIds": [143,144,145,146,179,180,181,323,324,408,409]
-  } 
-],
-*/
+// tmp maps for when loading the tilemap world
 static std::map<int, int> tilesetUidMap;
 static std::map<int, int> entityUidMap;
 static std::map<int, int> layerDefUidMap;
@@ -168,9 +152,9 @@ struct Level {
 
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
-  std::vector<int> getIndicesWithinRect(Rect r);
-
+  void getIndicesWithinRect(Rect r, std::vector<int>& out);
   Rect getTileRect(int tileIdx);
+  int getTileSize();
 
   // NeighBourDirection, level id (the long kind)
   std::map<NeighBourDirection, std::vector<std::string>> neighbours;
@@ -192,10 +176,9 @@ struct World {
 
   Level** levelsByCells;
 
-  v2i mapSizeInCells;
+  v2i worldSizeInCells;
+  v2i cellSize;
   int tileSize;
-  int worldCellWidth;
-  int worldCellHeight;
-
-  Level* getLevelByCell(v2i cellPosition);
+  Level* getLevelByCell(v2i px);
+  v2i getCellByPx(v2i px, int levelId);
 };

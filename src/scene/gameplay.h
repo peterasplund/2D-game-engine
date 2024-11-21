@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "../abstractGameobject.h"
 #include "../obj/player.h"
 #include "../obj/door.h"
@@ -32,7 +33,7 @@ private:
   MapHud* mapHud;
   //Tilemap* tilemap;
   int _level;
-  World* _ldtkProject;
+  World* world;
   bool loaded = false;
   AbstractGameObject* instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
@@ -50,10 +51,10 @@ public:
   }
   GameplayScene(Renderer* renderer, World* world) : Scene(renderer) {
     _renderer = renderer;
-    _ldtkProject = world;
+    this->world = world;
 
     // find player in levels
-    for(auto lvl : _ldtkProject->levels) {
+    for(auto lvl : this->world->levels) {
       for(auto layer : lvl.layers) {
         for(auto entity : layer.entities) {
           if (entity.identifier == "Player") {

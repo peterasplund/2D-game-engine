@@ -105,21 +105,26 @@ bool dynamicRectVsRect(
 }
 
 std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
-  std::vector<TileExistsAtResponse> response;
+  static std::vector<TileExistsAtResponse> response;
+  response.clear();
+
   Level* t = EntityManager::Instance()->getTilemap();
-  std::vector<int> tiles = t->getIndicesWithinRect({ 
+  static std::vector<int> possibleIndices;
+  possibleIndices.clear();
+
+  t->getIndicesWithinRect({ 
     (int)round(rect.x),
     (int)round(rect.y),
     (int)round(rect.w),
     (int)round(rect.h)
-  });
+  }, possibleIndices);
   
   for(uint32_t layerId = 0; layerId < t->layers.size(); layerId++) {
     if (t->layers[layerId].tiles.size() == 0) {
       continue;
     }
 
-    for(int possibleIdx : tiles) {
+    for(int possibleIdx : possibleIndices) {
       Tile tile = t->layers[layerId].tiles[possibleIdx];
 
       if (tile.getActive()) {
@@ -146,7 +151,8 @@ std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
 
 std::vector<AbstractGameObject*> collidable::objectExistsAt(RectF rect) {
   auto entities = EntityManager::Instance()->getEntities();
-  std::vector<AbstractGameObject*> response;
+  static std::vector<AbstractGameObject*> response;
+  response.clear();
 
   for(const auto &entity : entities) {
     if (rect.hasIntersection(&entity->_collidable.rect)) {
@@ -177,15 +183,18 @@ void collidable::update(v2f position) {
 
 Rect getCollisionAt(RectF r) {
   Level* tilemap = EntityManager::Instance()->getTilemap();
-  std::vector<int> possibleIndices = tilemap->getIndicesWithinRect({
+  static std::vector<int> possibleIndices;
+  possibleIndices.clear();
+
+  tilemap->getIndicesWithinRect({
     (int)round(r.x),
     (int)round(r.y),
     (int)round(r.w),
     (int)round(r.h)
-  });
+  }, possibleIndices);
 
   for (uint32_t layer = 0; layer < tilemap->layers.size(); layer++) {
-    for (int possibleIdx : possibleIndices) {
+    for(int possibleIdx : possibleIndices) {
       auto layerDef = tilemap->layers[layer].def;
       if (layerDef->type != LayerType::TILES && layerDef->type != LayerType::INT_GRID) {
         continue;
