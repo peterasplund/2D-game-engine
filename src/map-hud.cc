@@ -83,9 +83,9 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerCellPos) {
       int playerMarkerSize = 4;
 
       Rect playerMarker = { 
-        // @TODO: fix
-        ((innerRect.x + (MAP_HUD_CELL_WIDTH - 2) / 2) - (playerMarkerSize / 2)) + (playerCellPos.x * MAP_HUD_CELL_WIDTH),
-        ((innerRect.y + (MAP_HUD_CELL_HEIGHT - 2) / 2) - (playerMarkerSize / 2)) + (playerCellPos.y * MAP_HUD_CELL_HEIGHT),
+        ((innerRect.x + (MAP_HUD_CELL_WIDTH - 2) / 2) - (playerMarkerSize / 2)) ,
+        ((innerRect.y + (MAP_HUD_CELL_HEIGHT - 2) / 2) - (playerMarkerSize / 2)),
+
         playerMarkerSize,
         playerMarkerSize
       };
@@ -93,7 +93,6 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerCellPos) {
       break;
   }
 
-  /*
   _renderer->setColor(255, 255, 255, 255);
 
   // Draw walls (Outlines)
@@ -140,7 +139,6 @@ void MapHud::drawCell(MapCell cell, Marker marker, v2i playerCellPos) {
     _renderer->renderRectFilled(&wall1, false);
     _renderer->renderRectFilled(&wall2, false);
   }
-  */
 }
 
 void MapHud::draw(int currentLevel, v2i playerPosition) {
@@ -151,6 +149,7 @@ void MapHud::draw(int currentLevel, v2i playerPosition) {
 
     if (playerCellPos == cell.position) {
       marker = Marker::Player;
+      //printf("x: %d, y: %d\n", cell.position.x, cell.position.y);
     }
 
     drawCell(cell, marker, playerCellPos);

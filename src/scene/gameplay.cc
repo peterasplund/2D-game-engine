@@ -1,6 +1,7 @@
 #include "gameplay.h"
 #include "../obj/enemy.h"
 #include "../obj/npc.h"
+#include "../obj/bat.h"
 
 GameState gameState;
 
@@ -26,6 +27,11 @@ void GameplayScene::instantiateEntitites(Level* level) {
   for(auto layer : level->layers) {
     for(auto e : layer.entities) {
       auto entityDef = world->entityDefs[e.uid];
+
+      // tmp bat
+      AbstractGameObject* bat = new obj::Bat();
+      bat->init();
+      EntityManager::Instance()->addEntity(bat);
 
       if (entityDef.identifier == "NPC") {
         auto npc = instantiateGameObject(GAME_OBJECT::NPC);
@@ -99,6 +105,10 @@ void GameplayScene::init() {
     gameState.visited[i] = false;
   }
 
+  damageNumberSystem = new DamageNumbersSystem();
+  damageNumberSystem->init();
+
+
   mapHud = new MapHud(_renderer, world, { (WINDOW_WIDTH / 4) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5 ), 8 });
 
   gameObjects = {
@@ -162,6 +172,8 @@ void GameplayScene::switchLevel(LevelTransition level) {
 }
 
 void GameplayScene::update(float dt) {
+  damageNumberSystem->update(dt);
+
   if (pendingLevel.iid != -1) {
     if (!isFadingIn) {
       transitionTimer += LEVEL_FADE_SPEED;
@@ -268,6 +280,8 @@ void GameplayScene::draw(Renderer* renderer) {
   RectF camera = _camera.getRect();
   // v2f cameraOffset = { (float)camera.x, (float)camera.y };
   Level* level = &world->levels[this->_level];
+
+  damageNumberSystem->draw(renderer);
 
   // bg1->draw(renderer->getSdlRenderer(), 0);
   // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);

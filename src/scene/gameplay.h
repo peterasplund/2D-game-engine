@@ -13,6 +13,7 @@
 #include "../hud.h"
 #include "../map.h"
 #include "../map-hud.h"
+#include "../obj/damageNumbers.h"
 
 const int LEVEL_FADE_SPEED = 14;
 
@@ -40,6 +41,7 @@ private:
   int transitionTimer = 0;
   bool isFadingIn = false;
   LevelTransition pendingLevel = { -1, {0,0} };
+  DamageNumbersSystem* damageNumberSystem;
   void drawFade();
   void instantiateEntitites(Level* level);
 public:
