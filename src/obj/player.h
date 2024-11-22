@@ -31,6 +31,7 @@ namespace obj {
       void onInputPressed(int button) override;
       void onInputReleased(int button) override;
       void draw(Renderer* renderer) override;
+      RectF swordHitBox;
 
     protected:
       /// How high the initial jump should be
@@ -48,7 +49,7 @@ namespace obj {
       /// Max run speed
       const float RUN_SPEED = 0.2f;
       /// How long to slide
-      const float SLIDE_POWER = 0.36f;
+      const float SLIDE_POWER = 0.4f;
       /// How fast to get to a stop
       const float SLIDE_DEACCELERATION = 0.004f;
       /// Jump buffer window in MS
@@ -85,6 +86,9 @@ namespace obj {
       bool isMoving = false;
       bool onOneWayPlatform = false;
       bool dead = false;
+      bool hasTileAbove = false;
+      Rect normalBoundingbox = {18, 15, 18, 28};
+      Rect crouchingBoundingbox = {18, 27, 18, 16};
       SDL_Texture* _interactableTexture;
   };
 }

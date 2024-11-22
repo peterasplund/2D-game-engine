@@ -12,7 +12,7 @@ void DebugPrinter::addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b) {
       *rect,
   });
 }
-  
+
 void DebugPrinter::draw(Renderer* renderer) {
   if (!*debugRectangles) {
     return;

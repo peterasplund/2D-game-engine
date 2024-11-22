@@ -24,14 +24,14 @@ AbstractGameObject* GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
 }
 
 void GameplayScene::instantiateEntitites(Level* level) {
+  // tmp bat
+  AbstractGameObject* bat = new obj::Bat();
+  bat->init();
+  EntityManager::Instance()->addEntity(bat);
+
   for(auto layer : level->layers) {
     for(auto e : layer.entities) {
       auto entityDef = world->entityDefs[e.uid];
-
-      // tmp bat
-      AbstractGameObject* bat = new obj::Bat();
-      bat->init();
-      EntityManager::Instance()->addEntity(bat);
 
       if (entityDef.identifier == "NPC") {
         auto npc = instantiateGameObject(GAME_OBJECT::NPC);
@@ -105,7 +105,7 @@ void GameplayScene::init() {
     gameState.visited[i] = false;
   }
 
-  damageNumberSystem = new DamageNumbersSystem();
+  damageNumberSystem = DamageNumbersSystem::Instance();
   damageNumberSystem->init();
 
 
@@ -281,8 +281,6 @@ void GameplayScene::draw(Renderer* renderer) {
   // v2f cameraOffset = { (float)camera.x, (float)camera.y };
   Level* level = &world->levels[this->_level];
 
-  damageNumberSystem->draw(renderer);
-
   // bg1->draw(renderer->getSdlRenderer(), 0);
   // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
@@ -330,6 +328,8 @@ void GameplayScene::draw(Renderer* renderer) {
   DebugPrinter::Instance()->draw(renderer);
 
   mapHud->draw(_level, _player->_position);
+
+  damageNumberSystem->draw(renderer);
 
   this->drawFade();
 }

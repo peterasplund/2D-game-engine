@@ -29,6 +29,9 @@ class AbstractGameObject {
     virtual bool contains(RectF other);
     virtual bool contains(AbstractGameObject other);
     virtual void onCollision(AbstractGameObject* other) {}; // @TODO: connect this
+    virtual void damage(int dmg) {
+      printf("base damage!\n");
+    };
     Rect getRect();
     RectF getRectFloat();
     RectF* getRectPointer();
@@ -46,6 +49,7 @@ class AbstractGameObject {
     bool getListensForCollisions();
     GAME_OBJECT getType();
     OBJECT_TAG getTag();
+    bool hurt = false;
   protected:
     GAME_OBJECT _type;
     OBJECT_TAG _tag;

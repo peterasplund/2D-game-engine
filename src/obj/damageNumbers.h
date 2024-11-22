@@ -22,10 +22,7 @@ struct DamageNumber {
   }
 
   void draw(Renderer* renderer, SDL_Texture* texture) {
-    //printf("y: %f, yPos: %d\n", value, yPos);
-
     for (int i = 0; i < dmgStringLen; i++) {
-
       int value = dmgString[i] - 48;
       Rect textureRect = {
         value * 8,
@@ -38,6 +35,16 @@ struct DamageNumber {
 
       int alpha = ((timer / NUMBER_LIFETIME) * -1) * 255;
 
+      if (damage > 950) {
+        SDL_SetTextureColorMod(texture, 255, 0, 0);
+      }
+      else if (damage > 875) {
+        SDL_SetTextureColorMod(texture, 255, 255, 0);
+      }
+      else {
+        SDL_SetTextureColorMod(texture, 255, 255, 255);
+      }
+
       SDL_SetTextureAlphaMod(texture, alpha);
       renderer->renderTexture(texture, &textureRect, &dr, SDL_FLIP_NONE);
     }
@@ -46,7 +53,7 @@ struct DamageNumber {
   void update(float dt) {
     timer += dt;
 
-    float value = (timer / NUMBER_LIFETIME) * (M_PI / 2); // 0 - PI/2
+    float value = (timer / NUMBER_LIFETIME) * (M_PI / 2);
     position.y -= (cos(value) * NUMBER_SPEED);
 
     if (timer >= NUMBER_LIFETIME) {
@@ -64,6 +71,15 @@ class DamageNumbersSystem {
       int th = 12;
 
       texture = AssetManager::Instance()->getTexture("assets/font.png");
+    }
+
+    static DamageNumbersSystem* Instance() {
+      static DamageNumbersSystem* _instance = nullptr;
+      if (_instance == nullptr) {
+        _instance = new DamageNumbersSystem();
+      }
+
+      return _instance;
     }
 
     void addNumber(int damage, v2i position) {
@@ -90,13 +106,6 @@ class DamageNumbersSystem {
           if (i > 0) {
             i --;
           }
-        }
-      }
-
-      if (InputHandler::Instance()->Instance()->isHeld(BUTTON::ATTACK)) {
-        if (numbers[numbersCount - 1].timer == 0 || numbers[numbersCount - 1].timer > 140) {
-          int value = ((float)(rand()) / (float)RAND_MAX) * 255;
-          addNumber(value, { 64, 64});
         }
       }
     }

@@ -11,11 +11,12 @@ namespace obj {
     public:
       void init() override {
         AbstractGameObject::init();
+        _type = GAME_OBJECT::ENEMY;
 
         this->_collidable.boundingBox = { 
-          35, 20, 
-          60,
-          112 - 50
+          0, 0, 
+          16,
+          16,
         };
 
         int tw = 16;
@@ -46,6 +47,9 @@ namespace obj {
         AbstractGameObject::update(dt);
         elapsedTime += dt;
         
+        if (_timer.elapsed() > 350) {
+          hurt = false;
+        }
       }
 
       void draw(Renderer* renderer) override {
@@ -62,14 +66,22 @@ namespace obj {
         }
       }
 
+    virtual void damage(int dmg) override {
+      if (!hurt) {
+        hp -= dmg;
+        hurt = true;
+        _timer.reset();
+      }
+    }
+
     protected:
-      GAME_OBJECT _type = GAME_OBJECT::DOOR;
       float SPEED = 0.005f;
       float AMPLITUDE = 15.0f;
       float elapsedTime = 0.0f;
       Animator _animator;
+
       Timer _timer;
+      int hp = 3000;
       float hurtTimer;
-      bool hurt = true;
   };
 }
