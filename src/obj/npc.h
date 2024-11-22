@@ -5,6 +5,7 @@
 #include "../assetManager.h"
 #include "../inputHandler.h"
 #include "../renderer.h"
+#include "../dialogue.h"
 
 namespace obj {
   class Npc : public AbstractGameObject {
@@ -53,6 +54,15 @@ namespace obj {
       void setProperties(std::string name, std::string dialogue) {
         _name = name;
         _dialogue = dialogue;
+      }
+
+      void talk() {
+        std::string message;
+        message.append(_name);
+        message.append("\n");
+        message.append(_dialogue);
+
+        Dialogue::Instance()->message(message);
       }
 
       void update(float dt) override {

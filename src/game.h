@@ -27,7 +27,6 @@ public: Game() {
     AssetManager::Instance()->init(sdl_renderer);
 
     Renderer* renderer = new Renderer(sdl_renderer);
-    Dialogue* dialogue = new Dialogue(renderer);
 
 
     World world = createWorld("assets/maps/LDtk_test.ldtk");
@@ -82,8 +81,6 @@ public: Game() {
 
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
-      dialogue->update();
-      dialogue->draw();
 
       imgui->drawBegin();
       imgui->debugEntities(EntityManager::Instance()->getEntities());
@@ -102,7 +99,6 @@ public: Game() {
 
     delete _gameplayScene;
     delete _sceneManager;
-    delete dialogue;
     EntityManager::release();
   }
 

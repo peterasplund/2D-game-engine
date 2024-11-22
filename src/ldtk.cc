@@ -74,19 +74,19 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
         EntityFieldValue fieldValue;
         int defUid = field["defUid"];;
         fieldValue.field = &world->entityDefs[entityUidMap[entity.uid]].fields[defUid];
-        switch (fieldValue.field->type) {
-          case Entity_Field_Tag::String:
+        //switch (fieldValue.field->type) {
+          //case Entity_Field_Tag::String:
             fieldValue.identifier = field["__identifier"];
             fieldValue.value = field["__value"];
             entity.fieldValues.push_back(fieldValue);
-            break;
-          case Entity_Field_Tag::Integer:
+            //break;
+          //case Entity_Field_Tag::Integer:
             // @TODO: implement when needed
-            break;
-          case Entity_Field_Tag::Float:
+            //break;
+          //case Entity_Field_Tag::Float:
             // @TODO: implement when needed
-            break;
-        }
+            //break;
+        //}
       }
       layer.entities.push_back(entity);
 

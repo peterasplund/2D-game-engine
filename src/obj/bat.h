@@ -39,16 +39,28 @@ namespace obj {
         this->_renderable.texture = texture;
         _position.x = 255;
         _position.y = 198;
+
+        _velocity.v.x = -0.3f;
       }
 
       void update(float dt) override {
-        _position.x -= 0.3f;
+
+        _position += _velocity.v;
         _position.y = AMPLITUDE * cos(SPEED / 2 * elapsedTime) + 50.0f;
         AbstractGameObject::update(dt);
         elapsedTime += dt;
         
         if (_timer.elapsed() > 350) {
           hurt = false;
+        }
+
+        if (_velocity.v.x > -0.3f) {
+          _velocity.v.x -= 0.02f;
+        }
+        else if (_velocity.v.x < 0.3f) {
+          _velocity.v.x = -0.3f;
+        }
+        else {
         }
       }
 

@@ -1,6 +1,7 @@
 #include "player.h"
 #include "../debugPrinter.h"
 #include "damageNumbers.h"
+#include "npc.h"
 #include <cmath>
 #include <cstdlib>
 
@@ -201,10 +202,10 @@ void obj::Player::update(float dt) {
   }
 
   swordHitBox = {
-      _position.x + (direction == "left" ? -10 : 36),
-      _position.y,
-      30.0f,
-      45.0f,
+      _position.x + (direction == "left" ? -0 : 36),
+      _position.y + 5.0f,
+      20.0f,
+      40.0f,
   };
 
   InputHandler *inputHandler = InputHandler::Instance();
@@ -217,6 +218,11 @@ void obj::Player::update(float dt) {
   for (auto entity : entitiesTouching) {
     if (entity->getType() == GAME_OBJECT::NPC && _gravity.onFloor) {
       _canInteract = true;
+
+      if (inputHandler->isHeld(BUTTON::UP)) {
+        ((obj::Npc*)entity)->talk();
+        return;
+      }
     }
   }
 
@@ -227,7 +233,15 @@ void obj::Player::update(float dt) {
         DamageNumbersSystem::Instance()->addNumber(
             value, {(int)(swordHitBox.left() + swordHitBox.w / 2 + 8),
                     swordHitBox.top()});
+
         entity->damage(value);
+
+        if (direction == "right") {
+          entity->_velocity.v.x += 1.7f;
+        }
+        else {
+          entity->_velocity.v.x -= 1.7f;
+        }
       }
     }
   }

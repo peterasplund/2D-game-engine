@@ -43,6 +43,7 @@ void GameplayScene::instantiateEntitites(Level* level) {
         std::string name;
         std::string dialogue;
         for(auto field : e.fieldValues) {
+          printf("ID: %s\n", field.identifier.c_str());
           if (field.identifier == "name") {
             name = field.value;
           }
@@ -94,6 +95,8 @@ void GameplayScene::drawFade() {
 }
 
 void GameplayScene::init() {
+  dialogue = Dialogue::Instance();
+  dialogue->init(_renderer);
   int numCells = 0;
 
   for (int i = 0; i < world->levels.size(); i ++) {
@@ -173,6 +176,11 @@ void GameplayScene::switchLevel(LevelTransition level) {
 
 void GameplayScene::update(float dt) {
   damageNumberSystem->update(dt);
+
+  dialogue->update();
+  if (Dialogue::Instance()->isDisplayingMessage()) {
+    return;
+  }
 
   if (pendingLevel.iid != -1) {
     if (!isFadingIn) {
@@ -328,6 +336,8 @@ void GameplayScene::draw(Renderer* renderer) {
   DebugPrinter::Instance()->draw(renderer);
 
   mapHud->draw(_level, _player->_position);
+
+  dialogue->draw();
 
   damageNumberSystem->draw(renderer);
 

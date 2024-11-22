@@ -14,6 +14,7 @@
 #include "../map.h"
 #include "../map-hud.h"
 #include "../obj/damageNumbers.h"
+#include "../dialogue.h"
 
 const int LEVEL_FADE_SPEED = 14;
 
@@ -32,6 +33,7 @@ private:
   Bg* bg2;
   Hud* hud;
   MapHud* mapHud;
+  Dialogue* dialogue;
   //Tilemap* tilemap;
   int _level;
   World* world;

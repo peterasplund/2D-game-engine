@@ -30,17 +30,28 @@ struct Message {
 
 class Dialogue {
 public:
-  Dialogue(Renderer* renderer) {
-    _renderer = renderer;
-    _font = new Font(_renderer);
-    _timer = Timer();
-  }
-
-  ~Dialogue() {
+  void destroy() {
     delete _font;
   }
 
-  bool init() {
+  static Dialogue* Instance() {
+    static Dialogue* _instance = nullptr;
+    if (_instance == nullptr) {
+      _instance = new Dialogue();
+    }
+
+    return _instance;
+  }
+
+  bool isDisplayingMessage() {
+    return _displayingMessage.length() > 0;
+  }
+
+  bool init(Renderer* renderer) {
+    _renderer = renderer;
+    _font = new Font(_renderer);
+    _timer = Timer();
+
     SDL_Surface* surface = IMG_Load(FRAME_TEXTURE_PATH);
     if (surface == NULL) {
       printf("Image load error: Path(%s) - Error(%s)\n", FRAME_TEXTURE_PATH, IMG_GetError());
@@ -92,6 +103,7 @@ public:
   }
 
   void message(std::string msg) {
+    _currentCharacterIdx = 0;
     _displayingMessage = msg;
   }
 
@@ -102,6 +114,10 @@ public:
         if (_currentCharacterIdx < _displayingMessage.length()) {
           _currentCharacterIdx ++;
           _timer.reset();
+        }
+        else {
+          // @TODO: check input too
+          _displayingMessage = "";
         }
       }
     }
