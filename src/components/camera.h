@@ -29,7 +29,7 @@ struct camera {
     py = following->y;
 
     pos.x = round(px + (pw / 2) - (float)viewport.x / 2);
-    pos.y = round(py + (ph / 2) - (float)viewport.y / 2);
+    pos.y = round(following->bottom() - (float)viewport.y / 2);
 
     // clamp within bounds
     if (pos.x < bounds.x) { pos.x = bounds.x; }
