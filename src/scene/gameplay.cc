@@ -100,7 +100,7 @@ void GameplayScene::init() {
   int numCells = 0;
 
   for (int i = 0; i < world->levels.size(); i ++) {
-    numCells += world->levels[i].cellSize.x * world->levels[i].cellSize.y;
+    numCells += world->levels[i].cell.w * world->levels[i].cell.h;
   }
 
   gameState.visited.resize(numCells);
@@ -219,6 +219,7 @@ void GameplayScene::update(float dt) {
   Level* nextLevel = nullptr;
   v2f newPlayerPos = _player->getPosition();
   v2i playerCellPos = world->getCellByPx(_player->_position,  this->_level);
+  printf("player cell pos: (%d, %d)\n", playerCellPos.x, playerCellPos.y);
 
   if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
@@ -242,6 +243,7 @@ void GameplayScene::update(float dt) {
       dir = 's';
 
       nextLevel = world->getLevelByCell({ playerCellPos.x, playerCellPos.y + 1 });
+      printf("next level: %d\n", nextLevel->iid);
       newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
     }
   }
@@ -250,6 +252,7 @@ void GameplayScene::update(float dt) {
       dir = 'n';
 
       nextLevel = world->getLevelByCell({ playerCellPos.x, playerCellPos.y - 1 });
+      nextLevel->cell.debugInt();
 
       int tilesTall = world->levels[nextLevel->iid].tilesTall;
 

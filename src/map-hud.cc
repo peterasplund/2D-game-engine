@@ -19,8 +19,8 @@ MapHud::MapHud(Renderer* renderer, World* world, v2i position) {
   int tilesInCellY = world->cellSize.y;
 
   for(auto level : world->levels) {
-    int levelWidth = level.cellSize.x;
-    int levelHeight = level.cellSize.y;
+    int levelWidth = level.cell.w;
+    int levelHeight = level.cell.h;
 
     for (int x = 0; x < levelWidth; x++) {
       for (int y = 0; y < levelHeight; y++) {
@@ -28,7 +28,7 @@ MapHud::MapHud(Renderer* renderer, World* world, v2i position) {
 
         cell.iid = level.iid;
         cell.type = CellType::Normal;
-        cell.position = level.cellPosition;
+        cell.position = { level.cell.x, level.cell.y };
         cell.position.x += x;
         cell.position.y += y;
 

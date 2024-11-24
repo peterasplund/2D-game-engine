@@ -253,17 +253,16 @@ World createWorld(std::string filePath) {
       (int)levelJson["worldY"],
     };
 
-    // Save global world position
-    level.cellPosition = {
+    level.cell = {
       (level.cellPositionPx.x / world.cellSize.x) / world.tileSize,
       (level.cellPositionPx.y / world.cellSize.y) / world.tileSize,
-    };
-
-    // Save global world position
-    level.cellSize = {
       level.tilesWide / world.cellSize.x,
       level.tilesTall / world.cellSize.y,
     };
+
+    printf("%d\t", level.iid);
+    level.cell.debugInt();
+    printf("\n");
 
     // neighbours
     for(json neighbourJson : levelJson["__neighbours"]) {
@@ -286,8 +285,8 @@ World createWorld(std::string filePath) {
   world.worldSizeInCells.y = 0;
 
   for(auto level : world.levels) {
-    world.worldSizeInCells.x = max(world.worldSizeInCells.x, level.cellSize.x + level.cellPosition.x);
-    world.worldSizeInCells.y = max(world.worldSizeInCells.y, level.cellSize.y + level.cellPosition.y);
+    world.worldSizeInCells.x = max(world.worldSizeInCells.x, level.cell.w + level.cell.x);
+    world.worldSizeInCells.y = max(world.worldSizeInCells.y, level.cell.h + level.cell.y);
   }
 
   int xMax = world.worldSizeInCells.x;
@@ -297,10 +296,9 @@ World createWorld(std::string filePath) {
   world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level*));
 
   for(Level level : world.levels) {
-    for (int x = 0; x < level.cellSize.x; x ++) {
-      for (int y = 0; y < level.cellSize.y; y ++) {
-        int idx = (((level.cellPosition.y + y) * xMax) + level.cellPosition.x);
-
+    for (int x = level.cell.x; x < level.cell.w + level.cell.x; x ++) {
+      for (int y = level.cell.y; y < level.cell.h + level.cell.y; y ++) {
+        int idx = (y * xMax) + x;
         world.levelsByCells[idx] = &world.levels[level.iid];
       }
     }

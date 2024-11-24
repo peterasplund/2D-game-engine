@@ -97,15 +97,12 @@ int Level::getTileSize() {
   return this->world->tileSize;
 }
 
-Level* World::getLevelByCell(v2i cellPosition) {
-  return levelsByCells[(cellPosition.y * worldSizeInCells.x) + cellPosition.x];
+Level* World::getLevelByCell(v2i cell) {
+  int idx = (cell.y * worldSizeInCells.x) + cell.x;
+  return levelsByCells[idx];
 }
 
-v2i World::getCellByPx(v2i px, int levelId) {
-  v2i tilePos = (px / tileSize);
-  Level* lvl = &levels[levelId];
-  return {
-      (tilePos.x / cellSize.x) + lvl->cellPosition.x,
-      (tilePos.y / cellSize.y) + lvl->cellPosition.y,
-  };
+v2i World::getCellByPx(v2i px, int currentLevelId) {
+  Level* lvl = &levels[currentLevelId];
+  return ((px / tileSize) / cellSize) + lvl->getPosition();
 }

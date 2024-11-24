@@ -146,9 +146,8 @@ struct Level {
   int tileSize;
 
   int iid;
-  v2i cellPosition;
   v2i cellPositionPx;
-  v2i cellSize; // How many cells the level takes up
+  Rect cell;
 
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
@@ -158,6 +157,10 @@ struct Level {
 
   // NeighBourDirection, level id (the long kind)
   std::map<NeighBourDirection, std::vector<std::string>> neighbours;
+
+  v2i getPosition() {
+    return { cell.x, cell.y };
+  }
 };
 
 struct LayerDef {

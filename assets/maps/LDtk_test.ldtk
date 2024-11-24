@@ -2985,9 +2985,9 @@
 									"id": "V_String",
 									"params": ["Peter Aplund"]
 								}] },
-								{ "__identifier": "dialogue", "__type": "String", "__value": "More dialogue. We can write what ever we want.", "__tile": null, "defUid": 22, "realEditorValues": [{
+								{ "__identifier": "dialogue", "__type": "String", "__value": "More dialogue. We can write whatever we want.", "__tile": null, "defUid": 22, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["More dialogue. We can write what ever we want."]
+									"params": ["More dialogue. We can write whatever we want."]
 								}] },
 								{ "__identifier": "Npc_style", "__type": "LocalEnum.Npc_style", "__value": "Fruktkungen", "__tile": null, "defUid": 24, "realEditorValues": [{
 									"id": "V_String",
