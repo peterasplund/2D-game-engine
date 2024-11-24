@@ -202,7 +202,7 @@ void obj::Player::update(float dt) {
   }
 
   swordHitBox = {
-      _position.x + (direction == "left" ? -0 : 36),
+      _position.x + (direction == Direction::LEFT ? -0 : 36),
       _position.y + 5.0f,
       20.0f,
       40.0f,
@@ -236,7 +236,7 @@ void obj::Player::update(float dt) {
 
         entity->damage(value);
 
-        if (direction == "right") {
+        if (direction == Direction::RIGHT) {
           entity->_velocity.v.x += 1.7f;
         }
         else {
@@ -383,13 +383,13 @@ void obj::Player::update(float dt) {
   }
 
   if (_velocity.v.x > 0.01f) {
-    direction = "right";
+    direction = Direction::RIGHT;
   } else if (_velocity.v.x < -0.01f) {
-    direction = "left";
+    direction = Direction::LEFT;
   }
 
   _renderable.textureFlip =
-      direction == "left" ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+      direction == Direction::LEFT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
   // End attack
   if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
@@ -557,7 +557,7 @@ void obj::Player::slide() {
 
       _animator.reset();
       _animator.setAnimation("slide");
-      _velocity.v.x = direction == "left" ? -SLIDE_POWER : SLIDE_POWER;
+      _velocity.v.x = direction == Direction::LEFT ? -SLIDE_POWER : SLIDE_POWER;
     }
   }
 }
@@ -597,7 +597,7 @@ void obj::Player::draw(Renderer *renderer) {
     Rect sr = {0, 0, 6, 14};
     RectF playerR = _collidable.addBoundingBox(_position);
     Rect dr = {(int)(playerR.x + playerR.w / 2) - 2 -
-                   (direction == "left" ? 1 : 0),
+                   (direction == Direction::LEFT ? 1 : 0),
                (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
     renderer->renderTexture(_interactableTexture, &sr, &dr, SDL_FLIP_NONE);
   }

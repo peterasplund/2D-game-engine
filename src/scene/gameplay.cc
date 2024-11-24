@@ -219,7 +219,6 @@ void GameplayScene::update(float dt) {
   Level* nextLevel = nullptr;
   v2f newPlayerPos = _player->getPosition();
   v2i playerCellPos = world->getCellByPx(_player->_position,  this->_level);
-  printf("player cell pos: (%d, %d)\n", playerCellPos.x, playerCellPos.y);
 
   if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
     if (lvl.neighbours[NeighBourDirection::E].size() > 0) {

@@ -17,6 +17,8 @@ namespace obj {
     SLIDE,
     CLIMBING,
   };
+  
+  enum class Direction { LEFT, RIGHT };
 
   class Player : public AbstractGameObject {
     public:
@@ -65,7 +67,7 @@ namespace obj {
       const uint32_t ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW = 100;
 
       Animator _animator;
-      std::string direction = "right";
+      Direction direction = Direction::RIGHT;
       State state = State::IDLE;
       Timer attackTimer;
       Timer slideTimer;
