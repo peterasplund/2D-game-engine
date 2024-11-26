@@ -6,7 +6,6 @@
 
 // https://opengameart.org/content/bitmap-font
 
-
 enum class FONT_COLOR {
   NONE,
   CHARACTER,

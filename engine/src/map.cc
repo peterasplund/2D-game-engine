@@ -1,4 +1,5 @@
 #include "map.h"
+#include "logger.h"
 
 NeighBourDirection neighbourDirectionFromLetter(char c) {
   switch (c) {
@@ -11,10 +12,10 @@ NeighBourDirection neighbourDirectionFromLetter(char c) {
     case 'w':
       return NeighBourDirection::W;
     case 'o':
-      printf("Error: One or more  level is overlapping\n");
+      LOG_WARN("Error: One or more  level is overlapping");
       exit(1);
     default:
-      printf("Error: \"%c\" not a direction\n", c);
+      LOG_WARN("Error: \"%c\" not a direction", c);
       exit(1);
   }
 }
@@ -80,7 +81,7 @@ void Level::getIndicesWithinRect(Rect r, std::vector<int>& out) {
 
 Rect Level::getTileRect(int tileIdx) {
   if (tileIdx > (tilesWide * tilesTall)) {
-    printf("Error: Checking tiles out of bounds\n");
+    LOG_WARN("Error: Checking tiles out of bounds");
     exit(1);
   }
 

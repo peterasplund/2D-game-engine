@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "logger.h"
 
 Renderer::Renderer(SDL_Renderer* renderer) {
   _renderer = renderer;
@@ -130,17 +131,17 @@ void Renderer::drawCorner(int tileWidth, SDL_Texture* texture, const int x, cons
 void Renderer::loadSprite(const char* path, Sprite* sprite) {
     SDL_Surface* surface = IMG_Load(path);
     if (surface == NULL) {
-      printf("Image load error: Path(%s) - Error(%s)\n", path, IMG_GetError());
+      LOG_ERROR("Image load error: Path(%s) - Error(%s)", path, IMG_GetError());
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(_renderer, surface);
 
     if (texture == NULL) {
-      printf("Failed to create texture\n");
+      LOG_ERROR("Failed to create texture");
     }
 
     if (surface == NULL || surface == NULL) {
-      printf("Create texture error: %s\n", SDL_GetError());
+      LOG_ERROR("Create texture error: %s", SDL_GetError());
     }
 
     Rect textureRect = { 0, 0, surface->w, surface->h };

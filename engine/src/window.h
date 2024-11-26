@@ -1,15 +1,14 @@
 #pragma once
 
-#include "globals.h"
 #include "SDL.h"
-#include "imgui_layer.h"
+#include <string>
 
 class Window
 {
 public:
-  Window(const std::string &title, int width, int height) :
-  _title(title), _width(width), _height(height) {
-    _closed = !init();
+  Window(const std::string &title, int width, int height, int zoom) :
+  _title(title), _width(width), _height(height), _zoom(zoom) {
+    _closed = !init(width, height, zoom);
   }
 
   ~Window();
@@ -24,11 +23,12 @@ public:
 
   inline bool isClosed() { return _closed; }
 private:
-  bool init();
+  bool init(int width, int height, int zoom);
 
   std::string _title;
   int _width;
   int _height;
+  int _zoom;
   bool _closed = false;
   SDL_Window *_window = nullptr;
   SDL_Renderer *_renderer = nullptr;

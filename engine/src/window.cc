@@ -1,14 +1,17 @@
 #include "window.h"
-#include <iostream>
 
-bool Window::init() {
+#include <iostream>
+#include "logger.h"
+
+bool Window::init(int width, int height, int zoom) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    std::cerr << "Failed to initialize SDL: " << SDL_GetError() << "\n";
+    LOG_FATAL("Failed to initialize SDL: %s.", SDL_GetError());
     return 0;
   }
 
-  _width = WINDOW_WIDTH;
-  _height = WINDOW_HEIGHT;
+  _width = width;
+  _height = height;
+  _zoom = zoom;
 
   _window = SDL_CreateWindow(
     _title.c_str(),
@@ -20,7 +23,7 @@ bool Window::init() {
   );
 
   if (_window == nullptr) {
-    std::cerr << "Failed to create window.\n";
+    LOG_FATAL("Failed to create window.");
     return 0;
   }
 
@@ -29,14 +32,14 @@ bool Window::init() {
   // For opacity
   SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 
-  ImguiLayer::Instance()->init(_window, _renderer);
+  // ImguiLayer::Instance()->init(_window, _renderer);
 
   if (_renderer == nullptr) {
-    std::cerr << "Failed to create renderer.\n";
+    LOG_FATAL("Failed to create renderer.");
     return 0;
   }
 
-  SDL_RenderSetScale(_renderer, WINDOW_ZOOM, WINDOW_ZOOM);
+  SDL_RenderSetScale(_renderer, zoom, zoom);
 
   return true;
 }

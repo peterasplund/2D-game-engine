@@ -1,11 +1,11 @@
 #pragma once
 
-#include "SDL_render.h"
-#include "math.h"
 #include <vector>
 #include <string>
 #include <map>
 #include <algorithm>
+#include "SDL_render.h"
+#include "math.h"
 
 struct Level;
 struct LayerDef;
