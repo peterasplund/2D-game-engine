@@ -1,19 +1,21 @@
-SDL Game engine
+# 2D game engine
 
-TODO:
+## TODO:
 
-Tile map:
-- Entity position seems bugged
+### Gameplay
 
-Gameplay:
-- Clear entities on level transition (Rewrite entity system?)
-
+- Enemy die/health
+- Enemy spawn zone object (rectangle from editor)
 - Slopes
-- Build macro to map class property to imgui controls (in a seperate tab). This will speed up debugging player controls.
 - Finish Dialogue system
-- Separate Font drawing from dialogue system to be able to print menus and such
-- Decided to use grid-based or free movement in overworld
 
-deps:
+### Internals
+
+- Prepare for hot reloading
+- Rewrite entity handler
+- Separate Font drawing from dialogue system to be able to print menus and such
+- Build for windows
+
+## deps:
 - SDL2-2.0.10
 - SDL2_image-2.0.5
