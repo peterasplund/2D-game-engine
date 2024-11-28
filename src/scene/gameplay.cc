@@ -43,7 +43,7 @@ void GameplayScene::instantiateEntitites(Level* level) {
         std::string name;
         std::string dialogue;
         for(auto field : e.fieldValues) {
-          printf("ID: %s\n", field.identifier.c_str());
+          LOG_TRACE("Parsed field: %s\n", field.identifier.c_str());
           if (field.identifier == "name") {
             name = field.value;
           }
@@ -242,7 +242,6 @@ void GameplayScene::update(float dt) {
       dir = 's';
 
       nextLevel = world->getLevelByCell({ playerCellPos.x, playerCellPos.y + 1 });
-      printf("next level: %d\n", nextLevel->iid);
       newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
     }
   }
@@ -261,7 +260,7 @@ void GameplayScene::update(float dt) {
 
   if (nextLevel != nullptr) {
     int id = nextLevel->iid;
-    printf("goto: %d\n", nextLevel->iid);
+    LOG_INFO("goto level: %d\n", nextLevel->iid);
     v2i oldWorldPosition = world->levels[this->_level].cellPositionPx;
     v2i newWorldPosition = world->levels[id].cellPositionPx;
 

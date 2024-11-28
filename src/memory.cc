@@ -10,7 +10,6 @@ void *FrameAllocator::allocate(std::size_t size) {
   uint8_t* old_ptr = ptr;
 
   if (ptr - memory + size > FRAME_ALLOC_MAX_MEM) {
-    printf("Gorg!\n");
     return nullptr;
   }
 

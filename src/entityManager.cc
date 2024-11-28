@@ -1,5 +1,6 @@
 #include "entityManager.h"
 #include "abstractGameobject.h"
+#include "logger.h"
 
 EntityManager::EntityManager() {
   _entities = std::list<AbstractGameObject*>();
@@ -34,7 +35,7 @@ AbstractGameObject* EntityManager::getEntityByTag(OBJECT_TAG tag) {
     }
   }
 
-  printf("ERROR: Tried getting an entity by a tag that doesn't exist. Tag: %d\n", (int)tag);
+  LOG_WARN("ERROR: Tried getting an entity by a tag that doesn't exist. Tag: %d\n", (int)tag);
   return nullptr;
 }
 

@@ -3,6 +3,7 @@
 #include "../math.h"
 #include "../map.h"
 #include "../entityManager.h"
+#include "../logger.h"
 #include "velocity.h"
 
 // @TODO: use bitfield instead?
@@ -19,7 +20,7 @@ struct CollisionResponse {
 
 
   void print() {
-    printf("top: %d\t right: %d\t bottom: %d\tleft: %d\n", top, right, bottom, left);
+    LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d\n", top, right, bottom, left);
   }
 };
 

@@ -149,7 +149,6 @@ void MapHud::draw(int currentLevel, v2i playerPosition) {
 
     if (playerCellPos == cell.position) {
       marker = Marker::Player;
-      //printf("x: %d, y: %d\n", cell.position.x, cell.position.y);
     }
 
     drawCell(cell, marker, playerCellPos);

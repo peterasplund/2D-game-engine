@@ -69,7 +69,7 @@ public:
     }
 
     if (_level == -1) {
-      printf("Couldn't find start position for player\n");
+      LOG_FATAL("Couldn't find start position for player\n");
       exit(1);
     }
   }

@@ -18,19 +18,7 @@ class Animator
       _animations[name] = animation;
     }
 
-    bool setAnimation(std::string name) {
-      if (_animations[name] != nullptr) {
-        _currentAnimation = name;
-
-        if (_currentAnimation != name) {
-          // reset animation frame when changing animation
-          _animations[_currentAnimation]->reset();
-        }
-        return true;
-      }
-
-      return false;
-    }
+    bool setAnimation(std::string name);
 
     void start() {
       if (_animations[_currentAnimation] != nullptr) {
@@ -74,19 +62,7 @@ class Animator
       return _animations[_currentAnimation]->getTexture();
     }
 
-    Rect getFrame() {
-      if (_currentAnimation.empty()) {
-        printf("Error: No animation available at _currentAnimation...\n");
-        return {};
-      }
-
-      if (_animations[_currentAnimation] != nullptr) {
-        return _animations[_currentAnimation]->getFrame(timer);
-      }
-
-      printf("Error: No animation available at _currentAnimation\n");
-      return {};
-    }
+    Rect getFrame();
 
   private:
     std::map<std::string, Animation*> _animations;

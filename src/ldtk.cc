@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include "logger.h"
 
 int max(int a, int b);
 
@@ -112,7 +113,7 @@ Tileset parse_tileset(std::string projectPath, json data) {
   auto texture = AssetManager::Instance()->getTexture(path);
 
   if (texture == nullptr) {
-    printf("ERROR: Failed to load the tileset texture at: %s\n", path.c_str());
+    LOG_FATAL("ERROR: Failed to load the tileset texture at: %s\n", path.c_str());
   }
 
   std::map<std::string, std::vector<int>> tags;
@@ -170,7 +171,7 @@ json loadProjectFile(const char* filename) {
   std::ifstream f(filename);
 
   if (!f.is_open()) {
-    printf("ERROR: Failed to load the tileset file at: %s\n", filename);
+    LOG_FATAL("ERROR: Failed to load the tileset file at: %s\n", filename);
   }
 
   json data = json::parse(f);
@@ -189,9 +190,8 @@ World createWorld(std::string filePath) {
     (int)data["worldGridHeight"] / world.tileSize,
   };
 
-  printf("> parsing tileset defs\n");
-
   int i = 0;
+  LOG_TRACE("parsing tileset defs\n");
   for(json tilesetDefJson : data["defs"]["tilesets"]) {
     std::string identifier = tilesetDefJson["identifier"];
 
@@ -204,7 +204,7 @@ World createWorld(std::string filePath) {
   }
 
   i = 0;
-  printf("> parsing entity defs\n");
+  LOG_TRACE("parsing entity defs\n");
   for(json entityDefJson : data["defs"]["entities"]) {
     EntityDef entity = parse_entity_def(entityDefJson);
     // entity.uid
@@ -214,7 +214,7 @@ World createWorld(std::string filePath) {
   }
 
   i = 0;
-  printf("> parsing layer defs\n");
+  LOG_TRACE("parsing layer defs\n");
   for(json layerDefJson : data["defs"]["layers"]) {
     std::string type = layerDefJson["type"];
 
@@ -231,8 +231,8 @@ World createWorld(std::string filePath) {
     i ++;
   }
 
-  printf("> parsing levels\n");
   i = 0;
+  LOG_TRACE("parsing levels\n");
   for(json levelJson : data["levels"]) {
     Level level;
 
@@ -243,7 +243,7 @@ World createWorld(std::string filePath) {
     level.tilesTall = (int)levelJson["pxHei"] / tileSize;
     level.tileSize = tileSize;
 
-    printf("> parsing level %s layer instances\n", identifier.c_str());
+    LOG_TRACE("parsing level %s layer instances\n", identifier.c_str());
     for(json layerJson : levelJson["layerInstances"]) {
       level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
@@ -260,9 +260,7 @@ World createWorld(std::string filePath) {
       level.tilesTall / world.cellSize.y,
     };
 
-    printf("%d\t", level.iid);
     level.cell.debugInt();
-    printf("\n");
 
     // neighbours
     for(json neighbourJson : levelJson["__neighbours"]) {
@@ -309,7 +307,7 @@ World createWorld(std::string filePath) {
   layerDefUidMap.clear();
   levelUidMap.clear();
 
-  printf("Successfully loaded the world map\n\n");
+  LOG_TRACE("Successfully loaded the world map\n\n");
 
   return world;
 }
