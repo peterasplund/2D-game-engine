@@ -1,19 +1,18 @@
 #pragma once
 
-#include <math.h>
+#include "engine/inputHandler.h"
+#include "engine/ldtk.h"
+#include "engine/math.h"
+#include "engine/renderer.h"
+#include "engine/timer.h"
+#include "engine/window.h"
 #include "globals.h"
-#include "window.h"
-#include "inputHandler.h"
-#include "sceneManager.h"
 #include "scene/gameplay.h"
-#include "timer.h"
-#include "renderer.h"
-#include "dialogue.h"
-#include "ldtk.h"
+#include "sceneManager.h"
 
-class Game
-{
-public: Game() {
+class Game {
+public:
+  Game() {
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
     InputHandler::Instance()->addButton(SDLK_a, BUTTON::LEFT);
@@ -23,21 +22,22 @@ public: Game() {
     InputHandler::Instance()->addButton(SDLK_p, BUTTON::MENU);
 
     Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
-    SDL_Renderer* sdl_renderer = window.getRenderer();
+
+    SDL_Renderer *sdl_renderer = window.getRenderer();
+    SDL_RenderSetScale(sdl_renderer, WINDOW_ZOOM,
+                       WINDOW_ZOOM); // Set 4x zoom for the pixelated look
+
+    ImguiLayer::Instance()->init(window.getWindow(), window.getRenderer());
     AssetManager::Instance()->init(sdl_renderer);
 
-    Renderer* renderer = new Renderer(sdl_renderer);
-
+    Renderer *renderer = new Renderer(sdl_renderer);
 
     World world = createWorld("assets/maps/LDtk_test.ldtk");
 
-    //dialogue->init();
-    //dialogue->message("Fruktkungen: Godafton!\nThe quick brown fox jumps over the lazy dog.");
-
-    SceneManager* _sceneManager = new SceneManager(renderer);
+    SceneManager *_sceneManager = new SceneManager(renderer);
     Timer fpsTimer;
 
-    GameplayScene* _gameplayScene = new GameplayScene(renderer, &world);
+    GameplayScene *_gameplayScene = new GameplayScene(renderer, &world);
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
@@ -45,20 +45,23 @@ public: Game() {
     while (!window.isClosed()) {
       LAST = NOW;
       NOW = SDL_GetPerformanceCounter();
-      
-      deltaTime = std::min<double>((double)((NOW - LAST)*1000 / SDL_GetPerformanceFrequency() ), MAX_DELTA_TIME);
+
+      deltaTime = std::min<double>(
+          (double)((NOW - LAST) * 1000 / SDL_GetPerformanceFrequency()),
+          MAX_DELTA_TIME);
 
       renderer->clearScreen();
 
       SDL_Event event;
-      ImguiLayer* imgui = ImguiLayer::Instance();
+      ImguiLayer *imgui = ImguiLayer::Instance();
 
       while (SDL_PollEvent(&event)) {
-        for(const auto &obj : EntityManager::Instance()->getEntities()) {
+        for (const auto &obj : EntityManager::Instance()->getEntities()) {
           obj->handleEvent(&event);
         }
 
-        if (event.key.keysym.sym == SDLK_LSHIFT && event.key.state == SDL_PRESSED) {
+        if (event.key.keysym.sym == SDLK_LSHIFT &&
+            event.key.state == SDL_PRESSED) {
           imgui->toggleVisible();
         }
 
@@ -66,18 +69,6 @@ public: Game() {
         InputHandler::Instance()->pollEvent(event);
         imgui->processEvents(&event);
       }
-
-      // Old testing code to try out scene transition
-      /*
-      if (!_sceneManager->isUpdating() && InputHandler::Instance()->isHeld(BUTTON::MENU)) {
-        if (_sceneManager->currentScene() == "gameplay") {
-          _sceneManager->gotoScene("gameplay2", Transition::FADE);
-        }
-        else {
-          _sceneManager->gotoScene("gameplay", Transition::FADE);
-        }
-      }
-      */
 
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
@@ -89,11 +80,10 @@ public: Game() {
 
       renderer->present();
 
-
-      //if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
-        //Sleep the remaining frame time
-        // comment out for now since we're using VSYNC
-        //SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
+      // if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
+      // Sleep the remaining frame time
+      //  comment out for now since we're using VSYNC
+      // SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
       //}
     }
 
@@ -102,9 +92,7 @@ public: Game() {
     EntityManager::release();
   }
 
-  ~Game() {
-
-  }
+  ~Game() {}
 
 private:
   Uint64 NOW = SDL_GetPerformanceCounter();

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "../math.h"
-#include "../map.h"
+#include "../engine/logger.h"
+#include "../engine/map.h"
+#include "../engine/math.h"
 #include "../entityManager.h"
-#include "../logger.h"
 #include "velocity.h"
 
 // @TODO: use bitfield instead?
-/// Each direction corresponds to the ID of the tile it collided with. -1 means no collision.
+/// Each direction corresponds to the ID of the tile it collided with. -1 means
+/// no collision.
 struct CollisionResponse {
   int top = -1;
   int bottom = -1;
@@ -18,9 +19,9 @@ struct CollisionResponse {
     return top != -1 || bottom != -1 || left != -1 || right != -1;
   }
 
-
   void print() {
-    LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d\n", top, right, bottom, left);
+    LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom,
+             left);
   }
 };
 
@@ -33,16 +34,16 @@ struct TileExistsAtResponse {
 };
 
 class collidable {
-  public:
-    Rect boundingBox;
-    RectF rect;
+public:
+  Rect boundingBox;
+  RectF rect;
 
-    collidable();
-    collidable(v2f position, Rect boundingBox);
-    bool checkCollision(Rect* r, Level* tilemap, Rect* outRect);
-    std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
-    std::vector<AbstractGameObject*> objectExistsAt(RectF rect);
-    RectF addBoundingBox(v2f p);
-    void update(v2f position);
-    CollisionResponse moveAndSlide(v2f* position, velocity* velocity, float dt);
+  collidable();
+  collidable(v2f position, Rect boundingBox);
+  bool checkCollision(Rect *r, Level *tilemap, Rect *outRect);
+  std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
+  std::vector<AbstractGameObject *> objectExistsAt(RectF rect);
+  RectF addBoundingBox(v2f p);
+  void update(v2f position);
+  CollisionResponse moveAndSlide(v2f *position, velocity *velocity, float dt);
 };

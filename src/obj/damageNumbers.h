@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../assetManager.h"
-#include "../renderer.h"
-#include "../inputHandler.h"
+#include "../engine/assetManager.h"
+#include "../engine/inputHandler.h"
+#include "../engine/renderer.h"
 #include <cstdlib>
 
 #define NUMBER_SPEED 0.2f
@@ -21,27 +21,26 @@ struct DamageNumber {
     dmgStringLen = strlen(dmgString);
   }
 
-  void draw(Renderer* renderer, SDL_Texture* texture) {
+  void draw(Renderer *renderer, SDL_Texture *texture) {
     for (int i = 0; i < dmgStringLen; i++) {
       int value = dmgString[i] - 48;
       Rect textureRect = {
-        value * 8,
-        13,
-        8,
-        10,
+          value * 8,
+          13,
+          8,
+          10,
       };
 
-      Rect dr = { (int)round(position.x) + (i * 5), (int)round(position.y), textureRect.w, textureRect.h };
+      Rect dr = {(int)round(position.x) + (i * 5), (int)round(position.y),
+                 textureRect.w, textureRect.h};
 
       int alpha = ((timer / NUMBER_LIFETIME) * -1) * 255;
 
       if (damage > 950) {
         SDL_SetTextureColorMod(texture, 255, 0, 0);
-      }
-      else if (damage > 875) {
+      } else if (damage > 875) {
         SDL_SetTextureColorMod(texture, 255, 255, 0);
-      }
-      else {
+      } else {
         SDL_SetTextureColorMod(texture, 255, 255, 255);
       }
 
@@ -63,67 +62,66 @@ struct DamageNumber {
 };
 
 class DamageNumbersSystem {
-  public:
-    void init() {
+public:
+  void init() {
 
-      numbersCount = 0;
-      int tw = 8;
-      int th = 12;
+    numbersCount = 0;
+    int tw = 8;
+    int th = 12;
 
-      texture = AssetManager::Instance()->getTexture("assets/font.png");
+    texture = AssetManager::Instance()->getTexture("assets/font.png");
+  }
+
+  static DamageNumbersSystem *Instance() {
+    static DamageNumbersSystem *_instance = nullptr;
+    if (_instance == nullptr) {
+      _instance = new DamageNumbersSystem();
     }
 
-    static DamageNumbersSystem* Instance() {
-      static DamageNumbersSystem* _instance = nullptr;
-      if (_instance == nullptr) {
-        _instance = new DamageNumbersSystem();
+    return _instance;
+  }
+
+  void addNumber(int damage, v2i position) {
+    numbers[numbersCount].position = position;
+    numbers[numbersCount].timer = 0;
+    numbers[numbersCount].damage = damage;
+    numbers[numbersCount].alive = true;
+    numbers[numbersCount].init();
+
+    numbersCount++;
+  }
+
+  void update(float dt) {
+    for (int i = 0; i < numbersCount; i++) {
+      if (numbers[i].alive) {
+        numbers[i].update(dt);
       }
 
-      return _instance;
-    }
+      if (!numbers[i].alive) {
+        numbers[i] = numbers[numbersCount - 1];
+        numbersCount--;
 
-    void addNumber(int damage, v2i position) {
-      numbers[numbersCount].position = position;
-      numbers[numbersCount].timer = 0;
-      numbers[numbersCount].damage = damage;
-      numbers[numbersCount].alive = true;
-      numbers[numbersCount].init();
-
-      numbersCount ++;
-    }
-
-    void update(float dt) {
-      for (int i = 0; i < numbersCount; i++) {
-        if (numbers[i].alive) {
-          numbers[i].update(dt);
-        }
-
-
-        if (!numbers[i].alive) {
-          numbers[i] = numbers[numbersCount - 1];
-          numbersCount --;
-
-          if (i > 0) {
-            i --;
-          }
+        if (i > 0) {
+          i--;
         }
       }
     }
+  }
 
-    void draw(Renderer* renderer) {
-      for (int i = 0; i < numbersCount; i++) {
-        if (numbers[i].alive) {
-          numbers[i].draw(renderer, texture);
-        }
+  void draw(Renderer *renderer) {
+    for (int i = 0; i < numbersCount; i++) {
+      if (numbers[i].alive) {
+        numbers[i].draw(renderer, texture);
       }
     }
+  }
 
-  protected:
-    Rect textureRect = { 0, 0, 8, 12 };
-    v2i position;
-    SDL_Texture* texture;
-    float elapsedTime = 0.0f;
-    Renderer* renderer;
-    DamageNumber numbers[1024];
-    int numbersCount;
+protected:
+  Rect textureRect = {0, 0, 8, 12};
+  v2i position;
+  SDL_Texture *texture;
+  float elapsedTime = 0.0f;
+  Renderer *renderer;
+  DamageNumber numbers[1024];
+  int numbersCount;
 };

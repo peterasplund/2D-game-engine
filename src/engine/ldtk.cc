@@ -1,30 +1,26 @@
 #include "ldtk.h"
 #include "assetManager.h"
-#include <fstream>
-#include <algorithm>
-#include <vector>
-#include <iostream>
 #include "logger.h"
-
-int max(int a, int b);
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 using json = nlohmann::json;
 
-LayerType strToLayerType(const char* str) {
+LayerType strToLayerType(const char *str) {
   if (strcmp(str, "Entities") == 0) {
     return LayerType::ENTITIES;
-  }
-  else if (strcmp(str, "IntGrid") == 0) {
+  } else if (strcmp(str, "IntGrid") == 0) {
     return LayerType::INT_GRID;
-  }
-  else if (strcmp(str, "Tiles") == 0) {
+  } else if (strcmp(str, "Tiles") == 0) {
     return LayerType::TILES;
   }
 
   return LayerType::TILES;
 }
 
-Layer parse_layer_instance(World* world, Level* level, json layerJson) {
+Layer parse_layer_instance(World *world, Level *level, json layerJson) {
   Layer layer;
 
   int layerDefId = layerJson["layerDefUid"];
@@ -36,19 +32,19 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
 
   if (layer.def->type == LayerType::INT_GRID) {
     layer.tiles.resize(level->tilesTall * level->tilesWide);
-    for(json tile : layerJson["autoLayerTiles"]) {
+    for (json tile : layerJson["autoLayerTiles"]) {
       int x = (int)tile["px"][0];
       int y = (int)tile["px"][1];
       int id = tile["t"];
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
-      bool solid = world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
+      bool solid =
+          world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
       SDL_RendererFlip flip = tile["f"];
 
       Tile layerTile(id, flip, true, solid);
       layer.tiles[idx] = layerTile;
     }
-  } 
-  else if (layer.def->type == LayerType::TILES) {
+  } else if (layer.def->type == LayerType::TILES) {
     layer.tiles.resize(level->tilesTall * level->tilesWide);
     for (uint16_t i = 0; i < layerJson["gridTiles"].size(); i++) {
       json tile = layerJson["gridTiles"][i];
@@ -56,44 +52,48 @@ Layer parse_layer_instance(World* world, Level* level, json layerJson) {
       int y = tile["px"][1];
       uint16_t id = tile["t"];
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
-      bool solid = world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
+      bool solid =
+          world->tilesetDefs[layer.def->tilesetId].tileHasTag(id, "Solid");
       SDL_RendererFlip flip = tile["f"];
 
       Tile layerTile(id, flip, true, solid);
       layer.tiles[idx] = layerTile;
     }
-  }
-  else if (layer.def->type == LayerType::ENTITIES) {
-    for(json entityInstanceJson : layerJson["entityInstances"]) {
+  } else if (layer.def->type == LayerType::ENTITIES) {
+    for (json entityInstanceJson : layerJson["entityInstances"]) {
       Entity entity;
 
       entity.uid = entityUidMap[entityInstanceJson["defUid"]];
       entity.identifier = entityInstanceJson["__identifier"]; // remove this?
-      entity.position = { entityInstanceJson["px"][0], entityInstanceJson["px"][1] };
+      entity.position = {entityInstanceJson["px"][0],
+                         entityInstanceJson["px"][1]};
 
-      for(auto field : entityInstanceJson["fieldInstances"]) {
+      for (auto field : entityInstanceJson["fieldInstances"]) {
         EntityFieldValue fieldValue;
-        int defUid = field["defUid"];;
-        fieldValue.field = &world->entityDefs[entityUidMap[entity.uid]].fields[defUid];
-        //switch (fieldValue.field->type) {
-          //case Entity_Field_Tag::String:
-            fieldValue.identifier = field["__identifier"];
-            fieldValue.value = field["__value"];
-            entity.fieldValues.push_back(fieldValue);
-            //break;
-          //case Entity_Field_Tag::Integer:
-            // @TODO: implement when needed
-            //break;
-          //case Entity_Field_Tag::Float:
-            // @TODO: implement when needed
-            //break;
+        int defUid = field["defUid"];
+        ;
+        fieldValue.field =
+            &world->entityDefs[entityUidMap[entity.uid]].fields[defUid];
+        // switch (fieldValue.field->type) {
+        // case Entity_Field_Tag::String:
+        fieldValue.identifier = field["__identifier"];
+        fieldValue.value = field["__value"];
+        entity.fieldValues.push_back(fieldValue);
+        // break;
+        // case Entity_Field_Tag::Integer:
+        //  @TODO: implement when needed
+        // break;
+        // case Entity_Field_Tag::Float:
+        //  @TODO: implement when needed
+        // break;
         //}
       }
       layer.entities.push_back(entity);
 
-       std::sort(begin(layer.entities), end(layer.entities), [](const Entity &a, const Entity &b) {
-        return a.identifier == "Player" ? 1 : -1;
-      });
+      std::sort(begin(layer.entities), end(layer.entities),
+                [](const Entity &a, const Entity &b) {
+                  return a.identifier == "Player" ? 1 : -1;
+                });
     }
   }
 
@@ -113,23 +113,24 @@ Tileset parse_tileset(std::string projectPath, json data) {
   auto texture = AssetManager::Instance()->getTexture(path);
 
   if (texture == nullptr) {
-    LOG_FATAL("ERROR: Failed to load the tileset texture at: %s\n", path.c_str());
+    LOG_FATAL("ERROR: Failed to load the tileset texture at: %s",
+              path.c_str());
   }
 
   std::map<std::string, std::vector<int>> tags;
 
-  for(json tag : data["enumTags"]) {
+  for (json tag : data["enumTags"]) {
     std::string enumName = tag["enumValueId"];
     std::vector<int> tileIds;
 
-    for(int id : tag["tileIds"]) {
+    for (int id : tag["tileIds"]) {
       tileIds.push_back(id);
     }
 
     // Sort the ids so we can do a binary search later on
     std::sort(tileIds.begin(), tileIds.end());
 
-    tags[enumName] =  tileIds;
+    tags[enumName] = tileIds;
   }
 
   Tileset tileset;
@@ -148,7 +149,7 @@ EntityDef parse_entity_def(json data) {
   entity.uid = data["uid"];
   entity.identifier = data["identifier"];
 
-  for(json fieldJson : data["fieldDefs"]) {
+  for (json fieldJson : data["fieldDefs"]) {
     Entity_Field field;
 
     field.uid = fieldJson["uid"];
@@ -167,11 +168,11 @@ EntityDef parse_entity_def(json data) {
   return entity;
 }
 
-json loadProjectFile(const char* filename) {
+json loadProjectFile(const char *filename) {
   std::ifstream f(filename);
 
   if (!f.is_open()) {
-    LOG_FATAL("ERROR: Failed to load the tileset file at: %s\n", filename);
+    LOG_FATAL("ERROR: Failed to load the tileset file at: %s", filename);
   }
 
   json data = json::parse(f);
@@ -186,54 +187,54 @@ World createWorld(std::string filePath) {
 
   world.tileSize = data["defaultGridSize"];
   world.cellSize = {
-    (int)data["worldGridWidth"] / world.tileSize,
-    (int)data["worldGridHeight"] / world.tileSize,
+      (int)data["worldGridWidth"] / world.tileSize,
+      (int)data["worldGridHeight"] / world.tileSize,
   };
 
   int i = 0;
-  LOG_TRACE("parsing tileset defs\n");
-  for(json tilesetDefJson : data["defs"]["tilesets"]) {
+  LOG_TRACE("parsing tileset defs");
+  for (json tilesetDefJson : data["defs"]["tilesets"]) {
     std::string identifier = tilesetDefJson["identifier"];
 
     if (identifier != "Internal_Icons") {
       Tileset tileset = parse_tileset(projectPath, tilesetDefJson);
       tilesetUidMap[tileset.id] = i;
       world.tilesetDefs.push_back(tileset);
-      i ++;
+      i++;
     }
   }
 
   i = 0;
-  LOG_TRACE("parsing entity defs\n");
-  for(json entityDefJson : data["defs"]["entities"]) {
+  LOG_TRACE("parsing entity defs");
+  for (json entityDefJson : data["defs"]["entities"]) {
     EntityDef entity = parse_entity_def(entityDefJson);
     // entity.uid
     entityUidMap[entity.uid] = i;
     world.entityDefs.push_back(entity);
-    i ++;
+    i++;
   }
 
   i = 0;
-  LOG_TRACE("parsing layer defs\n");
-  for(json layerDefJson : data["defs"]["layers"]) {
+  LOG_TRACE("parsing layer defs");
+  for (json layerDefJson : data["defs"]["layers"]) {
     std::string type = layerDefJson["type"];
 
     LayerDef layerDef;
     layerDef.uid = layerDefJson["uid"];
     layerDef.identifier = layerDefJson["identifier"];
-    layerDef.tilesetId = layerDefJson["tilesetDefUid"].is_null() 
-      ? -1 
-      : tilesetUidMap[layerDefJson["tilesetDefUid"]];
+    layerDef.tilesetId = layerDefJson["tilesetDefUid"].is_null()
+                             ? -1
+                             : tilesetUidMap[layerDefJson["tilesetDefUid"]];
     layerDef.type = strToLayerType(type.c_str());
 
     layerDefUidMap[layerDefJson["uid"]] = i;
     world.layerDefs.push_back(layerDef);
-    i ++;
+    i++;
   }
 
   i = 0;
-  LOG_TRACE("parsing levels\n");
-  for(json levelJson : data["levels"]) {
+  LOG_TRACE("parsing levels");
+  for (json levelJson : data["levels"]) {
     Level level;
 
     std::string identifier = levelJson["identifier"];
@@ -243,31 +244,31 @@ World createWorld(std::string filePath) {
     level.tilesTall = (int)levelJson["pxHei"] / tileSize;
     level.tileSize = tileSize;
 
-    LOG_TRACE("parsing level %s layer instances\n", identifier.c_str());
-    for(json layerJson : levelJson["layerInstances"]) {
+    LOG_TRACE("parsing level %s layer instances", identifier.c_str());
+    for (json layerJson : levelJson["layerInstances"]) {
       level.layers.push_back(parse_layer_instance(&world, &level, layerJson));
     }
 
     level.cellPositionPx = {
-      (int)levelJson["worldX"],
-      (int)levelJson["worldY"],
+        (int)levelJson["worldX"],
+        (int)levelJson["worldY"],
     };
 
     level.cell = {
-      (level.cellPositionPx.x / world.cellSize.x) / world.tileSize,
-      (level.cellPositionPx.y / world.cellSize.y) / world.tileSize,
-      level.tilesWide / world.cellSize.x,
-      level.tilesTall / world.cellSize.y,
+        (level.cellPositionPx.x / world.cellSize.x) / world.tileSize,
+        (level.cellPositionPx.y / world.cellSize.y) / world.tileSize,
+        level.tilesWide / world.cellSize.x,
+        level.tilesTall / world.cellSize.y,
     };
 
     level.cell.debugInt();
 
     // neighbours
-    for(json neighbourJson : levelJson["__neighbours"]) {
+    for (json neighbourJson : levelJson["__neighbours"]) {
       std::string dirString = neighbourJson["dir"];
       std::string iid = neighbourJson["levelIid"];
 
-      for(char d : dirString) {
+      for (char d : dirString) {
         NeighBourDirection dir = neighbourDirectionFromLetter(d);
         level.neighbours[dir].push_back(iid);
       }
@@ -276,26 +277,28 @@ World createWorld(std::string filePath) {
     level.world = &world;
     world.levels.push_back(level);
     levelUidMap[levelJson["iid"]] = i;
-    i ++;
+    i++;
   }
 
   world.worldSizeInCells.x = 0;
   world.worldSizeInCells.y = 0;
 
-  for(auto level : world.levels) {
-    world.worldSizeInCells.x = max(world.worldSizeInCells.x, level.cell.w + level.cell.x);
-    world.worldSizeInCells.y = max(world.worldSizeInCells.y, level.cell.h + level.cell.y);
+  for (auto level : world.levels) {
+    world.worldSizeInCells.x =
+        max(world.worldSizeInCells.x, level.cell.w + level.cell.x);
+    world.worldSizeInCells.y =
+        max(world.worldSizeInCells.y, level.cell.h + level.cell.y);
   }
 
   int xMax = world.worldSizeInCells.x;
   int yMax = world.worldSizeInCells.y;
 
   // Allocate for the levelsByCells lookup
-  world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level*));
+  world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level *));
 
-  for(Level level : world.levels) {
-    for (int x = level.cell.x; x < level.cell.w + level.cell.x; x ++) {
-      for (int y = level.cell.y; y < level.cell.h + level.cell.y; y ++) {
+  for (Level level : world.levels) {
+    for (int x = level.cell.x; x < level.cell.w + level.cell.x; x++) {
+      for (int y = level.cell.y; y < level.cell.h + level.cell.y; y++) {
         int idx = (y * xMax) + x;
         world.levelsByCells[idx] = &world.levels[level.iid];
       }
@@ -307,7 +310,7 @@ World createWorld(std::string filePath) {
   layerDefUidMap.clear();
   levelUidMap.clear();
 
-  LOG_TRACE("Successfully loaded the world map\n\n");
+  LOG_TRACE("Successfully loaded the world map");
 
   return world;
 }

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
-#include "math.h"
-#include "entityManager.h"
 #include "abstractGameobject.h"
-#include "renderer.h"
+#include "engine/renderer.h"
+#include "entityManager.h"
 #include "imgui_layer.h"
+#include "math.h"
+#include <vector>
 
 struct DebugRect {
   Uint8 r;
@@ -16,7 +16,7 @@ struct DebugRect {
 
 class DebugPrinter {
 private:
-  bool* debugRectangles;
+  bool *debugRectangles;
   std::vector<DebugRect> debug_rects;
 
   DebugPrinter() {
@@ -24,8 +24,8 @@ private:
   }
 
 public:
-  static DebugPrinter* Instance() {
-    static DebugPrinter* _instance = nullptr;
+  static DebugPrinter *Instance() {
+    static DebugPrinter *_instance = nullptr;
     if (_instance == nullptr) {
       _instance = new DebugPrinter();
     }
@@ -33,9 +33,8 @@ public:
     return _instance;
   }
 
-  static void release() {
-  }
+  static void release() {}
 
-  void addDebugRect(Rect* rect, Uint8 r, Uint8 g, Uint8 b);
-  void draw(Renderer* renderer);
+  void addDebugRect(Rect *rect, Uint8 r, Uint8 g, Uint8 b);
+  void draw(Renderer *renderer);
 };

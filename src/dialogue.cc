@@ -1,5 +1,5 @@
 #include "dialogue.h"
-#include "logger.h"
+#include "engine/logger.h"
 
 bool Dialogue::init(Renderer *renderer) {
   _renderer = renderer;
@@ -8,7 +8,7 @@ bool Dialogue::init(Renderer *renderer) {
 
   SDL_Surface *surface = IMG_Load(FRAME_TEXTURE_PATH);
   if (surface == NULL) {
-    LOG_ERROR("Image load error: Path(%s) - Error(%s)\n", FRAME_TEXTURE_PATH,
+    LOG_ERROR("Image load error: Path(%s) - Error(%s)", FRAME_TEXTURE_PATH,
               IMG_GetError());
     return false;
   }
@@ -17,11 +17,11 @@ bool Dialogue::init(Renderer *renderer) {
       SDL_CreateTextureFromSurface(_renderer->getSdlRenderer(), surface);
 
   if (_frameTexture == NULL) {
-    LOG_ERROR("Failed to create texture\n");
+    LOG_ERROR("Failed to create texture");
   }
 
   if (surface == NULL || surface == NULL) {
-    LOG_ERROR("Create texture error: %s\n", SDL_GetError());
+    LOG_ERROR("Create texture error: %s", SDL_GetError());
     return false;
   }
 

@@ -2,10 +2,10 @@
 
 #include "SDL_render.h"
 #include "math.h"
-#include <vector>
-#include <string>
-#include <map>
 #include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 
 struct Level;
 struct LayerDef;
@@ -20,8 +20,8 @@ enum LayerType {
 enum class Entity_Field_Tag { Integer, Float, String };
 
 struct NPC {
-  char* name;
-  char* dialogue;
+  char *name;
+  char *dialogue;
   // style npcStyle;
 };
 
@@ -29,10 +29,8 @@ struct Entity_Field {
   int uid;
   std::string identifier;
   Entity_Field_Tag type;
-  
-  Entity_Field() {
-    uid = -1;
-  }
+
+  Entity_Field() { uid = -1; }
 };
 
 struct EntityDef {
@@ -43,7 +41,7 @@ struct EntityDef {
 };
 
 struct EntityFieldValue {
-  Entity_Field* field;
+  Entity_Field *field;
   std::string identifier;
   std::string value;
 };
@@ -122,7 +120,7 @@ struct Tile {
 
 class Layer {
 public:
-  LayerDef* def;
+  LayerDef *def;
   Level *level;
 
   int uid;
@@ -138,7 +136,7 @@ enum NeighBourDirection { N, E, S, W };
 NeighBourDirection neighbourDirectionFromLetter(char c);
 
 struct Level {
-  World* world;
+  World *world;
   std::vector<Layer> layers;
 
   int tilesWide;
@@ -151,16 +149,14 @@ struct Level {
 
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
-  void getIndicesWithinRect(Rect r, std::vector<int>& out);
+  void getIndicesWithinRect(Rect r, std::vector<int> &out);
   Rect getTileRect(int tileIdx);
   int getTileSize();
 
   // NeighBourDirection, level id (the long kind)
   std::map<NeighBourDirection, std::vector<std::string>> neighbours;
 
-  v2i getPosition() {
-    return { cell.x, cell.y };
-  }
+  v2i getPosition() { return {cell.x, cell.y}; }
 };
 
 struct LayerDef {
@@ -177,11 +173,11 @@ struct World {
   std::vector<EntityDef> entityDefs;
   std::vector<Tileset> tilesetDefs;
 
-  Level** levelsByCells;
+  Level **levelsByCells;
 
   v2i worldSizeInCells;
   v2i cellSize;
   int tileSize;
-  Level* getLevelByCell(v2i px);
+  Level *getLevelByCell(v2i px);
   v2i getCellByPx(v2i px, int levelId);
 };

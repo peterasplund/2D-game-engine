@@ -1,6 +1,7 @@
 #pragma once
-#include "renderer.h"
-#include "map.h"
+
+#include "engine/renderer.h"
+#include "engine/map.h"
 
 #define MAP_HUD_CELL_WIDTH 10
 #define MAP_HUD_CELL_HEIGHT 8

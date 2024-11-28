@@ -19,8 +19,6 @@ const char *levelColorCodes[6] = {
 void log(LogLevel level, const char *message, ...);
 
 void log(LogLevel level, const char *message, ...) {
-  bool is_error = level < LOG_LEVEL_WARN;
-
   const int msg_length = 32000;
   char out_message[msg_length];
   memset(out_message, 0, sizeof(out_message));
@@ -31,8 +29,9 @@ void log(LogLevel level, const char *message, ...) {
   vsnprintf(out_message, msg_length, message, arg_ptr);
   va_end(arg_ptr);
 
-  char out_message2[msg_length];
-  sprintf(out_message2, "%s%s %s\033[0;37m\n", levelColorCodes[level], levelStrings[level], out_message);
+  char msg[msg_length];
+  sprintf(msg, "%s%s %s\033[0;37m\n", levelColorCodes[level],
+          levelStrings[level], out_message);
 
-  printf("%s", out_message2);
+  printf("%s", msg);
 };

@@ -1,12 +1,12 @@
 #pragma once
+#include "SDL.h"
+#include "engine/math.h"
+#include "engine/renderer.h"
+#include "engine/timer.h"
+#include "font.h"
+#include "globals.h"
 #include <string>
 #include <vector>
-#include "SDL.h"
-#include "globals.h"
-#include "font.h"
-#include "math.h"
-#include "timer.h"
-#include "renderer.h"
 
 #define DIALOGUE_BOX_HEIGHT 70
 
@@ -30,12 +30,10 @@ struct Message {
 
 class Dialogue {
 public:
-  void destroy() {
-    delete _font;
-  }
+  void destroy() { delete _font; }
 
-  static Dialogue* Instance() {
-    static Dialogue* _instance = nullptr;
+  static Dialogue *Instance() {
+    static Dialogue *_instance = nullptr;
     if (_instance == nullptr) {
       _instance = new Dialogue();
     }
@@ -43,11 +41,9 @@ public:
     return _instance;
   }
 
-  bool isDisplayingMessage() {
-    return _displayingMessage.length() > 0;
-  }
+  bool isDisplayingMessage() { return _displayingMessage.length() > 0; }
 
-  bool init(Renderer* renderer);
+  bool init(Renderer *renderer);
 
   Message parseMessage(std::string s);
 
@@ -58,17 +54,19 @@ public:
 
   void update();
   void draw();
+
 private:
   const uint32_t LETTER_PAUSE = 65;
   const int FRAME_WIDTH = 16;
-  //const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) - DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
-  const Rect BOUNDS = { 0, 0, 300, 100};
+  // const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) -
+  // DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
+  const Rect BOUNDS = {0, 0, 300, 100};
   const int PADDING = 8;
-  const char* FRAME_TEXTURE_PATH = "assets/dialogue.png";
+  const char *FRAME_TEXTURE_PATH = "assets/dialogue.png";
   std::string _displayingMessage;
-  SDL_Texture* _frameTexture;
-  Renderer* _renderer;
+  SDL_Texture *_frameTexture;
+  Renderer *_renderer;
   Timer _timer;
   uint32_t _currentCharacterIdx = 0;
-  Font* _font;
+  Font *_font;
 };

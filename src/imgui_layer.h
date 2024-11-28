@@ -1,19 +1,19 @@
 #pragma once
 
-#include <memory>
 #include "abstractGameobject.h"
-
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
+#include <memory>
 
 class ImguiLayer {
 private:
   bool imguiVisible = false;
   bool debugRectangles = false;
+
 public:
-  static ImguiLayer* Instance() {
-    static ImguiLayer* _instance = nullptr;
+  static ImguiLayer *Instance() {
+    static ImguiLayer *_instance = nullptr;
     if (_instance == nullptr) {
       _instance = new ImguiLayer();
     }
@@ -21,13 +21,13 @@ public:
     return _instance;
   }
 
-  static void release() {
-  }
+  static void release() {}
 
   void init(SDL_Window *window, SDL_Renderer *renderer) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer2_Init(renderer);
   }
@@ -38,12 +38,9 @@ public:
     ImGui::DestroyContext();
   }
 
-  void update() {
-  }
+  void update() {}
 
-  void processEvents(SDL_Event* event) {
-    ImGui_ImplSDL2_ProcessEvent(event);
-  }
+  void processEvents(SDL_Event *event) { ImGui_ImplSDL2_ProcessEvent(event); }
 
   void drawBegin() {
     if (!imguiVisible) {
@@ -64,15 +61,11 @@ public:
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
   }
 
-  void toggleVisible() {
-    imguiVisible = !imguiVisible;
-  }
+  void toggleVisible() { imguiVisible = !imguiVisible; }
 
-  bool* getDebugRectanglesBool() {
-    return &debugRectangles;
-  }
+  bool *getDebugRectanglesBool() { return &debugRectangles; }
 
-  void debugEntities(const std::list<AbstractGameObject*>& entities) {
+  void debugEntities(const std::list<AbstractGameObject *> &entities) {
     if (!imguiVisible) {
       return;
     }
@@ -85,15 +78,16 @@ public:
     if (ImGui::TreeNode("Entities")) {
       int i = 0;
       char nodeName[1024];
-      for(const auto &obj : entities) {
+      for (const auto &obj : entities) {
         sprintf(nodeName, "- Object ID: %d -", i);
         if (ImGui::TreeNode(nodeName)) {
           ImGui::Text("Tag: %d", (int)obj->getTag());
           ImGui::Text("Type: %d", (int)obj->getType());
-          ImGui::Text("position: (%f\t%f)", obj->getPosition().x, obj->getPosition().y);
+          ImGui::Text("position: (%f\t%f)", obj->getPosition().x,
+                      obj->getPosition().y);
           ImGui::TreePop();
         }
-        i ++;
+        i++;
       }
 
       ImGui::TreePop();

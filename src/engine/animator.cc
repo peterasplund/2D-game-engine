@@ -17,7 +17,7 @@ bool Animator::setAnimation(std::string name) {
 
 Rect Animator::getFrame() {
   if (_currentAnimation.empty()) {
-    LOG_WARN("Error: No animation available at _currentAnimation...\n");
+    LOG_WARN("Error: No animation available at _currentAnimation...");
     return {};
   }
 
@@ -25,6 +25,6 @@ Rect Animator::getFrame() {
     return _animations[_currentAnimation]->getFrame(timer);
   }
 
-  LOG_WARN("Error: No animation available at _currentAnimation\n");
+  LOG_WARN("Error: No animation available at _currentAnimation");
   return {};
 }

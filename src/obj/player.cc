@@ -177,27 +177,25 @@ Tile *obj::Player::tileAt(RectF rect, std::string property) {
 void obj::Player::update(float dt) {
   AbstractGameObject::update(dt);
 
-
   RectF above = {
-    _collidable.rect.x + 1,
-    _position.y + normalBoundingbox.y - 1.0f,
-    (float)_collidable.rect.w - 2,
-     16,
+      _collidable.rect.x + 1,
+      _position.y + normalBoundingbox.y - 1.0f,
+      (float)_collidable.rect.w - 2,
+      16,
   };
 
   Rect debugAbove = {
-    (int)above.x,
-    (int)above.y,
-    (int)above.w,
-    (int)above.h,
+      (int)above.x,
+      (int)above.y,
+      (int)above.w,
+      (int)above.h,
   };
 
   DebugPrinter::Instance()->addDebugRect(&debugAbove, 0, 255, 0);
 
   if (tileAt(above, "Solid")) {
     hasTileAbove = true;
-  }
-  else {
+  } else {
     hasTileAbove = false;
   }
 
@@ -220,7 +218,7 @@ void obj::Player::update(float dt) {
       _canInteract = true;
 
       if (inputHandler->isHeld(BUTTON::UP)) {
-        ((obj::Npc*)entity)->talk();
+        ((obj::Npc *)entity)->talk();
         return;
       }
     }
@@ -238,8 +236,7 @@ void obj::Player::update(float dt) {
 
         if (direction == Direction::RIGHT) {
           entity->_velocity.v.x += 1.7f;
-        }
-        else {
+        } else {
           entity->_velocity.v.x -= 1.7f;
         }
       }
@@ -321,7 +318,8 @@ void obj::Player::update(float dt) {
           state = State::RUN;
         }
         isMoving = true;
-      } else if (state != State::SLIDE && state != State::ATTACK && !hasTileAbove) {
+      } else if (state != State::SLIDE && state != State::ATTACK &&
+                 !hasTileAbove) {
         state = State::IDLE;
       }
     }

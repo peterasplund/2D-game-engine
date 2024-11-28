@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../math.h"
+#include "../engine/math.h"
 
 struct velocity {
   v2f v;

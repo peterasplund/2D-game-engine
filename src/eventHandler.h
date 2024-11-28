@@ -1,13 +1,14 @@
 #pragma once
 
-#include <functional>
 #include "abstractGameobject.h"
+#include <functional>
 
 typedef std::function<bool(SDL_Event *)> cbEvent;
 
 class EventHandler {
   std::map<Uint32, std::vector<cbEvent>> _events;
-  std::vector<AbstractGameObject*> _gameObjects;
+  std::vector<AbstractGameObject *> _gameObjects;
+
 public:
   bool handleEvents() {
     SDL_Event event;
@@ -22,9 +23,9 @@ public:
           }
         }
 
-        // Call handleEvent on every game object. 
+        // Call handleEvent on every game object.
         // (Redo this so the object can listen for specific events)
-        for(AbstractGameObject* o : _gameObjects) {
+        for (AbstractGameObject *o : _gameObjects) {
           _gameObjects[0]->handleEvent(&event);
         }
       }

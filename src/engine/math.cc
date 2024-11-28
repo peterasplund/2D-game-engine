@@ -1,5 +1,7 @@
 #include "math.h"
-#include "logger.h"
+
+int min(int a, int b) { return a < b ? a : b; }
+int max(int a, int b) { return a > b ? a : b; }
 
 Rectangle<int, int> group_rects(Rectangle<float, float> r1,
                                 Rectangle<float, float> r2) {
@@ -16,13 +18,3 @@ Rectangle<int, int> group_rects(Rectangle<float, float> r1,
       (int)ceil(max_bottom - y),
   };
 }
-
-/*
-void Rectangle<int, int>::debug() {
-  LOG_INFO("(x: %f\ty: %f\tw: %f\th: %f)\n", x, y, w, h);
-}
-
-void Rectangle<int, int>::debugInt() {
-  LOG_INFO("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
-}
-*/

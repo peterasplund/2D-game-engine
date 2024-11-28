@@ -1,9 +1,9 @@
 #pragma once
 
-#include <map>
+#include "../entityManager.h" // @TODO: rewrite how this works
 #include "SDL.h"
 #include "math.h"
-#include "entityManager.h"
+#include <map>
 
 enum BUTTON {
   UP,
@@ -16,10 +16,9 @@ enum BUTTON {
   __LAST__,
 };
 
-class InputHandler
-{
+class InputHandler {
 private:
-  static InputHandler* _instance;
+  static InputHandler *_instance;
   std::map<int, BUTTON> _buttons;
   std::map<BUTTON, int> _buttons_translation;
   std::map<BUTTON, bool> _buttonsHeld;
@@ -27,11 +26,11 @@ private:
 
   InputHandler();
 
-  ~InputHandler() { }
+  ~InputHandler() {}
 
 public:
-  static InputHandler* Instance() {
-    static InputHandler* _instance = nullptr;
+  static InputHandler *Instance() {
+    static InputHandler *_instance = nullptr;
     if (_instance == nullptr) {
       _instance = new InputHandler();
     }

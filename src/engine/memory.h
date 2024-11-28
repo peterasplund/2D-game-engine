@@ -5,13 +5,11 @@
 
 struct FrameAllocator {
   uint8_t memory[FRAME_ALLOC_MAX_MEM];
-  uint8_t* ptr;
+  uint8_t *ptr;
 
-  FrameAllocator() {
-    freeAll();
-  }
+  FrameAllocator() { freeAll(); }
 
-  void* allocate(std::size_t size);
+  void *allocate(std::size_t size);
 
   void freeAll() {
     for (int i = 0; i < FRAME_ALLOC_MAX_MEM; i++) {
@@ -21,4 +19,3 @@ struct FrameAllocator {
     ptr = memory;
   }
 };
-
