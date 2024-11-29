@@ -1,10 +1,9 @@
 #pragma once
-#include "SDL.h"
+
 #include "engine/math.h"
 #include "engine/renderer.h"
 #include "engine/timer.h"
 #include "font.h"
-#include "globals.h"
 #include <string>
 #include <vector>
 

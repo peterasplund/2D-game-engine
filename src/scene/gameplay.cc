@@ -1,7 +1,9 @@
 #include "gameplay.h"
 #include "../obj/bat.h"
-#include "../obj/enemy.h"
+#include "../obj/door.h"
+#include "../obj/player.h"
 #include "../obj/npc.h"
+#include "../debugPrinter.h"
 
 GameState gameState;
 

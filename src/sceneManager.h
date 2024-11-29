@@ -2,7 +2,6 @@
 
 #include "engine/math.h"
 #include "engine/renderer.h"
-#include "engine/window.h"
 #include "globals.h"
 #include "scene.h"
 #include <map>

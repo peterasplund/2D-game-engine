@@ -1,7 +1,6 @@
 #pragma once
 #include "engine/assetManager.h"
 #include "engine/math.h"
-#include "engine/window.h"
 
 class Bg {
 protected:

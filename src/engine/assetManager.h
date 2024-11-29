@@ -1,10 +1,8 @@
 #pragma once
 
 #include "SDL.h"
-#include "SDL_image.h"
 #include <map>
 #include <string>
-#include <vector>
 
 // @TODO: use reference counting to destroy when no one uses the texture or
 // wahtererver

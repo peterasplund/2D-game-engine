@@ -2,12 +2,12 @@
 
 #include "engine/inputHandler.h"
 #include "engine/ldtk.h"
-#include "engine/math.h"
 #include "engine/renderer.h"
 #include "engine/timer.h"
 #include "engine/window.h"
 #include "globals.h"
 #include "scene/gameplay.h"
+#include "imgui_layer.h"
 #include "sceneManager.h"
 
 class Game {

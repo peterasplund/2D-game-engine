@@ -1,3 +1,4 @@
+#include "../engine/inputHandler.h";
 #include "player.h"
 #include "../debugPrinter.h"
 #include "damageNumbers.h"

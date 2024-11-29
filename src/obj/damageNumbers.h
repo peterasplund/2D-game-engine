@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../engine/assetManager.h"
-#include "../engine/inputHandler.h"
 #include "../engine/renderer.h"
 #include <cstdlib>
 

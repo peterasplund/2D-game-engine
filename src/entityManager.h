@@ -3,7 +3,6 @@
 #include "engine/map.h"
 #include "globals.h"
 #include <list>
-#include <memory>
 
 #define MAX_ENTITIES 1024
 

@@ -3,18 +3,13 @@
 #include "../abstractGameobject.h"
 #include "../bg.h"
 #include "../components/camera.h"
-#include "../debugPrinter.h"
 #include "../dialogue.h"
 #include "../engine/map.h"
 #include "../entityManager.h"
 #include "../hud.h"
 #include "../map-hud.h"
 #include "../obj/damageNumbers.h"
-#include "../obj/door.h"
-#include "../obj/player.h"
 #include "../scene.h"
-#include <memory>
-#include <vector>
 
 const int LEVEL_FADE_SPEED = 14;
 

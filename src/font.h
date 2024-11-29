@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-#include "SDL_image.h"
 #include "engine/renderer.h"
 #include "math.h"
 

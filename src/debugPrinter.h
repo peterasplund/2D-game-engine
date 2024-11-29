@@ -1,8 +1,6 @@
 #pragma once
 
-#include "abstractGameobject.h"
 #include "engine/renderer.h"
-#include "entityManager.h"
 #include "imgui_layer.h"
 #include "math.h"
 #include <vector>

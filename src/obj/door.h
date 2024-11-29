@@ -1,9 +1,7 @@
 #pragma once
 
 #include "../abstractGameobject.h"
-#include "../engine/animator.h"
 #include "../engine/assetManager.h"
-#include "../engine/inputHandler.h"
 #include "../engine/renderer.h"
 
 namespace obj {
