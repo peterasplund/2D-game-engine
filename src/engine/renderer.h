@@ -1,9 +1,8 @@
 #pragma once
 
-#include "SDL.h"
-#include "SDL_image.h"
 #include "math.h"
-#include <memory>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 
 enum class SIDE {
   TOP,

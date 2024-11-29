@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "logger.h"
+#include <SDL2/SDL_image.h>
 
 Renderer::Renderer(SDL_Renderer *renderer) { _renderer = renderer; }
 

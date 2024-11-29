@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../entityManager.h" // @TODO: rewrite how this works
-#include "SDL.h"
 #include "math.h"
 #include <map>
+#include <SDL2/SDL_events.h>
 
 enum BUTTON {
   UP,

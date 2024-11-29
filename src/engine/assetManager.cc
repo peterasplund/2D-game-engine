@@ -1,6 +1,6 @@
 #include "assetManager.h"
 #include "logger.h"
-#include "SDL_image.h"
+#include <SDL_image.h>
 
 SDL_Texture *AssetManager::loadTexture(std::string path) {
   SDL_Texture *tex = NULL;

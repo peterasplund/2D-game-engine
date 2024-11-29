@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL2/SDL_rect.h>
 
 int min(int a, int b);
 int max(int a, int b);

@@ -3,6 +3,7 @@
 #include "math.h"
 #include "timer.h"
 #include <vector>
+#include <SDL2/SDL_render.h>
 
 class Animation {
   struct Frame {

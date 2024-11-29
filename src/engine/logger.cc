@@ -1,7 +1,7 @@
 #include "logger.h"
 #include <memory.h>
 #include <stdarg.h>
-#include <string>
+#include <cstdio>
 
 const char *levelStrings[6] = {
     "[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]", "[TRACE]",

@@ -7,6 +7,7 @@
 #include "engine/math.h"
 #include "engine/renderer.h"
 #include "globals.h"
+#include <SDL2/SDL_events.h>
 
 class AbstractGameObject {
 public:

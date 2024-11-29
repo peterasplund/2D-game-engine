@@ -1,5 +1,6 @@
 #include "dialogue.h"
 #include "engine/logger.h"
+#include <SDL2/SDL_image.h>
 
 bool Dialogue::init(Renderer *renderer) {
   _renderer = renderer;

@@ -1,9 +1,9 @@
 TARGET = peterspelmotor
 #CC = clang++
 CC = g++
-LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/pugixml/src -L./lib/imgui/include
+LIBS = -lm `sdl2-config --libs --cflags` -lSDL2_image -L./lib/imgui/include
 OPT=-O0
-INCDIRS=-I/usr/include/SDL2 -I./lib/pugixml/src/ -I./lib/imgui/include/
+INCDIRS=-I/usr/include/SDL2 -I./lib/imgui/include/
 CFLAGS = -Wwrite-strings -Wall -std=c++17 -MD -I/usr/local/include $(INCDIRS) $(OPT) -g
 SRC=./src
 LIB=./lib
@@ -13,7 +13,6 @@ BIN=./bin
 
 CFILES = $(shell find $(SRC) -type f -name '*.cc')
 CFILES_LIBS = $(wildcard $(LIB)/imgui/src/*.cpp)
-CFILES_LIBS += $(wildcard $(LIB)/pugixml/src/*.cpp)
 
 OBJECTS = $(subst ./src/, ./bin/, $(patsubst %.cc, %.o, $(CFILES)))
 OBJECTS += $(subst ./, ./bin/, $(patsubst %.cpp, %.o, $(CFILES_LIBS)))
@@ -22,9 +21,6 @@ default: $(TARGET) copyassets #run
 all: default
 
 # Compiling external deps
-$(BIN)/lib/pugixml/src/%.o: $(LIB)/pugixml/src/%.cpp
-		@mkdir -p $(@D)
-		$(CC) -c $< -o $@
 $(BIN)/lib/imgui/src/%.o: $(LIB)/imgui/src/%.cpp
 		@mkdir -p $(@D)
 		$(CC) -I/usr/include/SDL2 -c $< -o $@

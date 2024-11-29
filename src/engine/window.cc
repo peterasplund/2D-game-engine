@@ -1,6 +1,5 @@
 #include "window.h"
 #include "logger.h"
-#include <iostream>
 
 bool Window::init(const char *title, int width, int height) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
