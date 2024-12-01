@@ -26,16 +26,10 @@ $(BIN)/lib/imgui/src/%.o: $(LIB)/imgui/src/%.cpp
 		$(CC) -I/usr/include/SDL2 -c $< -o $@
 
 # Compiling game
-$(BIN)/engine/%.o: $(SRC)/engine/%.cc
-		@mkdir -p $(@D)
-		$(CC) $(CFLAGS) -c $< -o $@
+#$(BIN)/engine/%.o: $(SRC)/engine/%.cc
+		#@mkdir -p $(@D)
+		#$(CC) $(CFLAGS) -c $< -o $@
 $(BIN)/%.o: $(SRC)/%.cc
-		@mkdir -p $(@D)
-		$(CC) $(CFLAGS) -c $< -o $@
-$(BIN)/components/%.o: $(SRC)/components/%.cc
-		@mkdir -p $(@D)
-		$(CC) $(CFLAGS) -c $< -o $@
-$(BIN)/scene/%.o: $(SRC)/scene/%.cc
 		@mkdir -p $(@D)
 		$(CC) $(CFLAGS) -c $< -o $@
 

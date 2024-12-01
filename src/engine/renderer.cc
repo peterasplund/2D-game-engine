@@ -23,6 +23,10 @@ void Renderer::renderTexture(SDL_Texture *texture, Rect *sr, Rect *dr,
   SDL_Rect sdl_sr = sr->to_sdl_rect();
   SDL_Rect sdl_dr = useOffset ? getOffsetRect(dr) : dr->to_sdl_rect();
 
+  if (texture == nullptr) {
+    LOG_FATAL("Trying to render null texture");
+  }
+
   SDL_RenderCopyEx(_renderer, texture, &sdl_sr, &sdl_dr, 0, 0, textureFlip);
 }
 

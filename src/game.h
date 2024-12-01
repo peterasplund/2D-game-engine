@@ -5,14 +5,19 @@
 #include "engine/renderer.h"
 #include "engine/timer.h"
 #include "engine/window.h"
+#include "engine/settings.h"
+#include "font.h"
 #include "globals.h"
-#include "scene/gameplay.h"
 #include "imgui_layer.h"
+#include "scene/gameplay.h"
 #include "sceneManager.h"
 
 class Game {
 public:
   Game() {
+    gameSettings().vsync = true;
+    gameSettings().maxFrameRate = 30; // this doesn't matter when vsync is enabled
+
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
     InputHandler::Instance()->addButton(SDLK_a, BUTTON::LEFT);
@@ -31,24 +36,30 @@ public:
     AssetManager::Instance()->init(sdl_renderer);
 
     Renderer *renderer = new Renderer(sdl_renderer);
+    debugFont = new Font(renderer);
+    debugFont->init();
 
     World world = createWorld("assets/maps/LDtk_test.ldtk");
 
     SceneManager *_sceneManager = new SceneManager(renderer);
-    Timer fpsTimer;
 
     GameplayScene *_gameplayScene = new GameplayScene(renderer, &world);
     _sceneManager->addScene("gameplay", _gameplayScene);
 
     _sceneManager->gotoScene("gameplay", Transition::NONE);
 
+    NOW = SDL_GetPerformanceCounter();
     while (!window.isClosed()) {
       LAST = NOW;
       NOW = SDL_GetPerformanceCounter();
 
+      deltaTime = (double)((NOW - LAST) * 1000 / SDL_GetPerformanceFrequency());
+
+      /*
       deltaTime = std::min<double>(
           (double)((NOW - LAST) * 1000 / SDL_GetPerformanceFrequency()),
           MAX_DELTA_TIME);
+          */
 
       renderer->clearScreen();
 
@@ -70,8 +81,11 @@ public:
         imgui->processEvents(&event);
       }
 
+      int fps = floor(1000 / deltaTime);
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
+      sprintf(fpsString, "fps: %d", fps);
+      debugFont->drawString(fpsString, {32, 32});
 
       imgui->drawBegin();
       imgui->debugEntities(EntityManager::Instance()->getEntities());
@@ -80,11 +94,12 @@ public:
 
       renderer->present();
 
-      // if( (fpsTimer.elapsed() < 1000 / WINDOW_FPS)) {
-      // Sleep the remaining frame time
-      //  comment out for now since we're using VSYNC
-      // SDL_Delay( ( 1000 / WINDOW_FPS ) - fpsTimer.elapsed() );
-      //}
+      END = SDL_GetPerformanceCounter();
+
+      if (!gameSettings().vsync) {
+        float elapsedMS = (END - NOW) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+        SDL_Delay(1000 / gameSettings().maxFrameRate -  elapsedMS);
+      }
     }
 
     delete _gameplayScene;
@@ -97,5 +112,8 @@ public:
 private:
   Uint64 NOW = SDL_GetPerformanceCounter();
   Uint64 LAST = 0;
+  Uint64 END = 0;
+  Font *debugFont;
   double deltaTime = 0;
+  char fpsString[10];
 };

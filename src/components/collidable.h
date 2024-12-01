@@ -41,9 +41,90 @@ public:
   collidable();
   collidable(v2f position, Rect boundingBox);
   bool checkCollision(Rect *r, Level *tilemap, Rect *outRect);
-  std::vector<TileExistsAtResponse> tileExistsAt(RectF rect);
+  std::vector<TileExistsAtResponse> tileExistsAtF(RectF rect) {
+    static std::vector<TileExistsAtResponse> response;
+    response.clear();
+
+    Level *t = EntityManager::Instance()->getTilemap();
+    static std::vector<int> possibleIndices;
+    possibleIndices.clear();
+
+    Rect r = {(int)round(rect.x), (int)round(rect.y), (int)round(rect.w),
+              (int)round(rect.h)};
+    t->getIndicesWithinRect(r, possibleIndices);
+
+    for (uint32_t layerId = 0; layerId < t->layers.size(); layerId++) {
+      if (t->layers[layerId].tiles.size() == 0) {
+        continue;
+      }
+
+      for (int possibleIdx : possibleIndices) {
+        Tile tile = t->layers[layerId].tiles[possibleIdx];
+
+        if (tile.getActive()) {
+          int tileId = possibleIdx;
+          Rect r = t->getTileRect(possibleIdx);
+
+          if (rect.hasIntersection(&r)) {
+            int tilesetId = t->layers[layerId].def->tilesetId;
+
+            response.push_back(TileExistsAtResponse{
+                (int)layerId,
+                tileId,
+                tilesetId,
+                tile,
+                r,
+            });
+          }
+        }
+      }
+    }
+
+    return response;
+  }
+
+  std::vector<TileExistsAtResponse> tileExistsAtI(Rect rect) {
+    static std::vector<TileExistsAtResponse> response;
+    response.clear();
+
+    Level *t = EntityManager::Instance()->getTilemap();
+    static std::vector<int> possibleIndices;
+    possibleIndices.clear();
+
+    t->getIndicesWithinRect(rect, possibleIndices);
+
+    for (uint32_t layerId = 0; layerId < t->layers.size(); layerId++) {
+      if (t->layers[layerId].tiles.size() == 0) {
+        continue;
+      }
+
+      for (int possibleIdx : possibleIndices) {
+        Tile tile = t->layers[layerId].tiles[possibleIdx];
+
+        if (tile.getActive()) {
+          int tileId = possibleIdx;
+          Rect r = t->getTileRect(possibleIdx);
+
+          if (rect.hasIntersection(&r)) {
+            int tilesetId = t->layers[layerId].def->tilesetId;
+
+            response.push_back(TileExistsAtResponse{
+                (int)layerId,
+                tileId,
+                tilesetId,
+                tile,
+                r,
+            });
+          }
+        }
+      }
+    }
+
+    return response;
+  }
+
   std::vector<AbstractGameObject *> objectExistsAt(RectF rect);
   RectF addBoundingBox(v2f p);
   void update(v2f position);
-  CollisionResponse moveAndSlide(v2f *position, velocity *velocity, float dt);
+  CollisionResponse moveAndSlide(v2f *position, velocity *velocity, double dt);
 };

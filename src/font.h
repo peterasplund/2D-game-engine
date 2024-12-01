@@ -31,6 +31,14 @@ public:
     drawGlyph(glyph, position);
   }
 
+  void drawString(const char* str, v2i position,
+                  FONT_COLOR color = FONT_COLOR::NONE) {
+    int len = strlen(str);
+    for (int i = 0; i < len; i ++) {
+      drawLetter(str[i], { position.x + (i * GLYPH_WIDTH), position.y }, color);
+    }
+  }
+
   int getGlyphWidth() { return GLYPH_WIDTH; }
 
   int getGlyphHeight() { return GLYPH_HEIGHT; }

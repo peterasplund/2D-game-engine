@@ -17,7 +17,7 @@ public:
     this->_renderable.texture = texture;
   }
 
-  void update(float dt) override {
+  void update(double dt) override {
     // AbstractGameObject::update(dt);
   }
 

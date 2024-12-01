@@ -44,8 +44,7 @@ public:
     _velocity.v.x = -0.3f;
   }
 
-  void update(float dt) override {
-
+  void update(double dt) override {
     _position += _velocity.v;
     _position.y = AMPLITUDE * cos(SPEED / 2 * elapsedTime) + 50.0f;
     AbstractGameObject::update(dt);

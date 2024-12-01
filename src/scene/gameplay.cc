@@ -5,6 +5,8 @@
 #include "../obj/npc.h"
 #include "../debugPrinter.h"
 
+const float LEVEL_FADE_SPEED = 2.3f;
+
 GameState gameState;
 
 // Use some configuration place to specify all game objects. Maybe even glob the
@@ -27,10 +29,7 @@ AbstractGameObject *GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
 }
 
 void GameplayScene::instantiateEntitites(Level *level) {
-  // tmp bat
-  AbstractGameObject *bat = new obj::Bat();
-  bat->init();
-  EntityManager::Instance()->addEntity(bat);
+  AbstractGameObject *bat = new obj::Bat(); bat->init(); EntityManager::Instance()->addEntity(bat);
 
   for (auto layer : level->layers) {
     for (auto e : layer.entities) {
@@ -85,7 +84,6 @@ void GameplayScene::instantiateEntitites(Level *level) {
 void GameplayScene::drawFade() {
   if (pendingLevel.iid != -1) {
     int fade = max(min(transitionTimer, 255), 0);
-    // int fade = transitionTimer < 0 ? 0 : transitionTimer > 255 ? 255 : 0;
     Rect fadeRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
     _renderer->setColor(0, 0, 0, fade);
@@ -171,9 +169,10 @@ void GameplayScene::switchLevel(LevelTransition level) {
 
   _camera.setBounds(
       {lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
+  _camera.pos.x = 0.0f;
 }
 
-void GameplayScene::update(float dt) {
+void GameplayScene::update(double dt) {
   damageNumberSystem->update(dt);
 
   dialogue->update();
@@ -183,13 +182,13 @@ void GameplayScene::update(float dt) {
 
   if (pendingLevel.iid != -1) {
     if (!isFadingIn) {
-      transitionTimer += LEVEL_FADE_SPEED;
+      transitionTimer += (LEVEL_FADE_SPEED * dt);
       if (transitionTimer >= 255) {
         isFadingIn = true;
         switchLevel(pendingLevel);
       }
     } else {
-      transitionTimer -= LEVEL_FADE_SPEED;
+      transitionTimer -= (LEVEL_FADE_SPEED * dt);
       if (transitionTimer <= 0) {
         isFadingIn = false;
         pendingLevel = {-1, {0, 0}};
@@ -323,9 +322,7 @@ void GameplayScene::draw(Renderer *renderer) {
     if (obj != nullptr) {
       Rect objRect = obj->getTextureRect();
       if (objRect.hasIntersection(&camera)) {
-        if (obj != nullptr) {
-          obj->draw(renderer);
-        }
+        obj->draw(renderer);
       }
     }
   }

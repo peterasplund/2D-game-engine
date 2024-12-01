@@ -48,7 +48,7 @@ struct DamageNumber {
     }
   }
 
-  void update(float dt) {
+  void update(double dt) {
     timer += dt;
 
     float value = (timer / NUMBER_LIFETIME) * (M_PI / 2);
@@ -81,16 +81,18 @@ public:
   }
 
   void addNumber(int damage, v2i position) {
-    numbers[numbersCount].position = position;
-    numbers[numbersCount].timer = 0;
-    numbers[numbersCount].damage = damage;
-    numbers[numbersCount].alive = true;
-    numbers[numbersCount].init();
+    if (numbersCount < 1024) {
+      numbers[numbersCount].position = position;
+      numbers[numbersCount].timer = 0;
+      numbers[numbersCount].damage = damage;
+      numbers[numbersCount].alive = true;
+      numbers[numbersCount].init();
 
-    numbersCount++;
+      numbersCount++;
+    }
   }
 
-  void update(float dt) {
+  void update(double dt) {
     for (int i = 0; i < numbersCount; i++) {
       if (numbers[i].alive) {
         numbers[i].update(dt);

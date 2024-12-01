@@ -11,8 +11,6 @@
 #include "../obj/damageNumbers.h"
 #include "../scene.h"
 
-const int LEVEL_FADE_SPEED = 14;
-
 struct LevelTransition {
   int iid;
   v2f playerPosition;
@@ -70,7 +68,7 @@ public:
   }
 
   void init();
-  void update(float dt);
+  void update(double dt);
   void draw(Renderer *renderer);
 
   void switchLevel(LevelTransition level);

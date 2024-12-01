@@ -4,7 +4,7 @@ void AbstractGameObject::init() {
   _collidable = collidable(_position, _renderable.textureRect);
 }
 
-void AbstractGameObject::update(float dt) {
+void AbstractGameObject::update(double dt) {
   if (_gravity.entityGravity != 0.0f) {
     _gravity.update(&_position, &_velocity, dt);
   }
@@ -15,10 +15,6 @@ void AbstractGameObject::update(float dt) {
 void AbstractGameObject::draw(Renderer *renderer) {
   // @TODO: add vectors instead
   _renderable.render(renderer, this->_position);
-}
-
-void AbstractGameObject::setListenForCollisions() {
-  _listenForCollisions = true;
 }
 
 bool AbstractGameObject::contains(RectF other) {
@@ -54,12 +50,10 @@ v2f AbstractGameObject::getPosition() { return this->_position; }
 
 v2f *AbstractGameObject::getPositionPointer() { return &this->_position; }
 
-bool AbstractGameObject::getListensForCollisions() {
-  return this->_listenForCollisions;
-}
-
 GAME_OBJECT AbstractGameObject::getType() { return _type; }
 
 OBJECT_TAG AbstractGameObject::getTag() { return _tag; }
 
-void AbstractGameObject::setPosition(v2f p) { this->_position = p; }
+void AbstractGameObject::setPosition(v2f p) { 
+  this->_position = p;
+}

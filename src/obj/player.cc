@@ -1,16 +1,16 @@
-#include "../engine/inputHandler.h";
 #include "player.h"
 #include "../debugPrinter.h"
+#include "../engine/inputHandler.h"
 #include "damageNumbers.h"
 #include "npc.h"
 #include <cmath>
 #include <cstdlib>
 
-float calcFriction(float v, float friction) {
+float obj::Player::calcFriction(float v, float friction, double dt) {
   if (std::abs(v) > 0.01) {
     int sign = v > 0 ? 1 : -1;
 
-    return v - friction * sign;
+    return (v - (friction * dt) * sign);
   }
 
   return 0.0f;
@@ -18,14 +18,28 @@ float calcFriction(float v, float friction) {
 
 void obj::Player::init() {
   AbstractGameObject::init();
+
   _tag = OBJECT_TAG::PLAYER;
   _type = GAME_OBJECT::PLAYER;
   _persist = true;
 
   this->_collidable.boundingBox = {18, 15, 18, 28};
+  this->_collidable.rect = {0, 0, 0, 0};
 
-  setListenForCollisions();
+  this->setupAnimations();
 
+  this->jumpController.init(this);
+  this->attackController.init(this);
+  this->climbController.init(this);
+  this->slideController.init(this);
+
+  _normalGravity = _gravity.entityGravity;
+
+  _interactableTexture =
+      AssetManager::Instance()->getTexture("assets/sprites/interactable.png");
+}
+
+void obj::Player::setupAnimations() {
   SDL_Texture *texture = AssetManager::Instance()->getTexture(
       "assets/sprites/warrior/Warrior/SpriteSheet/Warrior_Sheet-Effect.png");
 
@@ -144,40 +158,45 @@ void obj::Player::init() {
   _animator.setAnimation("idle");
 
   this->_renderable.texture = texture;
-
-  _normalGravity = _gravity.entityGravity;
-
-  _interactableTexture =
-      AssetManager::Instance()->getTexture("assets/sprites/interactable.png");
 }
 
-Tile *obj::Player::tileAt(RectF rect, std::string property) {
-  auto tilesAbove = _collidable.tileExistsAt(rect);
+template <class T, class J>
+Tile *obj::Player::tileAt(Rectangle<T, J> rect, std::string property) {
+  auto tilesAbove = _collidable.tileExistsAtF(rect);
 
-  if (tilesAbove.size() > 0) {
-    for (TileExistsAtResponse &tile : tilesAbove) {
-      if (property == "") {
-        return &tile.tile;
-      }
+  for (TileExistsAtResponse &tile : tilesAbove) {
+    if (property == "") {
+      return &tile.tile;
+    }
 
-      auto tileset = &EntityManager::Instance()
-                          ->getTilemap()
-                          ->world->tilesetDefs[tile.tilesetId];
+    auto tileset = &EntityManager::Instance()
+                        ->getTilemap()
+                        ->world->tilesetDefs[tile.tilesetId];
 
-      if (tileset->tileHasTag(tile.tile.getTileId(), property)) {
-        Layer *layer =
-            &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
-        return &layer->tiles.at(tile.tileId);
-      }
+    if (tileset->tileHasTag(tile.tile.getTileId(), property)) {
+      Layer *layer =
+          &EntityManager::Instance()->getTilemap()->layers[tile.layerId];
+      return &layer->tiles.at(tile.tileId);
     }
   }
 
   return nullptr;
 }
 
-void obj::Player::update(float dt) {
-  AbstractGameObject::update(dt);
+void obj::Player::update(double dt) {
+  if (_velocity.v.x > 0.01f) {
+    direction = Direction::RIGHT;
+  } else if (_velocity.v.x < -0.01f) {
+    direction = Direction::LEFT;
+  }
 
+  _renderable.textureFlip =
+      direction == Direction::LEFT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+
+  jumpController.update(dt);
+  attackController.update(dt);
+
+  // Level *tilemap = EntityManager::Instance()->getTilemap();
   RectF above = {
       _collidable.rect.x + 1,
       _position.y + normalBoundingbox.y - 1.0f,
@@ -185,33 +204,16 @@ void obj::Player::update(float dt) {
       16,
   };
 
-  Rect debugAbove = {
-      (int)above.x,
-      (int)above.y,
-      (int)above.w,
-      (int)above.h,
-  };
-
-  DebugPrinter::Instance()->addDebugRect(&debugAbove, 0, 255, 0);
-
   if (tileAt(above, "Solid")) {
     hasTileAbove = true;
   } else {
     hasTileAbove = false;
   }
 
-  swordHitBox = {
-      _position.x + (direction == Direction::LEFT ? -0 : 36),
-      _position.y + 5.0f,
-      20.0f,
-      40.0f,
-  };
-
   InputHandler *inputHandler = InputHandler::Instance();
   isMoving = false;
 
   auto entitiesTouching = _collidable.objectExistsAt(_collidable.rect);
-  auto entitiesTouchingSword = _collidable.objectExistsAt(swordHitBox);
 
   _canInteract = false;
   for (auto entity : entitiesTouching) {
@@ -220,26 +222,9 @@ void obj::Player::update(float dt) {
 
       if (inputHandler->isHeld(BUTTON::UP)) {
         ((obj::Npc *)entity)->talk();
+
+        AbstractGameObject::update(dt);
         return;
-      }
-    }
-  }
-
-  for (auto entity : entitiesTouchingSword) {
-    if (entity->getType() == GAME_OBJECT::ENEMY && state == State::ATTACK) {
-      int value = ((float)(rand()) / (float)RAND_MAX) * 1000;
-      if (!entity->hurt) {
-        DamageNumbersSystem::Instance()->addNumber(
-            value, {(int)(swordHitBox.left() + swordHitBox.w / 2 + 8),
-                    swordHitBox.top()});
-
-        entity->damage(value);
-
-        if (direction == Direction::RIGHT) {
-          entity->_velocity.v.x += 1.7f;
-        } else {
-          entity->_velocity.v.x -= 1.7f;
-        }
       }
     }
   }
@@ -249,72 +234,29 @@ void obj::Player::update(float dt) {
     if (!_animator.isPlaying()) {
       _animator.start();
     }
+
+    AbstractGameObject::update(dt);
     return;
   }
 
-  Tile *ladderAbove = tileAt(
-      {round(_collidable.rect.x), _collidable.rect.y - _collidable.rect.h / 2,
-       floor(_collidable.rect.w), _collidable.rect.h / 2},
-      "Ladder");
-
-  if (state == State::CLIMBING) {
-    _velocity.v.y = -0.0f;
-    _renderable.textureFlip = SDL_FLIP_NONE;
-    if (InputHandler::Instance()->isHeld(BUTTON::UP)) {
-      _velocity.v.y = -0.1f;
-    } else if (InputHandler::Instance()->isHeld(BUTTON::DOWN)) {
-      _velocity.v.y = 0.1f;
-    }
-
-    _velocity.v.x = 0.0f;
-
-    if (!ladderAbove) {
-      _animator.setAnimation("crouch");
-    } else {
-      _animator.setAnimation("climb");
-      _animator.stop();
-    }
-
-    if (_velocity.v.y < -0.001f) {
-      if (!_animator.isPlaying()) {
-        _animator.start();
-      }
-    } else if (_velocity.v.y > 0.001f) {
-      if (!_animator.isPlaying()) {
-        _animator.start();
-      }
-      // @TODO: reverse animation
-    }
-
-    auto resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
-
-    _velocity.v = {0, 0};
-
-    auto tilesWithin = _collidable.tileExistsAt(
-        {round(_collidable.rect.x), _collidable.rect.y,
-         floor(_collidable.rect.w), _collidable.rect.h});
-
-    Tile *onLadder = tileAt({round(_collidable.rect.x), _collidable.rect.y - 9,
-                             floor(_collidable.rect.w), _collidable.rect.h - 9},
-                            "Ladder");
-
-    if (onLadder == nullptr && !hasTileAbove) {
-      state = State::IDLE;
-    }
-
+  if (climbController.update(dt)) {
+    AbstractGameObject::update(dt);
+    _collidable.moveAndSlide(&_position, &_velocity, dt);
     return;
   }
 
   if (state != State::CROUCH && state != State::SLIDE) {
     if ((state != State::ATTACK || !_gravity.onFloor)) {
       if (inputHandler->isHeld(BUTTON::LEFT)) {
-        _velocity.v.x -= _gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION;
+        _velocity.v.x -=
+            (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
         if (state != State::ATTACK) {
           state = State::RUN;
         }
         isMoving = true;
       } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-        _velocity.v.x += _gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION;
+        _velocity.v.x +=
+            (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
         if (state != State::ATTACK) {
           state = State::RUN;
         }
@@ -353,18 +295,8 @@ void obj::Player::update(float dt) {
     if (state == State::CROUCH) {
       _animator.setAnimation("crouch");
     } else if (state != State::SLIDE && state != State::CROUCH) {
-      if (state == State::ATTACK) {
-        /*
-          if (_gravity.onFloor) {
-            printf("play animation attack\n");
-            _animator.setAnimation("attack");
-          }
-          else {
-            printf("play jumpAttack\n");
-            _animator.setAnimation("jumpAttack");
-          }
-          */
-      } else if (!_gravity.onFloor && _velocity.v.y < -0.01f) {
+      if (state != State::ATTACK && !_gravity.onFloor &&
+          _velocity.v.y < -0.01f) {
         _animator.setAnimation("jump");
         if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
           _animator.setAnimation("upToFall");
@@ -381,118 +313,111 @@ void obj::Player::update(float dt) {
     }
   }
 
-  if (_velocity.v.x > 0.01f) {
-    direction = Direction::RIGHT;
-  } else if (_velocity.v.x < -0.01f) {
-    direction = Direction::LEFT;
-  }
+  this->slideController.update(dt);
 
-  _renderable.textureFlip =
-      direction == Direction::LEFT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+  onOneWayPlatform = false;
+  Rect tilesBelowRect = {(int)round(_collidable.rect.x),
+                         (int)_collidable.rect.bottom(),
+                         (int)_collidable.rect.w, 1};
+  auto tilesBelow = _collidable.tileExistsAtI(tilesBelowRect);
+  /*
 
-  // End attack
-  if (attackTimer.elapsed() > attackDelay && state == State::ATTACK) {
-    state = State::IDLE;
-    _animator.reset();
-    _animator.setAnimation("idle");
-  }
+  auto closeTiles = _collidable.tileExistsAtF({
+      _collidable.rect.x - _collidable.rect.w,
+      _collidable.rect.y - _collidable.rect.h,
+      _collidable.rect.w * 3,
+      _collidable.rect.h * 3,
+  });
 
-  // End slide
-  if (slideTimer.elapsed() > slideDelay && state == State::SLIDE) {
-    state = State::CROUCH;
-    _animator.reset();
-  }
+  //_gravity.onFloor = false;
+  RectF pxBelow = _collidable.rect;
+  pxBelow.h = _collidable.rect.h + 1;
 
-  auto resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
+  float prevBottom = _prevPosition.y + _collidable.boundingBox.bottom();
+  float newBottom = _position.y + _collidable.boundingBox.bottom();
+  // printf("prev: %f new: %f\n", prevBottom, newBottom);
 
-  auto tilesWithin =
-      _collidable.tileExistsAt({round(_collidable.rect.x), _collidable.rect.y,
-                                floor(_collidable.rect.w), _collidable.rect.h});
+  for (auto tile : tilesBelow) {
+    Tileset *tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
+    if (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) {
+      // bool standingOnPlatform = (int)_collidable.rect.bottom() + 1 ==
+      // (int)tile.rect.top();
+      bool passedThroughThisFrame =
+          prevBottom < tile.rect.y && newBottom >= tile.rect.y;
+      printf("%d\n", passedThroughThisFrame);
 
-  // Climb onto ladder
-  if (tilesWithin.size() > 0) {
-    for (auto tile : tilesWithin) {
-      int tileCenter = tile.rect.x + tile.rect.w / 2;
-      int playerCenter = _collidable.rect.x + _collidable.rect.w / 2;
-      if (playerCenter > tileCenter - LADDER_X_DEADZONE &&
-          playerCenter < tileCenter + LADDER_X_DEADZONE) {
-        if (inputHandler->isHeld(BUTTON::UP)) {
-          auto tileset = &EntityManager::Instance()
-                              ->getTilemap()
-                              ->world->tilesetDefs[tile.tilesetId];
-
-          if (tileset->tileHasTag(tile.tile.getTileId(), "Ladder")) {
-            if (tile.rect.top() <= _collidable.rect.bottom() - 30) {
-              _position.x = tile.rect.x - 23;
-              state = State::CLIMBING;
-              return;
-            }
-          }
+      if (passedThroughThisFrame) {
+        if (tile.rect.hasIntersection(&tilesBelowRect) &&
+            _velocity.v.y > 0.1f) {
+          // if ((pxBelow.hasIntersection(&tile.rect) && _velocity.v.y == 0.0f))
+          // {
+          printf("on platform\n");
+          onOneWayPlatform = true;
+          _gravity.onFloor = true;
+          _velocity.v.y = 0.0f;
+          _position.y =
+              tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
+          break;
+        } else if (_collidable.rect.bottom() == tile.rect.top() - 1) {
+          onOneWayPlatform = true;
+          _gravity.onFloor = true;
+          _velocity.v.y = 0.0f;
+          _position.y =
+              tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
+          break;
         }
       }
     }
   }
+  */
 
-  auto tilesBelow = _collidable.tileExistsAt(
-      {round(_collidable.rect.x), (_collidable.rect.y + _collidable.rect.h + 1),
-       floor(_collidable.rect.w), 1});
+  // SECTION: handle onFloor by checking below player.
+  /*
+  auto tilesBelow = _collidable.tileExistsAt<float>(
+      {_collidable.rect.x, (_collidable.rect.y + _collidable.rect.h),
+       _collidable.rect.w, 1});
 
-  _gravity.onFloor = false;
-  onOneWayPlatform = false;
   if (tilesBelow.size() > 0) {
     for (auto tile : tilesBelow) {
-      if (tile.tile.getSolid()) {
-        _jumpHold = false;
-        _gravity.onFloor = true;
-      } else {
-        auto tileset = &EntityManager::Instance()
-                            ->getTilemap()
-                            ->world->tilesetDefs[tile.tilesetId];
+      Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
 
-        if (onwayPlatformFallThroughTimer.elapsed() >
-            ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
-          if (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) {
-            if (_velocity.v.y >= 0.f &&
-                _collidable.rect.bottom() <=
-                    tile.rect.y + ONEWAY_PLATFORM_GRACE) {
-              onOneWayPlatform = true;
-              _jumpHold = false;
-              _gravity.onFloor = true;
-              _velocity.v.y = 0.0f;
-              _position.y =
-                  tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
-            }
+      if (tile.tile.getSolid() || tileset->tileHasTag(tile.tile.getTileId(),
+  "Oneway")) { _gravity.onFloor = true;
+      }
+    }
+  }
+  */
+
+  /*
+    else {
+    Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
+
+      if (onwayPlatformFallThroughTimer.elapsed() >
+    ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) { if
+    (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) { if (prevBB.bottom()
+    <= _collidable.rect.top()) { printf("on top\n"); onOneWayPlatform = true;
+            _jumpHold = false;
+            _gravity.onFloor = true;
+            _velocity.v.y = 0.0f;
+            setPosition({_position.x, tile.rect.y - _collidable.rect.h -
+                                          _collidable.boundingBox.y});
           }
         }
       }
     }
-  }
+  */
 
   previouslyOnFloor = _gravity.onFloor;
-  _gravity.entityGravity =
-      _jumpHold && _velocity.v.y < -0.3f ? JUMP_SHORT_GRAVITY : _normalGravity;
+  _gravity.entityGravity = jumpController.jumpHold && _velocity.v.y < -0.3f
+                               ? JUMP_SHORT_GRAVITY
+                               : _normalGravity;
 
   if (!isMoving) {
     if (!_gravity.onFloor) {
-      _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION);
-    } else if (state == State::SLIDE) {
-      _velocity.v.x = calcFriction(_velocity.v.x, SLIDE_DEACCELERATION);
-    } else {
-      _velocity.v.x = calcFriction(_velocity.v.x, RUN_DEACCELERATION);
+      _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+    } else if (state != State::SLIDE) {
+      _velocity.v.x = calcFriction(_velocity.v.x, RUN_DEACCELERATION, dt);
     }
-  }
-
-  // Jump buffer
-  if (jumpBufferTimer.elapsed() < JUMP_BUFFER_WINDOW && _gravity.onFloor &&
-      inputHandler->isHeld(BUTTON::JUMP)) {
-    if (state == State::IDLE || state == State::RUN) {
-      performJump();
-    }
-  }
-
-  if (_justJumped) {
-    _jumpHold = true;
-    _justJumped = false;
   }
 
   if (state == State::SLIDE || state == State::CROUCH) {
@@ -507,88 +432,34 @@ void obj::Player::update(float dt) {
   } else {
     this->_collidable.boundingBox = {18, 15, 18, 28};
   }
-}
 
-void obj::Player::performJump() {
-  jumpBuffered = false;
-  state = State::JUMP;
-  _velocity.v.y = -JUMP_POWER;
-  _jumpHold = true;
-  _justJumped = true;
-}
+  _prevPosition = _position;
+  _gravity.onFloor = false;
+  _collidable.moveAndSlide(&_position, &_velocity, dt);
 
-void obj::Player::jump() {
-  if (state != State::ATTACK && state != State::CROUCH) {
-    if (_gravity.onFloor || state == State::SLIDE || state == State::CLIMBING) {
-      performJump();
-    }
-    if (!_gravity.onFloor) {
-      jumpBufferTimer.reset();
-      jumpBuffered = true;
+  for (auto tile : tilesBelow) {
+    if (tile.tile.getSolid()) {
+      _gravity.onFloor = true;
     }
   }
-}
 
-void obj::Player::attack() {
-  if (attackTimer.elapsed() > attackDelay) {
-    state = State::ATTACK;
-    _animator.reset();
-    _animator.setAnimation("attack");
-    attackTimer.reset();
-  }
-}
-
-void obj::Player::slide() {
-  if (state == State::CLIMBING) {
-    return;
-  }
-
-  // Slide
-  if (state == State::CROUCH) {
-    // Check if on top of one-way platform. In that case we don't wanna slide
-    // but deactivate the solid of the platform until we're below it
-    if (onOneWayPlatform) {
-      onwayPlatformFallThroughTimer.reset();
-      state = State::JUMP;
-    } else {
-      state = State::SLIDE;
-      slideTimer.reset();
-
-      _animator.reset();
-      _animator.setAnimation("slide");
-      _velocity.v.x = direction == Direction::LEFT ? -SLIDE_POWER : SLIDE_POWER;
-    }
-  }
+  AbstractGameObject::update(dt);
 }
 
 void obj::Player::onInputPressed(int button) {
-  if (button == BUTTON::JUMP) {
-    if (state == State::CROUCH) {
-      slide();
-    } else if (!hasTileAbove) {
-      jump();
-    }
-  }
-  if (button == BUTTON::ATTACK && !this->hasTileAbove)
-    attack();
+  jumpController.onInputPressed(button);
+  attackController.onInputPressed(button);
+  slideController.onInputPressed(button);
 };
 
 void obj::Player::onInputReleased(int button) {
-  if (button == BUTTON::JUMP) {
-    _jumpHold = false;
-  }
+  jumpController.onInputReleased(button);
 };
 
 void obj::Player::draw(Renderer *renderer) {
   _renderable.textureRect = _animator.getFrame();
   _renderable.texture = _animator.getTexture();
   AbstractGameObject::draw(renderer);
-
-  if (state == State::ATTACK) {
-    Rect hitbox = {(int)swordHitBox.x, (int)swordHitBox.y, (int)swordHitBox.w,
-                   (int)swordHitBox.h};
-    DebugPrinter::Instance()->addDebugRect(&hitbox, 0, 255, 0);
-  }
 
   // Draw interactable
   if (_canInteract) {
@@ -600,4 +471,6 @@ void obj::Player::draw(Renderer *renderer) {
                (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
     renderer->renderTexture(_interactableTexture, &sr, &dr, SDL_FLIP_NONE);
   }
+
+  attackController.draw(renderer);
 }

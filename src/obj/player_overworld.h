@@ -23,8 +23,6 @@ public:
 
     this->_collidable.boundingBox = {0, 0, 16, 16};
 
-    setListenForCollisions();
-
     SDL_Texture *texture = AssetManager::Instance()->getTexture(
         "assets/sprites/player_overworld.png");
 
@@ -39,7 +37,7 @@ public:
     _gravity.entityGravity = 0.0f;
   }
 
-  void update(float dt) override {
+  void update(double dt) override {
     AbstractGameObject::update(dt);
     InputHandler *inputHandler = InputHandler::Instance();
 

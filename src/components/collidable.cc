@@ -10,10 +10,13 @@ struct CollisionInfo {
   Rect rect;
 };
 
-collidable::collidable() {}
+collidable::collidable() {
+}
 
 collidable::collidable(v2f position, Rect boundingBox) {
   this->boundingBox = boundingBox;
+  this->rect = {position.x + boundingBox.x, position.y + boundingBox.y,
+          (float)boundingBox.w, (float)boundingBox.h};
 }
 
 // Calculate "Near time" and "Far time"
@@ -79,7 +82,7 @@ bool rayVsRect(v2f &ray_origin, v2f &ray_dir, RectF *target, v2f &contact_point,
 
 bool dynamicRectVsRect(RectF *r_dynamic, velocity inVelocity, Rect &r_static,
                        v2f &contact_point, v2f &contact_normal,
-                       float &contact_time, float dt) {
+                       float &contact_time, double dt) {
   if (inVelocity.v.x == 0.0f && inVelocity.v.y == 0.0f) {
     return false;
   }
@@ -98,48 +101,6 @@ bool dynamicRectVsRect(RectF *r_dynamic, velocity inVelocity, Rect &r_static,
   }
 
   return false;
-}
-
-std::vector<TileExistsAtResponse> collidable::tileExistsAt(RectF rect) {
-  static std::vector<TileExistsAtResponse> response;
-  response.clear();
-
-  Level *t = EntityManager::Instance()->getTilemap();
-  static std::vector<int> possibleIndices;
-  possibleIndices.clear();
-
-  t->getIndicesWithinRect({(int)round(rect.x), (int)round(rect.y),
-                           (int)round(rect.w), (int)round(rect.h)},
-                          possibleIndices);
-
-  for (uint32_t layerId = 0; layerId < t->layers.size(); layerId++) {
-    if (t->layers[layerId].tiles.size() == 0) {
-      continue;
-    }
-
-    for (int possibleIdx : possibleIndices) {
-      Tile tile = t->layers[layerId].tiles[possibleIdx];
-
-      if (tile.getActive()) {
-        int tileId = possibleIdx;
-        Rect r = t->getTileRect(possibleIdx);
-
-        if (rect.hasIntersection(&r)) {
-          int tilesetId = t->layers[layerId].def->tilesetId;
-
-          response.push_back(TileExistsAtResponse{
-              (int)layerId,
-              tileId,
-              tilesetId,
-              tile,
-              r,
-          });
-        }
-      }
-    }
-  }
-
-  return response;
 }
 
 std::vector<AbstractGameObject *> collidable::objectExistsAt(RectF rect) {
@@ -171,9 +132,7 @@ Rect getCollisionAt(RectF r) {
   static std::vector<int> possibleIndices;
   possibleIndices.clear();
 
-  tilemap->getIndicesWithinRect(
-      {(int)round(r.x), (int)round(r.y), (int)round(r.w), (int)round(r.h)},
-      possibleIndices);
+  tilemap->getIndicesWithinRect(r, possibleIndices);
 
   for (uint32_t layer = 0; layer < tilemap->layers.size(); layer++) {
     for (int possibleIdx : possibleIndices) {
@@ -204,7 +163,7 @@ Rect getCollisionAt(RectF r) {
 }
 
 CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
-                                           float dt) {
+                                           double dt) {
   CollisionResponse respnse = {false, false, false, false};
   v2 newPos = *position + velocity->v * dt;
   Rect collidedWith;

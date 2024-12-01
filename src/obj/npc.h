@@ -65,7 +65,7 @@ public:
     Dialogue::Instance()->message(message);
   }
 
-  void update(float dt) override { AbstractGameObject::update(dt); }
+  void update(double dt) override { AbstractGameObject::update(dt); }
 
   void draw(Renderer *renderer) override {
     _renderable.textureRect = _animator.getFrame();

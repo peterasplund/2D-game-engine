@@ -53,7 +53,8 @@ v2i Layer::getTilePos(uint32_t id) {
   return {-1, -1};
 }
 
-void Level::getIndicesWithinRect(Rect r, std::vector<int> &out) {
+template <class T, class J>
+void Level::getIndicesWithinRect(Rectangle<T, J> r, std::vector<int> &out) {
   int tileWidth = this->tileSize;
   int tileHeight = this->tileSize;
   int maxTileId = tilesWide * tilesTall;
@@ -96,3 +97,8 @@ v2i World::getCellByPx(v2i px, int currentLevelId) {
   Level *lvl = &levels[currentLevelId];
   return ((px / tileSize) / cellSize) + lvl->getPosition();
 }
+
+template void Level::getIndicesWithinRect(Rectangle<int, int> r, std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<float, float> r, std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<float, int> r, std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<int, float> r, std::vector<int> &out);

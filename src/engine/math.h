@@ -158,10 +158,10 @@ template <class T, class J> struct Rectangle {
   J w;
   J h;
 
-  int top() { return y; }
-  int bottom() { return y + h; }
-  int left() { return x; }
-  int right() { return x + w; }
+  T top() { return y; }
+  T bottom() { return y + h; }
+  T left() { return x; }
+  T right() { return x + w; }
 
   v2<T> pos() { return {x, y}; }
 

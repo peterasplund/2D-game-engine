@@ -14,6 +14,6 @@ public:
   virtual ~Scene() {}
 
   virtual void init() {}
-  virtual void update(float dt) {}
+  virtual void update(double dt) {}
   virtual void draw(Renderer* renderer) {}
 };

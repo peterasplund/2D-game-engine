@@ -13,13 +13,14 @@ class AbstractGameObject {
 public:
   collidable _collidable;
   v2f _position;
+  v2f _prevPosition;
   velocity _velocity;
   gravity _gravity;
   bool _persist = false;
   bool dead = false;
 
   virtual void init();
-  virtual void update(float dt);
+  virtual void update(double dt);
   virtual void draw(Renderer *renderer);
   virtual ~AbstractGameObject() {}
   virtual void handleEvent(SDL_Event *event) {};
@@ -44,15 +45,12 @@ public:
   v2f getPosition();
   void setPosition(v2f p);
   v2f *getPositionPointer();
-  bool getListensForCollisions();
   GAME_OBJECT getType();
   OBJECT_TAG getTag();
   bool hurt = false;
+  Renderable _renderable;
 
 protected:
   GAME_OBJECT _type;
   OBJECT_TAG _tag;
-  /// Will be able to listen to other collisions.
-  bool _listenForCollisions = false;
-  Renderable _renderable;
 };

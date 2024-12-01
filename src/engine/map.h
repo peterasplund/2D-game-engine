@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDL2/SDL_render.h>
 #include "math.h"
+#include <SDL2/SDL_render.h>
 #include <algorithm>
 #include <map>
 #include <string>
@@ -149,7 +149,9 @@ struct Level {
 
   int getIdxFromPoint(v2i point);
   v2i idxToPoint(int idx);
-  void getIndicesWithinRect(Rect r, std::vector<int> &out);
+
+  template <class T, class J>
+  void getIndicesWithinRect(Rectangle<T, J> r, std::vector<int> &out);
   Rect getTileRect(int tileIdx);
   int getTileSize();
 

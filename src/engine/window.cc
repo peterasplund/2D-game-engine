@@ -1,5 +1,6 @@
 #include "window.h"
 #include "logger.h"
+#include "settings.h"
 
 bool Window::init(const char *title, int width, int height) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -18,8 +19,13 @@ bool Window::init(const char *title, int width, int height) {
     exit(1);
   }
 
-  _renderer = SDL_CreateRenderer(
-      _window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  Uint32 flags = SDL_RENDERER_ACCELERATED;
+
+  if (gameSettings().vsync) {
+    flags |= SDL_RENDERER_PRESENTVSYNC;
+  }
+
+  _renderer = SDL_CreateRenderer(_window, -1, flags);
 
   // For opacity
   SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);

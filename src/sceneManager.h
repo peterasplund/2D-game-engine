@@ -40,7 +40,7 @@ public:
 
   void init() { _scenes[_current]->init(); }
 
-  void update(float dt) {
+  void update(double dt) {
     _scenes[_current]->update(dt);
 
     if (!_transitioningTo.empty()) {

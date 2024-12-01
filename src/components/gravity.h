@@ -9,7 +9,7 @@ struct gravity {
   float entityGravity = 0.02f;
   float maxFallSpeed = 0.8f;
 
-  void update(v2f *position, velocity *velocity, float dt) {
+  void update(v2f *position, velocity *velocity, double dt) {
     previouslyOnFloor = onFloor;
     if (!onFloor) {
       velocity->v.y += (entityGravity * dt) / 10;
