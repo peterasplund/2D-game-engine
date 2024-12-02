@@ -14,7 +14,7 @@ struct SlideController {
   /// How long to slide
   const float SLIDE_POWER = 0.4f;
   /// How fast to get to a stop
-  const float SLIDE_DEACCELERATION = 0.004f / 6;
+  const float SLIDE_DEACCELERATION = 0.0004f;
   float slideDelay = 400.0f;
   Timer slideTimer;
 

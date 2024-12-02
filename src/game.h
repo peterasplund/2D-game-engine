@@ -3,7 +3,6 @@
 #include "engine/inputHandler.h"
 #include "engine/ldtk.h"
 #include "engine/renderer.h"
-#include "engine/timer.h"
 #include "engine/window.h"
 #include "engine/settings.h"
 #include "font.h"
@@ -16,7 +15,7 @@ class Game {
 public:
   Game() {
     gameSettings().vsync = true;
-    gameSettings().maxFrameRate = 30; // this doesn't matter when vsync is enabled
+    gameSettings().maxFrameRate = 60; // this doesn't matter when vsync is enabled
 
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
@@ -53,13 +52,7 @@ public:
       LAST = NOW;
       NOW = SDL_GetPerformanceCounter();
 
-      deltaTime = (double)((NOW - LAST) * 1000 / SDL_GetPerformanceFrequency());
-
-      /*
-      deltaTime = std::min<double>(
-          (double)((NOW - LAST) * 1000 / SDL_GetPerformanceFrequency()),
-          MAX_DELTA_TIME);
-          */
+      deltaTime = (double)((NOW - LAST) * 1000.0f / SDL_GetPerformanceFrequency());
 
       renderer->clearScreen();
 
@@ -98,7 +91,7 @@ public:
 
       if (!gameSettings().vsync) {
         float elapsedMS = (END - NOW) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-        SDL_Delay(1000 / gameSettings().maxFrameRate -  elapsedMS);
+        SDL_Delay(1000 / (float)gameSettings().maxFrameRate -  elapsedMS);
       }
     }
 

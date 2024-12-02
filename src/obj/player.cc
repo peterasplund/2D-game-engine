@@ -7,11 +7,20 @@
 #include <cstdlib>
 
 float obj::Player::calcFriction(float v, float friction, double dt) {
+  if (v < 0) {
+    return std::min<float>(0.0f, v + (friction * dt));
+  }
+  else if (v > 0) {
+    return std::max<float>(0.0f, v - (friction * dt));
+  }
+  /*
+
   if (std::abs(v) > 0.01) {
     int sign = v > 0 ? 1 : -1;
 
     return (v - (friction * dt) * sign);
   }
+  */
 
   return 0.0f;
 }

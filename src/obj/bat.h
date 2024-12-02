@@ -41,11 +41,11 @@ public:
     _position.x = 255;
     _position.y = 198;
 
-    _velocity.v.x = -0.3f;
+    _velocity.v.x = -0.02f;
   }
 
   void update(double dt) override {
-    _position += _velocity.v;
+    _position += _velocity.v * dt;
     _position.y = AMPLITUDE * cos(SPEED / 2 * elapsedTime) + 50.0f;
     AbstractGameObject::update(dt);
     elapsedTime += dt;
@@ -54,10 +54,10 @@ public:
       hurt = false;
     }
 
-    if (_velocity.v.x > -0.3f) {
+    if (_velocity.v.x > -0.02f) {
       _velocity.v.x -= 0.02f;
-    } else if (_velocity.v.x < 0.3f) {
-      _velocity.v.x = -0.3f;
+    } else if (_velocity.v.x < 0.02f) {
+      _velocity.v.x = -0.02f;
     } else {
     }
   }

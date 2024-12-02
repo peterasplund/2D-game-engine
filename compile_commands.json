@@ -12,31 +12,11 @@
       "-g",
       "-c",
       "-o",
-      "bin/scene/gameplay.o",
-      "src/scene/gameplay.cc"
+      "bin/main.o",
+      "src/main.cc"
     ],
-    "directory": "/mnt/nvme0n1p1/code/sdl-game",
-    "file": "/mnt/nvme0n1p1/code/sdl-game/src/scene/gameplay.cc",
-    "output": "/mnt/nvme0n1p1/code/sdl-game/bin/scene/gameplay.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-Wwrite-strings",
-      "-Wall",
-      "-std=c++17",
-      "-I/usr/local/include",
-      "-I/usr/include/SDL2",
-      "-I./lib/imgui/include/",
-      "-O0",
-      "-g",
-      "-c",
-      "-o",
-      "bin/obj/player.o",
-      "src/obj/player.cc"
-    ],
-    "directory": "/mnt/nvme0n1p1/code/sdl-game",
-    "file": "/mnt/nvme0n1p1/code/sdl-game/src/obj/player.cc",
-    "output": "/mnt/nvme0n1p1/code/sdl-game/bin/obj/player.o"
+    "directory": "/home/peter/code/sdl-game",
+    "file": "/home/peter/code/sdl-game/src/main.cc",
+    "output": "/home/peter/code/sdl-game/bin/main.o"
   }
 ]

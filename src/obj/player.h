@@ -47,13 +47,13 @@ protected:
   /// value means higher jump).
   float JUMP_SHORT_GRAVITY = 0.006f;
   /// How fast to get to max run speed
-  const float RUN_ACCELERATION = 0.015f;
+  const float RUN_ACCELERATION = 0.0030f;
   /// How fast to get to a stop
-  const float RUN_DEACCELERATION = 0.02f / 6;
+  const float RUN_DEACCELERATION = 0.002f;
   /// How fast to get to max run speed in air
   const float AIR_ACCELERATION = 0.01f;
   /// How fast to get to a stop in air
-  const float AIR_DEACCELERATION = 0.003f / 6;
+  const float AIR_DEACCELERATION = 0.0003f;
   /// Max run speed
   const float RUN_SPEED = 0.16f;
 
