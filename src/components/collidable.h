@@ -10,18 +10,17 @@
 /// Each direction corresponds to the ID of the tile it collided with. -1 means
 /// no collision.
 struct CollisionResponse {
-  int top = -1;
-  int bottom = -1;
-  int left = -1;
-  int right = -1;
+  Rect* top;
+  Rect* bottom;
+  Rect* left;
+  Rect* right;
 
   bool hasCollision() {
-    return top != -1 || bottom != -1 || left != -1 || right != -1;
+    return top != nullptr || bottom != nullptr || left != nullptr || right != nullptr;
   }
 
   void print() {
-    LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom,
-             left);
+    //LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom, left);
   }
 };
 

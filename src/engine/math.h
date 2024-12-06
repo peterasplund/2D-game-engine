@@ -37,6 +37,10 @@ template <class T> struct v2 {
     return sqrt(dx * dx + dy * dy);
   }
 
+  float dotProduct(v2<T> vec) {
+    return x * vec.x + y * vec.y;
+  }
+
   // Compare if this vector is numerically equal to another
   inline constexpr bool operator==(const v2 &rhs) const {
     return (this->x == rhs.x && this->y == rhs.y);

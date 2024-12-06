@@ -1,7 +1,5 @@
 #include "player.h"
-#include "../debugPrinter.h"
 #include "../engine/inputHandler.h"
-#include "damageNumbers.h"
 #include "npc.h"
 #include <cmath>
 #include <cstdlib>
@@ -13,16 +11,9 @@ float obj::Player::calcFriction(float v, float friction, double dt) {
   else if (v > 0) {
     return std::max<float>(0.0f, v - (friction * dt));
   }
-  /*
-
-  if (std::abs(v) > 0.01) {
-    int sign = v > 0 ? 1 : -1;
-
-    return (v - (friction * dt) * sign);
+  else {
+    return 0.0f;
   }
-  */
-
-  return 0.0f;
 }
 
 void obj::Player::init() {

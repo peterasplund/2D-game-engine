@@ -10,13 +10,12 @@ struct CollisionInfo {
   Rect rect;
 };
 
-collidable::collidable() {
-}
+collidable::collidable() {}
 
 collidable::collidable(v2f position, Rect boundingBox) {
   this->boundingBox = boundingBox;
   this->rect = {position.x + boundingBox.x, position.y + boundingBox.y,
-          (float)boundingBox.w, (float)boundingBox.h};
+                (float)boundingBox.w, (float)boundingBox.h};
 }
 
 // Calculate "Near time" and "Far time"
@@ -80,10 +79,10 @@ bool rayVsRect(v2f &ray_origin, v2f &ray_dir, RectF *target, v2f &contact_point,
   return true;
 }
 
-bool dynamicRectVsRect(RectF *r_dynamic, velocity inVelocity, Rect &r_static,
+bool dynamicRectVsRect(RectF *r_dynamic, v2f inVelocity, Rect &r_static,
                        v2f &contact_point, v2f &contact_normal,
                        float &contact_time, double dt) {
-  if (inVelocity.v.x == 0.0f && inVelocity.v.y == 0.0f) {
+  if (inVelocity.x == 0.0f && inVelocity.y == 0.0f) {
     return false;
   }
 
@@ -93,14 +92,14 @@ bool dynamicRectVsRect(RectF *r_dynamic, velocity inVelocity, Rect &r_static,
 
   v2f ray_origin = r_dynamic->pos() + r_dynamic->size() / 2;
 
-  v2f velocity = inVelocity.v * dt;
+  v2f velocity = inVelocity * dt;
 
-  if (rayVsRect(ray_origin, velocity, &expanded_target, contact_point,
-                contact_normal, contact_time)) {
+  if (rayVsRect(ray_origin, velocity, &expanded_target, contact_point, contact_normal, contact_time)) {
     return (contact_time >= 0.0f && contact_time < 1.0f);
   }
-
-  return false;
+  else {
+    return false;
+  }
 }
 
 std::vector<AbstractGameObject *> collidable::objectExistsAt(RectF rect) {
@@ -127,7 +126,8 @@ void collidable::update(v2f position) {
           (float)boundingBox.w, (float)boundingBox.h};
 }
 
-Rect getCollisionAt(RectF r) {
+std::vector<Rect> getCollisionAt(RectF r) {
+  std::vector<Rect> rects;
   Level *tilemap = EntityManager::Instance()->getTilemap();
   static std::vector<int> possibleIndices;
   possibleIndices.clear();
@@ -154,55 +154,82 @@ Rect getCollisionAt(RectF r) {
       DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 
       if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
-        return otherRect;
+        rects.push_back(otherRect);
+        // return otherRect;
       }
     }
   }
 
-  return {-1, -1, -1, -1};
+  return rects;
 }
 
 CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
                                            double dt) {
-  CollisionResponse respnse = {false, false, false, false};
+  CollisionResponse response;
   v2 newPos = *position + velocity->v * dt;
-  Rect collidedWith;
+  std::vector<Rect> collidedWith = getCollisionAt(addBoundingBox({(float)newPos.x, (float)newPos.y}));
 
-  if (velocity->v.y != 0) {
-    RectF r = addBoundingBox({position->x, newPos.y});
-    collidedWith = getCollisionAt(r);
+  v2f cp, cn;
+  float ct = 0.0f;
+  std::vector<v2i> normal;
+  std::vector<std::pair<int, float>> z;
 
-    if (collidedWith.w != -1 && collidedWith.h != -1) {
-      if (velocity->v.y > 0.0f) {
-        newPos.y = floor(collidedWith.y - boundingBox.y - boundingBox.h);
-        respnse.top = true;
-      } else {
-        newPos.y = floor(collidedWith.bottom() - boundingBox.y);
-        respnse.bottom = true;
-      }
-      velocity->v.y = 0.0f;
+  RectF playerRect = {
+    round(rect.x),
+    round(rect.y),
+    round(rect.w),
+    round(rect.h),
+  };
+
+  for (int i = 0; i < collidedWith.size(); i++) {
+    if (dynamicRectVsRect(&playerRect, velocity->v, collidedWith[i], cp, cn, ct, dt)) {
+      z.push_back({i, ct});
+      normal.push_back(cn);
+      break;
     }
   }
 
-  if (velocity->v.x != 0) {
-    Rect collidedWith;
-    RectF r = addBoundingBox({newPos.x, position->y});
-    collidedWith = getCollisionAt(r);
+  // Sort closest first
+  std::sort(z.begin(), z.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b)
+			{
+				return a.second < b.second;
+			});
 
-    if (collidedWith.w != -1 && collidedWith.h != -1) {
-      if (velocity->v.x > 0.0f) {
-        newPos.x = floor(collidedWith.x - boundingBox.x - boundingBox.w);
-        respnse.right = true;
-      } else {
-        newPos.x = floor(collidedWith.right() - boundingBox.x);
-        respnse.left = true;
-      }
-      velocity->v.x = 0.0f;
+
+  v2f newVelocity = velocity->v;
+
+  for (int i = 0; i < z.size(); i ++) {
+    if (dynamicRectVsRect(&playerRect, newVelocity, collidedWith[i], cp, cn, ct, dt)) {
+
+      position->x += velocity->v.x * z[i].second; 
+      position->y += velocity->v.y * z[i].second;
+
+      // Slide
+      //float remainingtime = 1.0f - z[i].second;
+
+      //float remainingtime = z[i].second;
+      //double dotprod = (velocity->v.x * normal[i].y + velocity->v.y * normal[i].x) * remainingtime; 
+
+
+      float dotProduct = velocity->v.dotProduct(normal[i]);
+      dotProduct = dotProduct * (float)z[i].second;
+      newVelocity = dotProduct *  dotProduct * collisionNormal.x()));
+
+
+      printf("vel: (%f, %f)\n", newVelocity.x, newVelocity.y);
+      //printf("dotprod: %f\n", dotprod);
+
+      //newVelocity.x = dotprod * normal[i].x; 
+      //newVelocity.y = dotprod * normal[i].y; 
+      break;
     }
   }
 
-  position->x = newPos.x;
-  position->y = newPos.y;
+  velocity->v.x = newVelocity.x;
+  velocity->v.y = newVelocity.y;
 
-  return respnse;
+  position->x += round(velocity->v.x * dt);
+  position->y += round(velocity->v.y * dt);
+
+  return response;
 }
