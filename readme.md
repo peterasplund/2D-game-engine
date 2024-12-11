@@ -2,6 +2,10 @@
 
 ## TODO:
 
+### Bugs
+- Set FPS to 10 and vsync off. Screen transition seems to transport player multiple times
+- Set FPS to 10 and vsync off. Jump is still FPS dependent.
+
 ### Gameplay
 
 - Enemy die/health
