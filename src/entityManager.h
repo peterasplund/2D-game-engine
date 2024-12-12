@@ -33,4 +33,5 @@ public:
   Level *getTilemap();
 
   static void release();
+  AbstractGameObject* _player;
 };

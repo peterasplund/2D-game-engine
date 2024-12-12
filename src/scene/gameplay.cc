@@ -5,8 +5,6 @@
 #include "../obj/npc.h"
 #include "../debugPrinter.h"
 
-const float LEVEL_FADE_SPEED = 2.3f;
-
 GameState gameState;
 
 // Use some configuration place to specify all game objects. Maybe even glob the
@@ -81,16 +79,6 @@ void GameplayScene::instantiateEntitites(Level *level) {
   }
 }
 
-void GameplayScene::drawFade() {
-  if (pendingLevel.iid != -1) {
-    int fade = max(min(transitionTimer, 255), 0);
-    Rect fadeRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
-    _renderer->setColor(0, 0, 0, fade);
-    _renderer->renderRectFilled(&fadeRect, false);
-  }
-}
-
 void GameplayScene::init() {
   dialogue = Dialogue::Instance();
   dialogue->init(_renderer);
@@ -132,6 +120,8 @@ void GameplayScene::init() {
       level->tilesTall * level->tileSize,
   });
 
+  this->levelManager = new LevelManager(world, &_camera);
+
   if (loaded) {
     return;
   }
@@ -140,36 +130,11 @@ void GameplayScene::init() {
   bg2 = new Bg("assets/bgs/houses.png", {480, 270});
   hud = new Hud();
 
-  auto player = EntityManager::Instance()->getEntityByTag(OBJECT_TAG::PLAYER);
+  auto player = EntityManager::Instance()->_player;
   _player = player;
   _camera.follow(player->getRectPointer());
   _renderer->setOffsetPtr(&_camera.pos);
   loaded = true;
-}
-
-void GameplayScene::switchLevel(LevelTransition level) {
-  this->_level = level.iid;
-  Level *lvl = &world->levels[this->_level];
-  std::list<AbstractGameObject *> entities =
-      EntityManager::Instance()->_entities;
-
-  for (AbstractGameObject *entity : EntityManager::Instance()->_entities) {
-    if (!entity->_persist) {
-      entity->dead = true;
-    }
-  }
-
-  // EntityManager::Instance()->clearAllButConstantEntities();
-  EntityManager::Instance()->setTileMap(lvl);
-
-  instantiateEntitites(lvl);
-
-  _player->setPosition(pendingLevel.playerPosition);
-  _player->_collidable.update(_player->_position);
-
-  _camera.setBounds(
-      {lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
-  _camera.pos.x = 0.0f;
 }
 
 void GameplayScene::update(double dt) {
@@ -180,27 +145,10 @@ void GameplayScene::update(double dt) {
     return;
   }
 
-  if (pendingLevel.iid != -1) {
-    if (!isFadingIn) {
-      transitionTimer += (LEVEL_FADE_SPEED * dt);
-      if (transitionTimer >= 255) {
-        isFadingIn = true;
-        switchLevel(pendingLevel);
-      }
-    } else {
-      transitionTimer -= (LEVEL_FADE_SPEED * dt);
-      if (transitionTimer <= 0) {
-        isFadingIn = false;
-        pendingLevel = {-1, {0, 0}};
-      }
-    }
+  levelManager->update(dt);
 
-    // update fade values
-    transitionTimer++;
-
-    if (!isFadingIn) {
-      return;
-    }
+  if (levelManager->isTransitioning()) {
+    return;
   }
 
   for (const auto &obj : EntityManager::Instance()->getEntities()) {
@@ -209,74 +157,15 @@ void GameplayScene::update(double dt) {
     }
   }
 
-  Level lvl = world->levels[this->_level];
-  RectF playerRect = _player->_collidable.addBoundingBox(_player->_position);
-
-  char dir = '-';
-  Level *nextLevel = nullptr;
-  v2f newPlayerPos = _player->getPosition();
-  v2i playerCellPos = world->getCellByPx(_player->_position, this->_level);
-
-  if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
-    if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
-      dir = 'e';
-      nextLevel = world->getLevelByCell({playerCellPos.x + 1, playerCellPos.y});
-      newPlayerPos.x = -playerRect.w - (playerRect.w / 2);
-    }
-  } else if (playerRect.right() <= 1) {
-    if (lvl.neighbours[NeighBourDirection::W].size() > 0) {
-      dir = 'w';
-      nextLevel = world->getLevelByCell({playerCellPos.x - 1, playerCellPos.y});
-
-      int tilesWide = world->levels[nextLevel->iid].tilesWide;
-
-      newPlayerPos.x =
-          (tilesWide * lvl.tileSize) - playerRect.w - (playerRect.w / 2);
-    }
-  } else if (playerRect.top() + 1 >= lvl.tilesTall * lvl.tileSize) {
-    if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
-      dir = 's';
-
-      nextLevel = world->getLevelByCell({playerCellPos.x, playerCellPos.y + 1});
-      newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
-    }
-  } else if (playerRect.bottom() <= 1) {
-    if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
-      dir = 'n';
-
-      nextLevel = world->getLevelByCell({playerCellPos.x, playerCellPos.y - 1});
-      nextLevel->cell.debugInt();
-
-      int tilesTall = world->levels[nextLevel->iid].tilesTall;
-
-      newPlayerPos.y =
-          (tilesTall * lvl.tileSize) - playerRect.h - (playerRect.h / 2);
-    }
-  }
-
-  if (nextLevel != nullptr) {
-    int id = nextLevel->iid;
-    LOG_INFO("goto level: %d", nextLevel->iid);
-    v2i oldWorldPosition = world->levels[this->_level].cellPositionPx;
-    v2i newWorldPosition = world->levels[id].cellPositionPx;
-
-    v2i diff = newWorldPosition - oldWorldPosition;
-
-    if (dir == 'e' || dir == 'w') {
-      newPlayerPos.y -= diff.y;
-    } else if (dir == 's' || dir == 'n') {
-      newPlayerPos.x -= diff.x;
-    }
-
-    pendingLevel = {id, newPlayerPos};
-  }
-
   _camera.update();
+  levelManager->update2();
 
+  /*
   if (pendingLevel.iid == -1) {
     gameState.visited[(playerCellPos.y * world->worldSizeInCells.x) +
                       playerCellPos.x] = true;
   }
+  */
 
   EntityManager::Instance()->update();
 }
@@ -337,5 +226,5 @@ void GameplayScene::draw(Renderer *renderer) {
 
   damageNumberSystem->draw(renderer);
 
-  this->drawFade();
+  levelManager->drawFade(renderer);
 }

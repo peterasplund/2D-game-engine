@@ -10,11 +10,7 @@
 #include "../map-hud.h"
 #include "../obj/damageNumbers.h"
 #include "../scene.h"
-
-struct LevelTransition {
-  int iid;
-  v2f playerPosition;
-};
+#include "../levelManager.h"
 
 class GameplayScene : public Scene {
 private:
@@ -26,18 +22,16 @@ private:
   Hud *hud;
   MapHud *mapHud;
   Dialogue *dialogue;
-  // Tilemap* tilemap;
   int _level;
   World *world;
   bool loaded = false;
   AbstractGameObject *instantiateGameObject(GAME_OBJECT);
   std::map<std::string, GAME_OBJECT> gameObjects;
-  int transitionTimer = 0;
-  bool isFadingIn = false;
-  LevelTransition pendingLevel = {-1, {0, 0}};
   DamageNumbersSystem *damageNumberSystem;
   void drawFade();
   void instantiateEntitites(Level *level);
+  void onSwitchLevel();
+  LevelManager* levelManager;
 
 public:
   ~GameplayScene() {
@@ -70,6 +64,4 @@ public:
   void init();
   void update(double dt);
   void draw(Renderer *renderer);
-
-  void switchLevel(LevelTransition level);
 };

@@ -17,6 +17,11 @@ EntityManager *EntityManager::Instance() {
 
 void EntityManager::addEntity(AbstractGameObject *x) {
   _entities.push_back(std::move(x));
+
+  // Add easy access to some global objects
+  if (x->getTag() == OBJECT_TAG::PLAYER) {
+    _player = x;
+  }
 }
 
 void EntityManager::setTileMap(Level *x) { _tilemap = x; }
