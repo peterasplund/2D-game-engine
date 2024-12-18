@@ -14,7 +14,7 @@
 class Game {
 public:
   Game() {
-    gameSettings().vsync = false;
+    gameSettings().vsync = true;
     gameSettings().maxFrameRate = 10; // this doesn't matter when vsync is enabled
 
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);

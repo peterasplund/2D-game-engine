@@ -1,9 +1,30 @@
 #include "entityManager.h"
 #include "abstractGameobject.h"
 #include "engine/logger.h"
+#include "obj/bat.h"
+#include "obj/npc.h"
+#include "obj/player.h"
+
+// Use some configuration place to specify all game objects. Maybe even glob the
+// object directory (bad idea?)
+AbstractGameObject *EntityManager::instantiateGameObject(GAME_OBJECT obj) {
+  AbstractGameObject *o = nullptr;
+  switch (obj) {
+  case GAME_OBJECT::PLAYER:
+    o = new obj::Player();
+    break;
+  case GAME_OBJECT::NPC:
+    o = new obj::Npc();
+    break;
+  }
+
+  return o;
+}
 
 EntityManager::EntityManager() {
   _entities = std::list<AbstractGameObject *>();
+
+  this->_camera = camera();
 }
 
 EntityManager *EntityManager::Instance() {
@@ -63,6 +84,65 @@ void EntityManager::update() {
       it = _entities.erase(it);
     } else {
       ++it;
+    }
+  }
+}
+
+void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
+  AbstractGameObject *bat = new obj::Bat();
+  bat->init();
+  addEntity(bat);
+
+  std::map<std::string, GAME_OBJECT> gameObjects = {
+      {"Player", GAME_OBJECT::PLAYER},
+  };
+
+  for (auto layer : level->layers) {
+    for (auto e : layer.entities) {
+      auto entityDef = world->entityDefs[e.uid];
+
+      if (entityDef.identifier == "NPC") {
+        auto npc = instantiateGameObject(GAME_OBJECT::NPC);
+
+        npc->_position = {(float)e.position.x, (float)e.position.y};
+
+        npc->init();
+
+        std::string name;
+        std::string dialogue;
+        for (auto field : e.fieldValues) {
+          LOG_TRACE("Parsed field: %s", field.identifier.c_str());
+          if (field.identifier == "name") {
+            name = field.value;
+          }
+          if (field.identifier == "dialogue") {
+            dialogue = field.value;
+          }
+        }
+
+        ((obj::Npc *)npc)->setProperties(name, dialogue);
+
+        addEntity(npc);
+      } else {
+        // Tmp solution
+        if (entityDef.identifier == "Player" && _player != nullptr) {
+          continue;
+        }
+
+        auto it = gameObjects.find(entityDef.identifier);
+
+        if (it == gameObjects.end()) {
+          continue;
+        }
+
+        auto object = instantiateGameObject(it->second);
+        if (object != nullptr) {
+          object->_position = {(float)e.position.x, (float)e.position.y};
+          object->init();
+
+          addEntity(object);
+        }
+      }
     }
   }
 }

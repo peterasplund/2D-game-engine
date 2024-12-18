@@ -20,22 +20,21 @@ public:
   int _level;
   World* _world;
   bool isFadingIn = false;
-  camera* _camera;
 
   bool isTransitioning() {
     return isFadingIn || pendingLevel.iid != -1;
   }
 
-  LevelManager(World* world, camera* _camera) {
+  LevelManager(World* world) {
     _world = world;
-    this->_camera = _camera;
+    this->_level = -1;
 
     // find player in levels
-    for (auto lvl : this->_world->levels) {
+    for (auto lvl : _world->levels) {
       for (auto layer : lvl.layers) {
         for (auto entity : layer.entities) {
           if (entity.identifier == "Player") {
-            this->_level = lvl.iid;
+            _level = lvl.iid;
           }
         }
       }
@@ -47,8 +46,9 @@ public:
     }
   }
 
-  void switchLevel(LevelTransition level) {
-    this->_level = level.iid;
+  void setLevel(int l) {
+    this->_level = l;
+    camera* _camera = &EntityManager::Instance()->_camera;
     Level *lvl = &_world->levels[this->_level];
     std::list<AbstractGameObject *> entities =
         EntityManager::Instance()->_entities;
@@ -60,17 +60,28 @@ public:
     }
 
     EntityManager::Instance()->setTileMap(lvl);
+    EntityManager::Instance()->instantiateLevelEntitites(_world, lvl);
 
-    /*
-    instantiateEntitites(lvl);
+    _camera->setBounds({lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
+    _camera->pos.x = 0.0f;
+  }
 
-    _player->setPosition(pendingLevel.playerPosition);
-    _player->_collidable.update(_player->_position);
+  void switchLevel(LevelTransition level) {
+    setLevel(level.iid);
 
-    _camera.setBounds(
-        {lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
-    _camera.pos.x = 0.0f;
-    */
+    obj::Player* player = (obj::Player*) EntityManager::Instance()->_player;
+    player->setPosition(pendingLevel.playerPosition);
+    player->_collidable.update(player->_position);
+
+
+    // Update every object once to prevent flashing bug. This happens
+    // since we pause objects and don't update them during a transition.
+    for (const auto &obj : EntityManager::Instance()->getEntities()) {
+      if (obj != nullptr) {
+        obj->update(0.0f);
+      }
+    }
+    EntityManager::Instance()->update();
   }
 
   void update(double dt) {
@@ -93,9 +104,7 @@ public:
         return;
       }
     }
-  }
 
-  void update2() {
     obj::Player* player = (obj::Player*) EntityManager::Instance()->_player;
     char dir = '-';
     Level *nextLevel = nullptr;

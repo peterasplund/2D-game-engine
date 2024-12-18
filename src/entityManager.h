@@ -3,7 +3,7 @@
 #include "engine/map.h"
 #include "globals.h"
 #include <list>
-
+#include "components/camera.h"
 #define MAX_ENTITIES 1024
 
 class AbstractGameObject;
@@ -24,6 +24,9 @@ public:
 
   void setTileMap(Level *x);
 
+  AbstractGameObject* instantiateGameObject(GAME_OBJECT obj);
+  void instantiateLevelEntitites(World* world, Level *level);
+
   const std::list<AbstractGameObject *> &getEntities();
   // std::vector<std::shared_ptr<AbstractGameObject>>
   // getEntitiesByTag(OBJECT_TAG tag);
@@ -33,5 +36,6 @@ public:
   Level *getTilemap();
 
   static void release();
-  AbstractGameObject* _player;
+  AbstractGameObject* _player = nullptr;
+  camera _camera;
 };

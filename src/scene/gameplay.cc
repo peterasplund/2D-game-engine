@@ -7,78 +7,6 @@
 
 GameState gameState;
 
-// Use some configuration place to specify all game objects. Maybe even glob the
-// object directory (bad idea?)
-AbstractGameObject *GameplayScene::instantiateGameObject(GAME_OBJECT obj) {
-  AbstractGameObject *o = nullptr;
-  switch (obj) {
-  case GAME_OBJECT::PLAYER:
-    o = new obj::Player();
-    break;
-  case GAME_OBJECT::NPC:
-    o = new obj::Npc();
-    break;
-  case GAME_OBJECT::DOOR:
-    o = new obj::Door();
-    break;
-  }
-
-  return o;
-}
-
-void GameplayScene::instantiateEntitites(Level *level) {
-  AbstractGameObject *bat = new obj::Bat(); bat->init(); EntityManager::Instance()->addEntity(bat);
-
-  for (auto layer : level->layers) {
-    for (auto e : layer.entities) {
-      auto entityDef = world->entityDefs[e.uid];
-
-      if (entityDef.identifier == "NPC") {
-        auto npc = instantiateGameObject(GAME_OBJECT::NPC);
-
-        npc->_position = {(float)e.position.x, (float)e.position.y};
-
-        npc->init();
-
-        std::string name;
-        std::string dialogue;
-        for (auto field : e.fieldValues) {
-          LOG_TRACE("Parsed field: %s", field.identifier.c_str());
-          if (field.identifier == "name") {
-            name = field.value;
-          }
-          if (field.identifier == "dialogue") {
-            dialogue = field.value;
-          }
-        }
-
-        ((obj::Npc *)npc)->setProperties(name, dialogue);
-
-        EntityManager::Instance()->addEntity(npc);
-      } else {
-        // Tmp solution
-        if (entityDef.identifier == "Player" && _player != nullptr) {
-          continue;
-        }
-
-        auto it = gameObjects.find(entityDef.identifier);
-
-        if (it == gameObjects.end()) {
-          continue;
-        }
-
-        auto object = instantiateGameObject(it->second);
-        if (object != nullptr) {
-          object->_position = {(float)e.position.x, (float)e.position.y};
-          object->init();
-
-          EntityManager::Instance()->addEntity(object);
-        }
-      }
-    }
-  }
-}
-
 void GameplayScene::init() {
   dialogue = Dialogue::Instance();
   dialogue->init(_renderer);
@@ -100,27 +28,19 @@ void GameplayScene::init() {
       _renderer, world,
       {(WINDOW_WIDTH / 4) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5), 8});
 
-  gameObjects = {
-      {"Player", GAME_OBJECT::PLAYER},
-      {"door", GAME_OBJECT::DOOR},
-  };
-
-  Level *level = &world->levels[this->_level];
-
-  instantiateEntitites(level);
-
-  for (auto layer : level->layers) {
-    // Init tiles
-    EntityManager::Instance()->setTileMap(level);
+  camera* _camera = &EntityManager::Instance()->_camera;
+  this->levelManager = new LevelManager(world);
+  Level *level = &world->levels[this->levelManager->_level];
+  if (level == nullptr) {
+    LOG_FATAL("Level was nullptr. Exit.");
   }
 
-  _camera = camera();
-  _camera.setBounds({
+  levelManager->setLevel(this->levelManager->_level);
+
+  _camera->setBounds({
       level->tilesWide * level->tileSize,
       level->tilesTall * level->tileSize,
   });
-
-  this->levelManager = new LevelManager(world, &_camera);
 
   if (loaded) {
     return;
@@ -132,8 +52,8 @@ void GameplayScene::init() {
 
   auto player = EntityManager::Instance()->_player;
   _player = player;
-  _camera.follow(player->getRectPointer());
-  _renderer->setOffsetPtr(&_camera.pos);
+  _camera->follow(player->getRectPointer());
+  _renderer->setOffsetPtr(&_camera->pos);
   loaded = true;
 }
 
@@ -157,23 +77,19 @@ void GameplayScene::update(double dt) {
     }
   }
 
-  _camera.update();
-  levelManager->update2();
+  // Update visited on map
+  v2i playerCellPos = world->getCellByPx(_player->getPosition(),  levelManager->_level);
+  gameState.visited[(playerCellPos.y * world->worldSizeInCells.x) +
+                    playerCellPos.x] = true;
 
-  /*
-  if (pendingLevel.iid == -1) {
-    gameState.visited[(playerCellPos.y * world->worldSizeInCells.x) +
-                      playerCellPos.x] = true;
-  }
-  */
-
+  EntityManager::Instance()->_camera.update();
   EntityManager::Instance()->update();
 }
 
 void GameplayScene::draw(Renderer *renderer) {
-  RectF camera = _camera.getRect();
+  RectF camera = EntityManager::Instance()->_camera.getRect();
+  Level *level = &world->levels[this->levelManager->_level];
   // v2f cameraOffset = { (float)camera.x, (float)camera.y };
-  Level *level = &world->levels[this->_level];
 
   // bg1->draw(renderer->getSdlRenderer(), 0);
   // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
@@ -220,7 +136,7 @@ void GameplayScene::draw(Renderer *renderer) {
 
   DebugPrinter::Instance()->draw(renderer);
 
-  mapHud->draw(_level, _player->_position);
+  mapHud->draw(this->levelManager->_level, _player->_position);
 
   dialogue->draw();
 
