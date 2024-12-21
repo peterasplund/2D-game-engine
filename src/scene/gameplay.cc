@@ -4,6 +4,7 @@
 #include "../obj/player.h"
 #include "../obj/npc.h"
 #include "../debugPrinter.h"
+#include "../engine/settings.h"
 
 GameState gameState;
 
@@ -24,9 +25,11 @@ void GameplayScene::init() {
   damageNumberSystem = DamageNumbersSystem::Instance();
   damageNumberSystem->init();
 
+  int windowWidth = gameSettings().windowWidth;
+
   mapHud = new MapHud(
       _renderer, world,
-      {(WINDOW_WIDTH / 4) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5), 8});
+      {(windowWidth) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5), 8});
 
   camera* _camera = &EntityManager::Instance()->_camera;
   this->levelManager = new LevelManager(world);

@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "scene.h"
 #include <map>
+#include "engine/settings.h"
 
 const int FADE_SPEED = 8;
 
@@ -33,7 +34,12 @@ private:
 public:
   SceneManager(Renderer *renderer) {
     _renderer = renderer;
-    _fadeRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    int windowWidth = gameSettings().windowWidth;
+    int windowHeight = gameSettings().windowHeight;
+    int zoom = gameSettings().zoom;
+
+    _fadeRect = {0, 0, windowWidth * zoom, windowHeight * zoom};
   }
 
   ~SceneManager() { _scenes.clear(); }

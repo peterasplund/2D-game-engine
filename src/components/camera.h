@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../engine/math.h"
+#include "../engine/settings.h"
 #include "../globals.h"
 
 struct camera {
@@ -14,8 +15,8 @@ struct camera {
   RectF *following; // entity to follow, eg. the player
 
   camera() {
-    int x = std::round(WINDOW_WIDTH / WINDOW_ZOOM);
-    int y = std::round(WINDOW_HEIGHT / WINDOW_ZOOM);
+    int x = std::round(gameSettings().windowWidth);
+    int y = std::round(gameSettings().windowHeight);
     viewport = {x, y};
   }
 

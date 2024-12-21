@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "obj/player.h"
 #include "components/camera.h"
+#include "engine/settings.h"
 
 const float LEVEL_FADE_SPEED = 2.3f;
 
@@ -171,7 +172,11 @@ public:
   void drawFade(Renderer* renderer) {
     if (pendingLevel.iid != -1) {
       int fade = max(min(transitionTimer, 255), 0);
-      Rect fadeRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+      int windowWidth = gameSettings().windowWidth;
+      int windowHeight = gameSettings().windowHeight;
+      int zoom = gameSettings().zoom;
+      Rect fadeRect = {0, 0, windowWidth * zoom, windowHeight * zoom};
       renderer->setColor(0, 0, 0, fade);
       renderer->renderRectFilled(&fadeRect, false);
     }

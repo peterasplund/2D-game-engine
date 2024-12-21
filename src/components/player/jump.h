@@ -13,7 +13,6 @@ struct JumpController {
 
   Timer jumpBufferTimer;
   bool jumpHold = false;
-  bool justJumped = false;
   bool jumpBuffered = false;
   /// How high the initial jump should be
   const float JUMP_POWER = 0.4f;

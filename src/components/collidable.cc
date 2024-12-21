@@ -43,7 +43,7 @@ void collidable::update(v2f position) {
           (float)boundingBox.w, (float)boundingBox.h};
 }
 
-Rect getCollisionAt(RectF r) {
+CollisionAt* getCollisionAt(RectF r) {
   Level *tilemap = EntityManager::Instance()->getTilemap();
   static std::vector<int> possibleIndices;
   possibleIndices.clear();
@@ -70,19 +70,21 @@ Rect getCollisionAt(RectF r) {
       DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 
       if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
-        return otherRect;
+        CollisionAt* resp = new CollisionAt{possibleIdx, tile};
+        return resp;
       }
     }
   }
 
-  return {-1, -1, -1, -1};
+  return nullptr;
 }
 
 CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
                                            double dt) {
-  CollisionResponse response = {false, false, false, false};
+  Level *tilemap = EntityManager::Instance()->getTilemap();
+  CollisionResponse response;
   v2f newPos = *position;
-  Rect collidedWith;
+  CollisionAt* collidedWith;
 
   float xValue = velocity->v.x * dt;
   float yValue = velocity->v.y * dt;
@@ -106,16 +108,19 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
     RectF r = addBoundingBox(newPos);
     collidedWith = getCollisionAt(r);
 
-    if (collidedWith.w != -1 && collidedWith.h != -1) {
-      if (velocity->v.x > 0.0f) {
-        newPos.x = floor(collidedWith.x - boundingBox.x - boundingBox.w);
-        response.right = true;
-      } else {
-        newPos.x = floor(collidedWith.right() - boundingBox.x);
-        response.left = true;
+    if (collidedWith != nullptr) {
+      Rect otherRect = tilemap->getTileRect(collidedWith->idx);
+      if (otherRect.w != -1 && otherRect.h != -1) {
+        if (velocity->v.x > 0.0f) {
+          newPos.x = floor(otherRect.x - boundingBox.x - boundingBox.w);
+          response.right = collidedWith;
+        } else {
+          newPos.x = floor(otherRect.right() - boundingBox.x);
+          response.left = collidedWith;
+        }
+        velocity->v.x = 0;
+        break;
       }
-      velocity->v.x = 0;
-      break;
     }
   }
 
@@ -128,23 +133,24 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
       framePos += 1;
     }
 
-    //printf("framePos: %f\n", framePos);
-
     newPos.y = velocity->v.y > 0 ? position->y + framePos : position->y - framePos;
     RectF r = addBoundingBox(newPos);
     collidedWith = getCollisionAt(r);
+    if (collidedWith != nullptr) {
+      Rect otherRect = tilemap->getTileRect(collidedWith->idx);
 
-    if (collidedWith.w != -1 && collidedWith.h != -1) {
-      if (velocity->v.y > 0.0f) {
-        newPos.y = floor(collidedWith.y - boundingBox.y - boundingBox.h);
-        response.bottom = true;
-      } else {
-        newPos.y = floor(collidedWith.bottom() - boundingBox.y);
-        newPos.y = floor(collidedWith.bottom() - boundingBox.y);
-        response.top = true;
+      if (otherRect.w != -1 && otherRect.h != -1) {
+        if (velocity->v.y > 0.0f) {
+          newPos.y = floor(otherRect.y - boundingBox.y - boundingBox.h);
+          response.bottom = collidedWith;
+        } else {
+          newPos.y = floor(otherRect.bottom() - boundingBox.y);
+          newPos.y = floor(otherRect.bottom() - boundingBox.y);
+          response.top = collidedWith;
+        }
+        velocity->v.y = 0;
+        break;
       }
-      velocity->v.y = 0;
-      break;
     }
   }
 

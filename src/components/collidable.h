@@ -6,22 +6,26 @@
 #include "../entityManager.h"
 #include "velocity.h"
 
+struct CollisionAt {
+  int idx;
+  Tile tile;
+};
+
 // @TODO: use bitfield instead?
 /// Each direction corresponds to the ID of the tile it collided with. -1 means
 /// no collision.
 struct CollisionResponse {
-  int top = -1;
-  int bottom = -1;
-  int left = -1;
-  int right = -1;
+  CollisionAt* top = nullptr;
+  CollisionAt* bottom = nullptr;
+  CollisionAt* left = nullptr;
+  CollisionAt* right = nullptr;
 
   bool hasCollision() {
-    return top != -1 || bottom != -1 || left != -1 || right != -1;
+    return top || bottom || left || right;
   }
 
   void print() {
-    LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom,
-             left);
+    //LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom, left);
   }
 };
 

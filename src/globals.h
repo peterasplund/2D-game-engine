@@ -2,10 +2,6 @@
 
 #include <vector>
 
-#define WINDOW_WIDTH 480 * 4
-#define WINDOW_HEIGHT 272 * 4
-#define WINDOW_ZOOM 4
-#define WINDOW_FPS 60
 #define MAX_DELTA_TIME 7
 
 enum class GAME_OBJECT {

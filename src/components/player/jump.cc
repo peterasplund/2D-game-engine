@@ -18,7 +18,6 @@ void JumpController::performJump() {
   player->state = obj::State::JUMP;
   player->_velocity.v.y = -JUMP_POWER;
   jumpHold = true;
-  justJumped = true;
 }
 
 void JumpController::jump() {

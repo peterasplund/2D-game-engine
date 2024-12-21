@@ -77,7 +77,7 @@ void Level::getIndicesWithinRect(Rectangle<T, J> r, std::vector<int> &out) {
 }
 
 Rect Level::getTileRect(int tileIdx) {
-  if (tileIdx > (tilesWide * tilesTall)) {
+  if (tileIdx > (tilesWide * tilesTall) || tileIdx < 0) {
     LOG_FATAL("Error: Checking tiles out of bounds");
     exit(1);
   }

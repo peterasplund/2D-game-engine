@@ -15,7 +15,8 @@ class Game {
 public:
   Game() {
     gameSettings().vsync = true;
-    gameSettings().maxFrameRate = 10; // this doesn't matter when vsync is enabled
+    gameSettings().maxFrameRate = 60; // this doesn't matter when vsync is enabled
+    gameSettings().zoom = 3;
 
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
@@ -25,11 +26,13 @@ public:
     InputHandler::Instance()->addButton(SDLK_j, BUTTON::ATTACK);
     InputHandler::Instance()->addButton(SDLK_p, BUTTON::MENU);
 
-    Window window("Hello world", WINDOW_WIDTH, WINDOW_HEIGHT);
+    int zoom = gameSettings().zoom;
+    int width = gameSettings().windowWidth;
+    int height = gameSettings().windowHeight;
+    Window window("Hello world", width * zoom, height * zoom);
 
     SDL_Renderer *sdl_renderer = window.getRenderer();
-    SDL_RenderSetScale(sdl_renderer, WINDOW_ZOOM,
-                       WINDOW_ZOOM); // Set 4x zoom for the pixelated look
+    SDL_RenderSetScale(sdl_renderer, zoom, zoom);
 
     ImguiLayer::Instance()->init(window.getWindow(), window.getRenderer());
     AssetManager::Instance()->init(sdl_renderer);

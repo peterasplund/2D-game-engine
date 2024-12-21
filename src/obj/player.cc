@@ -444,7 +444,7 @@ void obj::Player::update(double dt) {
 
   _prevPosition = _position;
   _gravity.onFloor = false;
-  _collidable.moveAndSlide(&_position, &_velocity, dt);
+  CollisionResponse resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
 
   for (auto tile : tilesBelow) {
     if (tile.tile.getSolid()) {
