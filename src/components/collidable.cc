@@ -10,6 +10,94 @@ struct CollisionInfo {
   Rect rect;
 };
 
+// Calculate "Near time" and "Far time"
+// https://youtu.be/8JJ-4JgR7Dg?t=1813
+bool rayVsRect(v2f& ray_origin, v2f& ray_dir, RectF* target,
+    v2f& contact_point, v2f& contact_normal, float& t_hit_near) {
+  contact_normal = { 0,0 };
+  contact_point = { 0,0 };
+
+  // Cache division
+  v2f invdir = 1.0f / ray_dir;
+  v2i targetPos = target->pos();
+  v2i targetSize = target->size();
+
+  // Calculate intersections with rectangle bounding axes
+  v2f t_near = (targetPos - ray_origin) * invdir;
+  v2f t_far = (targetPos + targetSize - ray_origin) * invdir;
+
+  if (std::isnan(t_far.y) || std::isnan(t_far.x)) return false;
+  if (std::isnan(t_near.y) || std::isnan(t_near.x)) return false;
+
+  // Sort distances
+  if (t_near.x > t_far.x) std::swap(t_near.x, t_far.x);
+  if (t_near.y > t_far.y) std::swap(t_near.y, t_far.y);
+
+  // Early rejection		
+  if (t_near.x > t_far.y || t_near.y > t_far.x) return false;
+
+  // Closest 'time' will be the first contact
+  t_hit_near = std::max(t_near.x, t_near.y);
+
+  // Furthest 'time' is contact on opposite side of target
+  float t_hit_far = std::min(t_far.x, t_far.y);
+
+  // Reject if ray direction is pointing away from object
+  if (t_hit_far < 0)
+    return false;
+
+  // Contact point of collision from parametric line equation
+  contact_point = ray_origin + t_hit_near * ray_dir;
+
+  if (t_near.x > t_near.y) {
+    if (invdir.x < 0) {
+      contact_normal = { 1, 0 };
+    }
+    else {
+      contact_normal = { -1, 0 };
+    }
+  }
+  else if (t_near.x < t_near.y) {
+    if (invdir.y < 0) {
+      contact_normal = { 0, 1 };
+    }
+    else {
+      contact_normal = { 0, -1 };
+    }
+  }
+
+  return true;
+}
+
+bool collidable::dynamicRectVsRect(
+    RectF* r_dynamic, velocity inVelocity,
+    Rect& r_static, v2f& contact_point,
+    v2f& contact_normal, float& contact_time, float dt) {
+  if (inVelocity.v.x == 0.0f && inVelocity.v.y == 0.0f) {
+    return false;
+  }
+
+  RectF expanded_target;
+  expanded_target.setPos(r_static.pos() - r_dynamic->size() / 2);
+  expanded_target.setSize(r_static.size() + r_dynamic->size());
+
+  v2f ray_origin = r_dynamic->pos() + r_dynamic->size() / 2;
+
+  v2f velocity = inVelocity.v * dt;
+
+  if (rayVsRect(
+        ray_origin,
+        velocity,
+        &expanded_target,
+        contact_point,
+        contact_normal,
+        contact_time)) {
+    return (contact_time >= 0.0f && contact_time < 1.0f);
+  }
+
+  return false;
+}
+
 collidable::collidable() {
 }
 
@@ -118,7 +206,7 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
           newPos.x = floor(otherRect.right() - boundingBox.x);
           response.left = collidedWith;
         }
-        velocity->v.x = 0;
+        //velocity->v.x = 0;
         break;
       }
     }

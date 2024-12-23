@@ -33,6 +33,7 @@ public:
 
   static void release() {}
 
-  void addDebugRect(Rect *rect, Uint8 r, Uint8 g, Uint8 b);
+  void addDebugRect(Rectangle<int, int> *rect, Uint8 r, Uint8 g, Uint8 b);
+  void addDebugRect(Rectangle<float, float> *rect, Uint8 r, Uint8 g, Uint8 b);
   void draw(Renderer *renderer);
 };

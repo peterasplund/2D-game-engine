@@ -1,6 +1,6 @@
 #include "debugPrinter.h"
 
-void DebugPrinter::addDebugRect(Rect *rect, Uint8 r, Uint8 g, Uint8 b) {
+void DebugPrinter::addDebugRect(Rectangle<int, int> *rect, Uint8 r, Uint8 g, Uint8 b) {
   if (!*debugRectangles) {
     return;
   }
@@ -11,6 +11,11 @@ void DebugPrinter::addDebugRect(Rect *rect, Uint8 r, Uint8 g, Uint8 b) {
       b,
       *rect,
   });
+}
+
+void DebugPrinter::addDebugRect(Rectangle<float, float> *rect, Uint8 r, Uint8 g, Uint8 b) {
+  Rect rectI = { (int)rect->x, (int)rect->y, (int)rect->w, (int)rect->h };
+  this->addDebugRect(&rectI, r, g, b);
 }
 
 void DebugPrinter::draw(Renderer *renderer) {

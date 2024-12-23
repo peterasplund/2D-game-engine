@@ -205,7 +205,39 @@ void obj::Player::update(double dt) {
   jumpController.update(dt);
   attackController.update(dt);
 
-  // Level *tilemap = EntityManager::Instance()->getTilemap();
+  Level *tilemap = EntityManager::Instance()->getTilemap();
+
+  auto closeTiles = _collidable.tileExistsAtF({
+      _collidable.rect.x - _collidable.rect.w,
+      _collidable.rect.y - _collidable.rect.h,
+      _collidable.rect.w * 3,
+      _collidable.rect.h * 3,
+  });
+
+  onOneWayPlatform = false;
+  if (onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+    RectF feet = { _collidable.rect.x, _collidable.rect.y + _collidable.rect.h - 2, _collidable.rect.w, 2 };
+    DebugPrinter::Instance()->addDebugRect(&feet, 0, 255, 0);
+    if (_velocity.v.y >= 0.0f) {
+      for(auto closeTile : closeTiles) {
+        Tileset* tileset = &tilemap->world->tilesetDefs[closeTile.tilesetId];
+        if (tileset->tileHasTag(closeTile.tile.getTileId(), "Oneway")) {
+          float ct;
+          v2f cn, cp;
+
+          Rect closeTileRect = { closeTile.rect.x, closeTile.rect.y, closeTile.rect.w, 1 };
+
+          if (_collidable.dynamicRectVsRect(&feet, _velocity, closeTileRect, cp, cn, ct, dt)) {
+            if (cn.y < 0) {
+              _position.y = closeTile.rect.y - 43;
+              _velocity.v.y = 0.0f;
+            }
+          }
+        }
+      }
+    }
+  }
+
   RectF above = {
       _collidable.rect.x + 1,
       _position.y + normalBoundingbox.y - 1.0f,
@@ -249,6 +281,7 @@ void obj::Player::update(double dt) {
   }
 
   if (climbController.update(dt)) {
+    LOG_WARN("CLIMB");
     AbstractGameObject::update(dt);
     _collidable.moveAndSlide(&_position, &_velocity, dt);
     return;
@@ -324,97 +357,9 @@ void obj::Player::update(double dt) {
 
   this->slideController.update(dt);
 
-  onOneWayPlatform = false;
   Rect tilesBelowRect = {(int)round(_collidable.rect.x),
                          (int)_collidable.rect.bottom(),
                          (int)_collidable.rect.w, 1};
-  auto tilesBelow = _collidable.tileExistsAtI(tilesBelowRect);
-  /*
-
-  auto closeTiles = _collidable.tileExistsAtF({
-      _collidable.rect.x - _collidable.rect.w,
-      _collidable.rect.y - _collidable.rect.h,
-      _collidable.rect.w * 3,
-      _collidable.rect.h * 3,
-  });
-
-  //_gravity.onFloor = false;
-  RectF pxBelow = _collidable.rect;
-  pxBelow.h = _collidable.rect.h + 1;
-
-  float prevBottom = _prevPosition.y + _collidable.boundingBox.bottom();
-  float newBottom = _position.y + _collidable.boundingBox.bottom();
-  // printf("prev: %f new: %f\n", prevBottom, newBottom);
-
-  for (auto tile : tilesBelow) {
-    Tileset *tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
-    if (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) {
-      // bool standingOnPlatform = (int)_collidable.rect.bottom() + 1 ==
-      // (int)tile.rect.top();
-      bool passedThroughThisFrame =
-          prevBottom < tile.rect.y && newBottom >= tile.rect.y;
-      printf("%d\n", passedThroughThisFrame);
-
-      if (passedThroughThisFrame) {
-        if (tile.rect.hasIntersection(&tilesBelowRect) &&
-            _velocity.v.y > 0.1f) {
-          // if ((pxBelow.hasIntersection(&tile.rect) && _velocity.v.y == 0.0f))
-          // {
-          printf("on platform\n");
-          onOneWayPlatform = true;
-          _gravity.onFloor = true;
-          _velocity.v.y = 0.0f;
-          _position.y =
-              tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
-          break;
-        } else if (_collidable.rect.bottom() == tile.rect.top() - 1) {
-          onOneWayPlatform = true;
-          _gravity.onFloor = true;
-          _velocity.v.y = 0.0f;
-          _position.y =
-              tile.rect.y - _collidable.rect.h - _collidable.boundingBox.y;
-          break;
-        }
-      }
-    }
-  }
-  */
-
-  // SECTION: handle onFloor by checking below player.
-  /*
-  auto tilesBelow = _collidable.tileExistsAt<float>(
-      {_collidable.rect.x, (_collidable.rect.y + _collidable.rect.h),
-       _collidable.rect.w, 1});
-
-  if (tilesBelow.size() > 0) {
-    for (auto tile : tilesBelow) {
-      Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
-
-      if (tile.tile.getSolid() || tileset->tileHasTag(tile.tile.getTileId(),
-  "Oneway")) { _gravity.onFloor = true;
-      }
-    }
-  }
-  */
-
-  /*
-    else {
-    Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
-
-      if (onwayPlatformFallThroughTimer.elapsed() >
-    ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) { if
-    (tileset->tileHasTag(tile.tile.getTileId(), "Oneway")) { if (prevBB.bottom()
-    <= _collidable.rect.top()) { printf("on top\n"); onOneWayPlatform = true;
-            _jumpHold = false;
-            _gravity.onFloor = true;
-            _velocity.v.y = 0.0f;
-            setPosition({_position.x, tile.rect.y - _collidable.rect.h -
-                                          _collidable.boundingBox.y});
-          }
-        }
-      }
-    }
-  */
 
   previouslyOnFloor = _gravity.onFloor;
   _gravity.entityGravity = jumpController.jumpHold && _velocity.v.y < -0.3f
@@ -443,11 +388,29 @@ void obj::Player::update(double dt) {
   }
 
   _prevPosition = _position;
-  _gravity.onFloor = false;
   CollisionResponse resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
+  //resp.print();
 
+  _gravity.onFloor = false;
+
+  auto tilesBelow = _collidable.tileExistsAtI(tilesBelowRect);
   for (auto tile : tilesBelow) {
-    if (tile.tile.getSolid()) {
+    Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
+    bool oneWay = tileset->tileHasTag(tile.tile.getTileId(), "Oneway");
+
+    if (oneWay && tile.rect.y != tilesBelowRect.bottom() - 1) {
+      oneWay = false;
+    }
+
+    if (onwayPlatformFallThroughTimer.elapsed() <= ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+      oneWay = false;
+    }
+
+    if (oneWay) {
+      onOneWayPlatform = true;
+    }
+
+    if (tile.tile.getSolid() || oneWay) {
       _gravity.onFloor = true;
     }
   }
@@ -459,6 +422,12 @@ void obj::Player::onInputPressed(int button) {
   jumpController.onInputPressed(button);
   attackController.onInputPressed(button);
   slideController.onInputPressed(button);
+
+  if (onOneWayPlatform && button == BUTTON::JUMP) {
+    onwayPlatformFallThroughTimer.reset();
+    onOneWayPlatform = false;
+    LOG_FATAL("FALL THROUGH");
+  }
 };
 
 void obj::Player::onInputReleased(int button) {

@@ -14,7 +14,7 @@
 class Game {
 public:
   Game() {
-    gameSettings().vsync = true;
+    gameSettings().vsync = false;
     gameSettings().maxFrameRate = 60; // this doesn't matter when vsync is enabled
     gameSettings().zoom = 3;
 
@@ -77,11 +77,11 @@ public:
         imgui->processEvents(&event);
       }
 
-      int fps = floor(1000 / deltaTime);
+      //int fps = floor(1000 / deltaTime);
       _sceneManager->update(deltaTime);
       _sceneManager->draw(renderer);
-      sprintf(fpsString, "fps: %d", fps);
-      debugFont->drawString(fpsString, {32, 32});
+      //sprintf(fpsString, "fps: %d", fps);
+      //debugFont->drawString(fpsString, {32, 32});
 
       imgui->drawBegin();
       imgui->debugEntities(EntityManager::Instance()->getEntities());

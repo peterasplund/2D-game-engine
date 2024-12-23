@@ -21,11 +21,14 @@ struct CollisionResponse {
   CollisionAt* right = nullptr;
 
   bool hasCollision() {
-    return top || bottom || left || right;
+    return top != nullptr || bottom != nullptr || left != nullptr || right != nullptr;
   }
 
   void print() {
-    //LOG_INFO("top: %d\t right: %d\t bottom: %d\tleft: %d", top, right, bottom, left);
+    LOG_DEBUG(
+      "collision (▲%d\t►%d\t▼%d\t◄%d)", 
+      top != nullptr, right != nullptr, bottom != nullptr, left != nullptr
+    );
   }
 };
 
@@ -45,6 +48,12 @@ public:
   collidable();
   collidable(v2f position, Rect boundingBox);
   bool checkCollision(Rect *r, Level *tilemap, Rect *outRect);
+
+  bool dynamicRectVsRect(
+      RectF* r_dynamic, velocity inVelocity,
+      Rect& r_static, v2f& contact_point,
+      v2f& contact_normal, float& contact_time, float dt);
+
   std::vector<TileExistsAtResponse> tileExistsAtF(RectF rect) {
     static std::vector<TileExistsAtResponse> response;
     response.clear();
