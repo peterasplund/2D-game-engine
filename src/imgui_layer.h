@@ -64,7 +64,7 @@ public:
 
   bool *getDebugRectanglesBool() { return &debugRectangles; }
 
-  void debugEntities(const std::list<AbstractGameObject *> &entities) {
+  void debugEntities(const std::vector<AbstractGameObject *> &entities) {
     if (!imguiVisible) {
       return;
     }

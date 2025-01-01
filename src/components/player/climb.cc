@@ -14,7 +14,7 @@ bool ClimbController::update(double dt) {
       player->tileAt<float, float>({rect.x, rect.y - 9, rect.w, rect.h - 9}, "Ladder");
 
   if (player->state == obj::State::CLIMBING) {
-    player->_velocity.v.y = -0.0f;
+    player->_velocity.v.y = 0.0f;
     player->_renderable.textureFlip = SDL_FLIP_NONE;
     if (InputHandler::Instance()->isHeld(BUTTON::UP)) {
       player->_velocity.v.y = -0.1f;

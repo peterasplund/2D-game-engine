@@ -28,6 +28,7 @@ float obj::Player::calcFriction(float v, float friction, double dt) {
 void obj::Player::init() {
   AbstractGameObject::init();
 
+  _zIndex = 100;
   _tag = OBJECT_TAG::PLAYER;
   _type = GAME_OBJECT::PLAYER;
   _persist = true;
@@ -281,7 +282,7 @@ void obj::Player::update(double dt) {
   }
 
   if (climbController.update(dt)) {
-    LOG_WARN("CLIMB");
+    _gravity.entityGravity = 0.0f;
     AbstractGameObject::update(dt);
     _collidable.moveAndSlide(&_position, &_velocity, dt);
     return;

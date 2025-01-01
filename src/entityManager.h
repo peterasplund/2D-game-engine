@@ -2,7 +2,6 @@
 
 #include "engine/map.h"
 #include "globals.h"
-#include <list>
 #include "components/camera.h"
 #define MAX_ENTITIES 1024
 
@@ -13,7 +12,7 @@ class AbstractGameObject;
  */
 class EntityManager {
 public:
-  std::list<AbstractGameObject *> _entities;
+  std::vector<AbstractGameObject *> _entities;
   Level *_tilemap;
   EntityManager();
 
@@ -27,7 +26,7 @@ public:
   AbstractGameObject* instantiateGameObject(GAME_OBJECT obj);
   void instantiateLevelEntitites(World* world, Level *level);
 
-  const std::list<AbstractGameObject *> &getEntities();
+  const std::vector<AbstractGameObject *> &getEntities();
   // std::vector<std::shared_ptr<AbstractGameObject>>
   // getEntitiesByTag(OBJECT_TAG tag);
   /// Gets the first object it finds by tag

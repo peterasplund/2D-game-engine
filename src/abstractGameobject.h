@@ -18,6 +18,7 @@ public:
   gravity _gravity;
   bool _persist = false;
   bool dead = false;
+  int _zIndex = 0;
 
   virtual void init();
   virtual void update(double dt);

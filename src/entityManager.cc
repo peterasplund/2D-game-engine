@@ -22,7 +22,7 @@ AbstractGameObject *EntityManager::instantiateGameObject(GAME_OBJECT obj) {
 }
 
 EntityManager::EntityManager() {
-  _entities = std::list<AbstractGameObject *>();
+  _entities = std::vector<AbstractGameObject *>();
 
   this->_camera = camera();
 }
@@ -47,7 +47,7 @@ void EntityManager::addEntity(AbstractGameObject *x) {
 
 void EntityManager::setTileMap(Level *x) { _tilemap = x; }
 
-const std::list<AbstractGameObject *> &EntityManager::getEntities() {
+const std::vector<AbstractGameObject *> &EntityManager::getEntities() {
   return _entities;
 }
 
@@ -69,7 +69,7 @@ Level *EntityManager::getTilemap() { return _tilemap; }
 
 void EntityManager::release() {
   auto i = Instance()->_entities;
-  std::list<AbstractGameObject *>::iterator it;
+  std::vector<AbstractGameObject *>::iterator it;
   for (it = Instance()->_entities.begin(); it != Instance()->_entities.end();) {
     delete (*it);
     it = Instance()->_entities.erase(it);
@@ -77,7 +77,7 @@ void EntityManager::release() {
 }
 
 void EntityManager::update() {
-  std::list<AbstractGameObject *>::iterator it;
+  std::vector<AbstractGameObject *>::iterator it;
   for (it = _entities.begin(); it != _entities.end();) {
     if ((*it)->dead) {
       delete (*it);
@@ -145,4 +145,9 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
       }
     }
   }
+
+  // Sort by zIndex to always render in the correct order.
+  std::sort(_entities.begin(), _entities.end(), [](const AbstractGameObject* a, const AbstractGameObject* b) {
+      return a->_zIndex < b->_zIndex;
+  });
 }

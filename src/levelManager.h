@@ -51,7 +51,7 @@ public:
     this->_level = l;
     camera* _camera = &EntityManager::Instance()->_camera;
     Level *lvl = &_world->levels[this->_level];
-    std::list<AbstractGameObject *> entities =
+    std::vector<AbstractGameObject *> entities =
         EntityManager::Instance()->_entities;
 
     for (AbstractGameObject *entity : EntityManager::Instance()->_entities) {
@@ -64,7 +64,6 @@ public:
     EntityManager::Instance()->instantiateLevelEntitites(_world, lvl);
 
     _camera->setBounds({lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
-    _camera->pos.x = 0.0f;
   }
 
   void switchLevel(LevelTransition level) {
@@ -74,6 +73,7 @@ public:
     player->setPosition(pendingLevel.playerPosition);
     player->_collidable.update(player->_position);
 
+    (&EntityManager::Instance()->_camera)->update();
 
     // Update every object once to prevent flashing bug. This happens
     // since we pause objects and don't update them during a transition.
