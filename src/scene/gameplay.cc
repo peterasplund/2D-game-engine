@@ -99,6 +99,17 @@ void GameplayScene::draw(Renderer *renderer) {
 
   for (auto layer : level->layers) {
     if (layer.def->type == LayerType::ENTITIES) {
+      // @TODO: handle drawing some tiles after objects depending on their z-setting
+      // in the tmx-format Draw objects
+      for (const auto &obj : EntityManager::Instance()->getEntities()) {
+        if (obj != nullptr) {
+          Rect objRect = obj->getTextureRect();
+          if (objRect.hasIntersection(&camera)) {
+            obj->draw(renderer);
+          }
+        }
+      }
+
       continue;
     }
 
@@ -124,16 +135,6 @@ void GameplayScene::draw(Renderer *renderer) {
     }
   }
 
-  // @TODO: handle drawing some tiles after objects depending on their z-setting
-  // in the tmx-format Draw objects
-  for (const auto &obj : EntityManager::Instance()->getEntities()) {
-    if (obj != nullptr) {
-      Rect objRect = obj->getTextureRect();
-      if (objRect.hasIntersection(&camera)) {
-        obj->draw(renderer);
-      }
-    }
-  }
 
   hud->draw(renderer->getSdlRenderer());
 
