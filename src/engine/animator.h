@@ -5,10 +5,13 @@
 #include "timer.h"
 #include <map>
 #include <string>
+#include <memory>
 
 class Animator {
 public:
-  Animator() { timer = new Timer(); }
+  Animator() { 
+    timer = Timer(); 
+  }
 
   ~Animator() {}
 
@@ -63,5 +66,5 @@ public:
 private:
   std::map<std::string, Animation *> _animations;
   std::string _currentAnimation;
-  Timer *timer;
+  Timer timer;
 };

@@ -76,7 +76,14 @@ Layer parse_layer_instance(World *world, Level *level, json layerJson) {
         // switch (fieldValue.field->type) {
         // case Entity_Field_Tag::String:
         fieldValue.identifier = field["__identifier"];
-        fieldValue.value = field["__value"];
+
+        if (field["__value"].is_array()) {
+          //fieldValue.value = field["__value"][0]; // @TODO: implment this 
+        }
+        else {
+          fieldValue.value = field["__value"];
+        }
+
         entity.fieldValues.push_back(fieldValue);
         // break;
         // case Entity_Field_Tag::Integer:

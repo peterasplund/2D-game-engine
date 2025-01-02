@@ -3,13 +3,14 @@
 #include "../../engine/inputHandler.h"
 #include "../../obj/damageNumbers.h"
 #include "../../obj/player.h"
+#include "../../obj/player.h"
 
 void AttackController::update(double dt) {
   obj::State s = player->state;
 
   swordHitBox = {
       player->_position.x +
-          (player->direction == obj::Direction::LEFT ? -0 : 36),
+          (player->direction == Direction::LEFT ? -0 : 36),
       player->_position.y + 5.0f,
       20.0f,
       40.0f,
@@ -27,14 +28,14 @@ void AttackController::update(double dt) {
   for (auto entity : entitiesTouchingSword) {
     if (entity->getType() == GAME_OBJECT::ENEMY && s == obj::State::ATTACK) {
       int value = ((float)(rand()) / (float)RAND_MAX) * 1000;
-      if (!entity->hurt) {
+      if (!entity->hurt && !entity->invincible) {
         DamageNumbersSystem::Instance()->addNumber(
             value, {(int)(swordHitBox.left() + swordHitBox.w / 2 + 8),
                     (int)swordHitBox.top()});
 
         entity->damage(value);
 
-        if (player->direction == obj::Direction::RIGHT) {
+        if (player->direction == Direction::RIGHT) {
           entity->_velocity.v.x = 0.5f;
         } else {
           entity->_velocity.v.x = -0.5f;

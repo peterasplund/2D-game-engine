@@ -9,6 +9,7 @@ enum class GAME_OBJECT {
   DOOR,
   NPC,
   ENEMY,
+  SKELETON,
 };
 
 enum class OBJECT_TAG {

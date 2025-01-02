@@ -427,7 +427,6 @@ void obj::Player::onInputPressed(int button) {
   if (onOneWayPlatform && button == BUTTON::JUMP) {
     onwayPlatformFallThroughTimer.reset();
     onOneWayPlatform = false;
-    LOG_FATAL("FALL THROUGH");
   }
 };
 

@@ -2,6 +2,7 @@
 #include "abstractGameobject.h"
 #include "engine/logger.h"
 #include "obj/bat.h"
+#include "obj/skeleton.h"
 #include "obj/npc.h"
 #include "obj/player.h"
 
@@ -15,6 +16,9 @@ AbstractGameObject *EntityManager::instantiateGameObject(GAME_OBJECT obj) {
     break;
   case GAME_OBJECT::NPC:
     o = new obj::Npc();
+    break;
+  case GAME_OBJECT::SKELETON:
+    o = new obj::Skeleton();
     break;
   }
 
@@ -129,13 +133,27 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
           continue;
         }
 
-        auto it = gameObjects.find(entityDef.identifier);
+        AbstractGameObject* object;
 
-        if (it == gameObjects.end()) {
-          continue;
+        if (entityDef.identifier == "Monster") {
+          std::string enemyType = "";
+          for (auto field : e.fieldValues) {
+            if (field.identifier == "enemyType") {
+              enemyType = field.value;
+            }
+          }
+          object = instantiateGameObject(GAME_OBJECT::SKELETON);
+        }
+        else {
+          auto it = gameObjects.find(entityDef.identifier);
+
+          if (it == gameObjects.end()) {
+            continue;
+          }
+
+          object = instantiateGameObject(it->second);
         }
 
-        auto object = instantiateGameObject(it->second);
         if (object != nullptr) {
           object->_position = {(float)e.position.x, (float)e.position.y};
           object->init();

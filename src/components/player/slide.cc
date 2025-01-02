@@ -39,7 +39,7 @@ void SlideController::slide() {
 
       player->_animator.reset();
       player->_animator.setAnimation("slide");
-      player->_velocity.v.x = player->direction == obj::Direction::LEFT
+      player->_velocity.v.x = player->direction == Direction::LEFT
                                   ? -SLIDE_POWER
                                   : SLIDE_POWER;
     }

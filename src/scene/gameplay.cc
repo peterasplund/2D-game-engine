@@ -92,15 +92,12 @@ void GameplayScene::update(double dt) {
 void GameplayScene::draw(Renderer *renderer) {
   RectF camera = EntityManager::Instance()->_camera.getRect();
   Level *level = &world->levels[this->levelManager->_level];
-  // v2f cameraOffset = { (float)camera.x, (float)camera.y };
 
   // bg1->draw(renderer->getSdlRenderer(), 0);
   // bg2->draw(renderer->getSdlRenderer(), -camera.x * 0.04);
 
   for (auto layer : level->layers) {
     if (layer.def->type == LayerType::ENTITIES) {
-      // @TODO: handle drawing some tiles after objects depending on their z-setting
-      // in the tmx-format Draw objects
       for (const auto &obj : EntityManager::Instance()->getEntities()) {
         if (obj != nullptr) {
           Rect objRect = obj->getTextureRect();

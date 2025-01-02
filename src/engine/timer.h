@@ -10,6 +10,7 @@ class Timer
     Timer() {
       base = SDL_GetTicks();
     }
+    ~Timer() {}
 
     void reset() {
       base = SDL_GetTicks();

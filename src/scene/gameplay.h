@@ -22,7 +22,6 @@ private:
   Dialogue *dialogue;
   World *world;
   bool loaded = false;
-  AbstractGameObject *instantiateGameObject(GAME_OBJECT);
   DamageNumbersSystem *damageNumberSystem;
   void drawFade();
   void onSwitchLevel();

@@ -9,6 +9,8 @@
 #include "globals.h"
 #include <SDL2/SDL_events.h>
 
+enum class Direction { LEFT, RIGHT };
+
 class AbstractGameObject {
 public:
   collidable _collidable;
@@ -49,6 +51,7 @@ public:
   GAME_OBJECT getType();
   OBJECT_TAG getTag();
   bool hurt = false;
+  bool invincible = false;
   Renderable _renderable;
 
 protected:

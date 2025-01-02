@@ -20,8 +20,6 @@ enum class State {
   CLIMBING,
 };
 
-enum class Direction { LEFT, RIGHT };
-
 class Player : public AbstractGameObject {
 public:
   virtual ~Player() {}

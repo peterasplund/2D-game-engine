@@ -6,13 +6,6 @@
 #define MAP_HUD_CELL_WIDTH 10
 #define MAP_HUD_CELL_HEIGHT 8
 
-enum class Direction {
-  North,
-  West,
-  South,
-  East,
-};
-
 enum class BorderValue {
   Wall,
   Open,
