@@ -76,5 +76,7 @@ protected:
   AttackController attackController;
   ClimbController climbController;
   SlideController slideController;
+
+  bool debugFly = false;
 };
 } // namespace obj

@@ -135,7 +135,7 @@ public:
         dir = 's';
 
         nextLevel = _world->getLevelByCell({playerCellPos.x, playerCellPos.y + 1});
-        newPlayerPos.y = -playerRect.h - (playerRect.h / 2);
+        newPlayerPos.y = -playerRect.h;
       }
     } else if (playerRect.bottom() <= 1) {
       if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
@@ -147,7 +147,7 @@ public:
         int tilesTall = _world->levels[nextLevel->iid].tilesTall;
 
         newPlayerPos.y =
-            (tilesTall * lvl.tileSize) - playerRect.h - (playerRect.h / 2);
+            (tilesTall * lvl.tileSize) - playerRect.h; //- (playerRect.h / 2);
       }
     }
 

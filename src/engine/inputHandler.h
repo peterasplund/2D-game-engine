@@ -12,6 +12,7 @@ enum BUTTON {
   JUMP,
   ATTACK,
   MENU,
+  DEBUG_FLY,
   __LAST__,
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL_rect.h>
+#include "logger.h"
 
 int min(int a, int b);
 int max(int a, int b);
@@ -217,11 +218,11 @@ template <class T, class J> struct Rectangle {
 
   // @TODO: place this behind compiler flag
   void debug() {
-    printf("(x: %f\ty: %f\tw: %f\th: %f)\n", x, y, w, h);
+    LOG_DEBUG("(x: %f\ty: %f\tw: %f\th: %f)\n", x, y, w, h);
   }
 
   void debugInt() {
-    printf("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
+    LOG_DEBUG("(x: %d\ty: %d\tw: %d\th: %d)\n", x, y, w, h);
   }
 };
 

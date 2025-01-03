@@ -194,6 +194,30 @@ Tile *obj::Player::tileAt(Rectangle<T, J> rect, std::string property) {
 }
 
 void obj::Player::update(double dt) {
+  InputHandler *inputHandler = InputHandler::Instance();
+
+  debugFly = inputHandler->isHeld(BUTTON::DEBUG_FLY);
+
+  if (debugFly) {
+    if (inputHandler->isHeld(BUTTON::LEFT)) {
+      _position.x -= 0.5f * dt;
+    }
+    else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+      _position.x += 0.5f * dt;
+    }
+
+    if (inputHandler->isHeld(BUTTON::UP)) {
+      _position.y -= 0.5f * dt;
+    }
+    else if (inputHandler->isHeld(BUTTON::DOWN)) {
+      _position.y += 0.5f * dt;
+    }
+
+    AbstractGameObject::update(dt);
+
+    return;
+  }
+
   if (_velocity.v.x > 0.01f) {
     direction = Direction::RIGHT;
   } else if (_velocity.v.x < -0.01f) {
@@ -252,7 +276,6 @@ void obj::Player::update(double dt) {
     hasTileAbove = false;
   }
 
-  InputHandler *inputHandler = InputHandler::Instance();
   isMoving = false;
 
   auto entitiesTouching = _collidable.objectExistsAt(_collidable.rect);

@@ -25,6 +25,7 @@ public:
     InputHandler::Instance()->addButton(SDLK_k, BUTTON::JUMP);
     InputHandler::Instance()->addButton(SDLK_j, BUTTON::ATTACK);
     InputHandler::Instance()->addButton(SDLK_p, BUTTON::MENU);
+    InputHandler::Instance()->addButton(SDLK_SPACE, BUTTON::DEBUG_FLY);
 
     int zoom = gameSettings().zoom;
     int width = gameSettings().windowWidth;
