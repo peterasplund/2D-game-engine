@@ -18,6 +18,7 @@ enum class State {
   HURT,
   SLIDE,
   CLIMBING,
+  DEAD,
 };
 
 class Player : public AbstractGameObject {
@@ -39,6 +40,8 @@ public:
   Animator _animator;
   bool isMoving = false;
   bool onOneWayPlatform = false;
+  int maxHp = 25;
+  int hp = maxHp;
 
 protected:
   /// How much higher the player should go if they hold the jump button (lower
@@ -65,12 +68,16 @@ protected:
   Timer _infiniteTimer; // Never to be reset. Just use for animations and such
   float _normalGravity;
   bool _canInteract = false;
+  int _hurtInvicibility = 900;
+  float _hurtFlashTimer;
+  float _hurtForce = 10.0f;
   float backDashSpeed = 1.5f;
   bool isBackDashing = false;
   bool previouslyOnFloor = false;
   bool dead = false;
   Rect normalBoundingbox = {18, 15, 18, 28};
   Rect crouchingBoundingbox = {18, 27, 18, 16};
+  Rect deadBoundingbox = {4, 33, 30, 10};
   SDL_Texture *_interactableTexture;
   JumpController jumpController;
   AttackController attackController;

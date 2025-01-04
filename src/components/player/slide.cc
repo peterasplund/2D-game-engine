@@ -29,10 +29,9 @@ void SlideController::slide() {
   }
 
   // Slide
-  if (s == obj::State::CROUCH) {
+  if (s == obj::State::CROUCH && player->_gravity.onFloor) {
     // Check if on top of one-way platform. In that case we don't wanna slide
     // but deactivate the solid of the platform until we're below it
-    LOG_INFO("On owp: %d", player->onOneWayPlatform);
     if (!player->onOneWayPlatform) {
       player->state = obj::State::SLIDE;
       slideTimer.reset();

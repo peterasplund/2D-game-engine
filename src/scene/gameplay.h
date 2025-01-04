@@ -14,7 +14,7 @@
 class GameplayScene : public Scene {
 private:
   Renderer *_renderer;
-  AbstractGameObject *_player = nullptr;
+  obj::Player *_player = nullptr;
   Bg *bg1;
   Bg *bg2;
   Hud *hud;

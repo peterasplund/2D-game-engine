@@ -233,3 +233,6 @@ typedef Rectangle<int, int> Rect;
 
 Rectangle<int, int> group_rects(Rectangle<float, float> r1,
                                 Rectangle<float, float> r2);
+
+float lerp(float v0, float v1, float t);
+float easing(float t);

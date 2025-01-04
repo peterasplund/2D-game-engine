@@ -7,7 +7,7 @@
 #include "components/camera.h"
 #include "engine/settings.h"
 
-const float LEVEL_FADE_SPEED = 2.3f;
+const int FADE_TIME = 150;
 
 struct LevelTransition {
   int iid;
@@ -17,13 +17,13 @@ struct LevelTransition {
 class LevelManager {
 public:
   LevelTransition pendingLevel = {-1, {0, 0}};
-  int transitionTimer = 0;
+  Timer transitionTimer;
   int _level;
   World* _world;
-  bool isFadingIn = false;
+  bool isFadingToBlack = true;
 
   bool isTransitioning() {
-    return isFadingIn || pendingLevel.iid != -1;
+    return pendingLevel.iid != -1 && isFadingToBlack;
   }
 
   LevelManager(World* world) {
@@ -87,21 +87,24 @@ public:
 
   void update(double dt) {
     if (pendingLevel.iid != -1) {
-      if (!isFadingIn) {
-        transitionTimer += (LEVEL_FADE_SPEED * dt);
-        if (transitionTimer >= 255) {
-          isFadingIn = true;
+      if (isFadingToBlack) {
+        if (transitionTimer.elapsed() > FADE_TIME) {
+          transitionTimer.reset();
+          isFadingToBlack = false;
           switchLevel(pendingLevel);
+          return;
         }
-      } else {
-        transitionTimer -= (LEVEL_FADE_SPEED * dt);
-        if (transitionTimer <= 0) {
-          isFadingIn = false;
+      }
+      else {
+        if (transitionTimer.elapsed() > FADE_TIME) {
+          transitionTimer.reset();
+          isFadingToBlack = true;
           pendingLevel = {-1, {0, 0}};
+          return;
         }
       }
 
-      if (!isFadingIn) {
+      if (isFadingToBlack) {
         return;
       }
     }
@@ -166,12 +169,19 @@ public:
       }
 
       pendingLevel = {id, newPlayerPos};
+      transitionTimer.reset();
     }
   }
 
   void drawFade(Renderer* renderer) {
     if (pendingLevel.iid != -1) {
-      int fade = max(min(transitionTimer, 255), 0);
+      float timerValue = (float)transitionTimer.elapsed() / (float)FADE_TIME;
+
+      float fadeFraction = isFadingToBlack 
+        ? lerp(0, 1, easing(timerValue))
+        : lerp(1, 0, easing(timerValue));
+
+      int fade = fadeFraction * 255;
 
       int windowWidth = gameSettings().windowWidth;
       int windowHeight = gameSettings().windowHeight;

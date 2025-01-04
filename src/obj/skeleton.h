@@ -111,6 +111,7 @@ public:
     _collidable.moveAndSlide(&_position, &_velocity, dt);
     _velocity.v.x = 0.0f;
     invincible = false;
+    active = true;
     switch (_state) {
       case State::WALK:
         if (_direction == Direction::RIGHT) {
@@ -125,17 +126,22 @@ public:
         }
         break;
       case State::RISING:
+        invincible = true;
+        active = false;
         if (_stateTimer.elapsed() > _risingTime) {
           setState(State::WALK);
         }
         break;
       case State::MELTING:
+        invincible = true;
+        active = false;
         if (_stateTimer.elapsed() > _meltingTime) {
           setState(State::HIDING);
         }
         break;
       case State::HIDING:
         invincible = true;
+        active = false;
         if (_stateTimer.elapsed() > _hidingTime) {
           setState(State::RISING);
         }
@@ -195,6 +201,7 @@ protected:
   Timer _timer;
   Timer _stateTimer;
   int hp = 3000;
+  int damagePoints = 15;
   float hurtTimer;
 };
 } // namespace obj

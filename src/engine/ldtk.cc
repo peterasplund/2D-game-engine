@@ -200,14 +200,15 @@ World createWorld(std::string filePath) {
   int i = 0;
   LOG_TRACE("parsing tileset defs");
   for (json tilesetDefJson : data["defs"]["tilesets"]) {
-    std::string identifier = tilesetDefJson["identifier"];
+    // Skip internal icons
+    if (tilesetDefJson["identifier"] == "Internal_Icons") { continue; }
+    // Skip tilesets without textures
+    if (tilesetDefJson["relPath"].is_null()) { continue; }
 
-    if (identifier != "Internal_Icons") {
-      Tileset tileset = parse_tileset(projectPath, tilesetDefJson);
-      tilesetUidMap[tileset.id] = i;
-      world.tilesetDefs.push_back(tileset);
-      i++;
-    }
+    Tileset tileset = parse_tileset(projectPath, tilesetDefJson);
+    tilesetUidMap[tileset.id] = i;
+    world.tilesetDefs.push_back(tileset);
+    i++;
   }
 
   i = 0;

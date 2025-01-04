@@ -68,10 +68,10 @@ public:
     _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
 
     if (hurt) {
-      hurtTimer += 0.1;
+      _hurtFlashTimer += 0.1;
     }
 
-    if (!hurt || (int)hurtTimer % 2) {
+    if (!hurt || (int)_hurtFlashTimer % 2) {
       AbstractGameObject::draw(renderer);
     }
   }
@@ -92,6 +92,6 @@ protected:
 
   Timer _timer;
   int hp = 3000;
-  float hurtTimer;
+  float _hurtFlashTimer;
 };
 } // namespace obj

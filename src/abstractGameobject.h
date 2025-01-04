@@ -21,6 +21,7 @@ public:
   bool _persist = false;
   bool dead = false;
   int _zIndex = 0;
+  int damagePoints = 5;
 
   virtual void init();
   virtual void update(double dt);
@@ -52,6 +53,7 @@ public:
   OBJECT_TAG getTag();
   bool hurt = false;
   bool invincible = false;
+  bool active = true;
   Renderable _renderable;
 
 protected:

@@ -54,7 +54,7 @@ void GameplayScene::init() {
   hud = new Hud();
 
   auto player = EntityManager::Instance()->_player;
-  _player = player;
+  _player = (obj::Player*)player;
   _camera->follow(player->getRectPointer());
   _renderer->setOffsetPtr(&_camera->pos);
   loaded = true;
@@ -132,8 +132,7 @@ void GameplayScene::draw(Renderer *renderer) {
     }
   }
 
-
-  hud->draw(renderer->getSdlRenderer());
+  hud->draw(renderer->getSdlRenderer(), _player->hp, _player->maxHp);
 
   DebugPrinter::Instance()->draw(renderer);
 

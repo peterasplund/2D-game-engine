@@ -198,7 +198,26 @@ void obj::Player::update(double dt) {
 
   debugFly = inputHandler->isHeld(BUTTON::DEBUG_FLY);
 
+  if (state == State::DEAD) {
+    hurt = false;
+    _animator.setAnimation("die");
+    _collidable.boundingBox = deadBoundingbox;
+
+    if (!_animator.isPlaying()) {
+      _animator.start();
+    }
+
+    _gravity.entityGravity = _normalGravity;
+    _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+
+    _collidable.moveAndSlide(&_position, &_velocity, dt);
+    AbstractGameObject::update(dt);
+    return;
+  }
+
   if (debugFly) {
+    _animator.setAnimation("idle");
+    _velocity.v = { 0.0f, 0.0f };
     if (inputHandler->isHeld(BUTTON::LEFT)) {
       _position.x -= 0.5f * dt;
     }
@@ -218,10 +237,39 @@ void obj::Player::update(double dt) {
     return;
   }
 
-  if (_velocity.v.x > 0.01f) {
-    direction = Direction::RIGHT;
-  } else if (_velocity.v.x < -0.01f) {
-    direction = Direction::LEFT;
+  auto entitiesTouching = _collidable.objectExistsAt(_collidable.rect);
+
+  if (state != State::DEAD && hp <= 0) {
+    state = State::DEAD;
+    return;
+  }
+
+  // Check hitbox
+  if (!hurt) {
+    for (auto other : entitiesTouching) {
+      if (other->getType() == GAME_OBJECT::ENEMY && other->active) {
+        int entityCenter = other->_collidable.rect.x - (other->_collidable.rect.w / 2);
+        int center = _collidable.rect.x - (_collidable.rect.w / 2);
+        if (center > entityCenter) {
+          _velocity.v.x = +_hurtForce; 
+          _velocity.v.y = -0.3f; 
+        }
+        else {
+          _velocity.v.x = -_hurtForce; 
+          _velocity.v.y = -0.3f; 
+        }
+
+        state = State::JUMP;
+        hurt = true;
+        hurtTimer.reset();
+        hp -= other->damagePoints;
+        break;
+      }
+    }
+  }
+
+  if (hurtTimer.elapsed() > _hurtInvicibility) {
+    hurt = false;
   }
 
   _renderable.textureFlip =
@@ -277,78 +325,97 @@ void obj::Player::update(double dt) {
   }
 
   isMoving = false;
-
-  auto entitiesTouching = _collidable.objectExistsAt(_collidable.rect);
-
   _canInteract = false;
-  for (auto entity : entitiesTouching) {
-    if (entity->getType() == GAME_OBJECT::NPC && _gravity.onFloor) {
-      _canInteract = true;
 
-      if (inputHandler->isHeld(BUTTON::UP)) {
-        ((obj::Npc *)entity)->talk();
+  // Everything dependent on input within this if-case
+  if (!hurt || hurtTimer.elapsed() > 250) {
+    for (auto entity : entitiesTouching) {
+      if (entity->getType() == GAME_OBJECT::NPC && _gravity.onFloor) {
+        _canInteract = true;
 
-        AbstractGameObject::update(dt);
-        return;
-      }
-    }
-  }
+        if (inputHandler->isHeld(BUTTON::UP)) {
+          ((obj::Npc *)entity)->talk();
 
-  if (dead) {
-    _animator.setAnimation("die");
-    if (!_animator.isPlaying()) {
-      _animator.start();
-    }
-
-    AbstractGameObject::update(dt);
-    return;
-  }
-
-  if (climbController.update(dt)) {
-    _gravity.entityGravity = 0.0f;
-    AbstractGameObject::update(dt);
-    _collidable.moveAndSlide(&_position, &_velocity, dt);
-    return;
-  }
-
-  if (state != State::CROUCH && state != State::SLIDE) {
-    if ((state != State::ATTACK || !_gravity.onFloor)) {
-      if (inputHandler->isHeld(BUTTON::LEFT)) {
-        _velocity.v.x -=
-            (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
-        if (state != State::ATTACK) {
-          state = State::RUN;
-        }
-        isMoving = true;
-      } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
-        _velocity.v.x +=
-            (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
-        if (state != State::ATTACK) {
-          state = State::RUN;
-        }
-        isMoving = true;
-      } else if (state != State::SLIDE && state != State::ATTACK &&
-                 !hasTileAbove) {
-        state = State::IDLE;
-      }
-    }
-  }
-
-  // Crouch
-  if (inputHandler->isHeld(BUTTON::DOWN) &&
-      onwayPlatformFallThroughTimer.elapsed() >
-          ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
-    if (_gravity.onFloor) {
-      if (state == State::IDLE || state == State::RUN) {
-        if (state != State::CROUCH) {
-          state = State::CROUCH;
+          AbstractGameObject::update(dt);
+          return;
         }
       }
     }
-  } else if (state == State::CROUCH && !hasTileAbove) {
-    state = State::IDLE;
+
+    if (climbController.update(dt)) {
+      _gravity.entityGravity = 0.0f;
+      AbstractGameObject::update(dt);
+      _collidable.moveAndSlide(&_position, &_velocity, dt);
+      return;
+    }
+
+    // Move left and right
+    if (state != State::CROUCH && state != State::SLIDE) {
+      if ((state != State::ATTACK || !_gravity.onFloor)) {
+        if (inputHandler->isHeld(BUTTON::LEFT)) {
+          direction = Direction::LEFT;
+          _velocity.v.x -=
+              (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
+          if (state != State::ATTACK) {
+            state = State::RUN;
+          }
+          isMoving = true;
+        } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+          direction = Direction::RIGHT;
+          _velocity.v.x +=
+              (_gravity.onFloor ? RUN_ACCELERATION : AIR_ACCELERATION) * dt;
+          if (state != State::ATTACK) {
+            state = State::RUN;
+          }
+          isMoving = true;
+        } else if (state != State::SLIDE && state != State::ATTACK &&
+                  !hasTileAbove) {
+          state = State::IDLE;
+        }
+      }
+    }
+
+    // Crouch
+    if (inputHandler->isHeld(BUTTON::DOWN) &&
+        onwayPlatformFallThroughTimer.elapsed() >
+            ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+      if (_gravity.onFloor) {
+        if (state == State::IDLE || state == State::RUN) {
+          if (state != State::CROUCH) {
+            state = State::CROUCH;
+          }
+        }
+      }
+    } else if (state == State::CROUCH && !hasTileAbove) {
+      state = State::IDLE;
+    }
+
+    if (state != State::ATTACK) {
+      if (state == State::CROUCH) {
+        _animator.setAnimation("crouch");
+      } else if (state != State::SLIDE && state != State::CROUCH) {
+        if (state != State::ATTACK && !_gravity.onFloor &&
+            _velocity.v.y < -0.01f) {
+          _animator.setAnimation("jump");
+          if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
+            _animator.setAnimation("upToFall");
+          }
+        } else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
+          _animator.setAnimation("fall");
+        } else {
+          if (state == State::RUN) {
+            _animator.setAnimation("run");
+          } else {
+            _animator.setAnimation("idle");
+          }
+        }
+      }
+    }
+
+    this->slideController.update(dt);
   }
 
+  // Cap velocity
   if (state != State::SLIDE) {
     if (_velocity.v.x >= RUN_SPEED) {
       _velocity.v.x = RUN_SPEED;
@@ -357,29 +424,6 @@ void obj::Player::update(double dt) {
     }
   }
 
-  if (state != State::ATTACK) {
-    if (state == State::CROUCH) {
-      _animator.setAnimation("crouch");
-    } else if (state != State::SLIDE && state != State::CROUCH) {
-      if (state != State::ATTACK && !_gravity.onFloor &&
-          _velocity.v.y < -0.01f) {
-        _animator.setAnimation("jump");
-        if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
-          _animator.setAnimation("upToFall");
-        }
-      } else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
-        _animator.setAnimation("fall");
-      } else {
-        if (state == State::RUN) {
-          _animator.setAnimation("run");
-        } else {
-          _animator.setAnimation("idle");
-        }
-      }
-    }
-  }
-
-  this->slideController.update(dt);
 
   Rect tilesBelowRect = {(int)round(_collidable.rect.x),
                          (int)_collidable.rect.bottom(),
@@ -443,35 +487,47 @@ void obj::Player::update(double dt) {
 }
 
 void obj::Player::onInputPressed(int button) {
-  jumpController.onInputPressed(button);
-  attackController.onInputPressed(button);
-  slideController.onInputPressed(button);
+  if (state != State::DEAD && (!hurt || hurtTimer.elapsed() > 250)) {
+    jumpController.onInputPressed(button);
+    attackController.onInputPressed(button);
+    slideController.onInputPressed(button);
 
-  if (onOneWayPlatform && button == BUTTON::JUMP) {
-    onwayPlatformFallThroughTimer.reset();
-    onOneWayPlatform = false;
+    if (onOneWayPlatform && button == BUTTON::JUMP) {
+      onwayPlatformFallThroughTimer.reset();
+      onOneWayPlatform = false;
+    }
   }
 };
 
 void obj::Player::onInputReleased(int button) {
-  jumpController.onInputReleased(button);
+  if (state != State::DEAD && (!hurt || hurtTimer.elapsed() > 250)) {
+    jumpController.onInputReleased(button);
+  }
 };
 
 void obj::Player::draw(Renderer *renderer) {
   _renderable.textureRect = _animator.getFrame();
   _renderable.texture = _animator.getTexture();
-  AbstractGameObject::draw(renderer);
 
-  // Draw interactable
-  if (_canInteract) {
-    int yAdded = sin(_infiniteTimer.elapsed() / 100) * 2;
-    Rect sr = {0, 0, 6, 14};
-    RectF playerR = _collidable.addBoundingBox(_position);
-    Rect dr = {(int)(playerR.x + playerR.w / 2) - 2 -
-                   (direction == Direction::LEFT ? 1 : 0),
-               (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
-    renderer->renderTexture(_interactableTexture, &sr, &dr, SDL_FLIP_NONE);
+  if (hurt) {
+    _hurtFlashTimer += 0.1;
   }
 
-  attackController.draw(renderer);
+  if (!hurt || (int)_hurtFlashTimer % 2) {
+    // Draw player
+    AbstractGameObject::draw(renderer);
+
+    // Draw interactable
+    if (_canInteract) {
+      int yAdded = sin(_infiniteTimer.elapsed() / 100) * 2;
+      Rect sr = {0, 0, 6, 14};
+      RectF playerR = _collidable.addBoundingBox(_position);
+      Rect dr = {(int)(playerR.x + playerR.w / 2) - 2 -
+                    (direction == Direction::LEFT ? 1 : 0),
+                (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
+      renderer->renderTexture(_interactableTexture, &sr, &dr, SDL_FLIP_NONE);
+    }
+
+    attackController.draw(renderer);
+  }
 }
