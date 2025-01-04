@@ -46,7 +46,8 @@ void AttackController::update(double dt) {
 }
 
 void AttackController::attack() {
-  if (attackTimer.elapsed() > attackDelay) {
+  if (attackTimer.elapsed() > attackDelay || firstAttack) {
+    firstAttack = false;
     player->state = obj::State::ATTACK;
     player->_animator.reset();
     player->_animator.setAnimation("attack");

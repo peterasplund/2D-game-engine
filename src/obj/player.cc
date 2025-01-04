@@ -510,6 +510,7 @@ void obj::Player::draw(Renderer *renderer) {
   _renderable.texture = _animator.getTexture();
 
   if (hurt) {
+    _animator.setAnimation("backDash");
     _hurtFlashTimer += 0.1;
   }
 
