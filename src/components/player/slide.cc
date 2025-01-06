@@ -15,7 +15,7 @@ void SlideController::update(double dt) {
   if (!player->isMoving) {
     if (player->_gravity.onFloor && s == obj::State::SLIDE) {
       player->_velocity.v.x =
-          player->calcFriction(player->_velocity.v.x, SLIDE_DEACCELERATION, dt);
+          player->_velocity.calcFriction(player->_velocity.v.x, SLIDE_DEACCELERATION, dt);
     }
   }
 }

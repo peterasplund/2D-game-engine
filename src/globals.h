@@ -10,6 +10,7 @@ enum class GAME_OBJECT {
   NPC,
   ENEMY,
   SKELETON,
+  SAVE_POINT,
 };
 
 enum class OBJECT_TAG {

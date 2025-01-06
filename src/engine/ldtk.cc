@@ -20,6 +20,7 @@ LayerType strToLayerType(const char *str) {
 }
 
 Layer parse_layer_instance(World *world, Level *level, json layerJson) {
+    LOG_WARN("> parse_layer_instance");
   Layer layer;
 
   int layerDefId = layerJson["layerDefUid"];
@@ -34,6 +35,12 @@ Layer parse_layer_instance(World *world, Level *level, json layerJson) {
     for (json tile : layerJson["autoLayerTiles"]) {
       int x = (int)tile["px"][0];
       int y = (int)tile["px"][1];
+
+      // Can happen if we change tileset in LDTK and keep old unused mappings. Just skip them.
+      if (tile["t"].is_null()) {
+        continue;
+      }
+
       int id = tile["t"];
       int idx = (level->tilesWide * (y / tileSize)) + (x / tileSize);
       bool solid =

@@ -33,7 +33,6 @@ public:
   void onInputPressed(int button) override;
   void onInputReleased(int button) override;
   void draw(Renderer *renderer) override;
-  float calcFriction(float v, float friction, double dt);
   State state = State::IDLE;
   bool hasTileAbove = false;
   Direction direction = Direction::RIGHT;
@@ -43,6 +42,7 @@ public:
   int maxHp = 25;
   int hp = maxHp;
 
+  void restoreHp() { hp = maxHp; }
 protected:
   /// How much higher the player should go if they hold the jump button (lower
   /// value means higher jump).

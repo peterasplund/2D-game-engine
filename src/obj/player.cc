@@ -6,25 +6,6 @@
 #include <cmath>
 #include <cstdlib>
 
-float obj::Player::calcFriction(float v, float friction, double dt) {
-  if (v < 0) {
-    return std::min<float>(0.0f, v + (friction * dt));
-  }
-  else if (v > 0) {
-    return std::max<float>(0.0f, v - (friction * dt));
-  }
-  /*
-
-  if (std::abs(v) > 0.01) {
-    int sign = v > 0 ? 1 : -1;
-
-    return (v - (friction * dt) * sign);
-  }
-  */
-
-  return 0.0f;
-}
-
 void obj::Player::init() {
   AbstractGameObject::init();
 
@@ -208,7 +189,7 @@ void obj::Player::update(double dt) {
     }
 
     _gravity.entityGravity = _normalGravity;
-    _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+    _velocity.v.x = _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
 
     _collidable.moveAndSlide(&_position, &_velocity, dt);
     AbstractGameObject::update(dt);
@@ -330,11 +311,13 @@ void obj::Player::update(double dt) {
   // Everything dependent on input within this if-case
   if (!hurt || hurtTimer.elapsed() > 250) {
     for (auto entity : entitiesTouching) {
-      if (entity->getType() == GAME_OBJECT::NPC && _gravity.onFloor) {
+      if (entity->canInteract && _gravity.onFloor) {
         _canInteract = true;
 
         if (inputHandler->isHeld(BUTTON::UP)) {
-          ((obj::Npc *)entity)->talk();
+          state = State::IDLE;
+          _animator.setAnimation("idle");
+          ((obj::Npc *)entity)->onInteract(this);
 
           AbstractGameObject::update(dt);
           return;
@@ -436,9 +419,9 @@ void obj::Player::update(double dt) {
 
   if (!isMoving) {
     if (!_gravity.onFloor) {
-      _velocity.v.x = calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+      _velocity.v.x = _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
     } else if (state != State::SLIDE) {
-      _velocity.v.x = calcFriction(_velocity.v.x, RUN_DEACCELERATION, dt);
+      _velocity.v.x = _velocity.calcFriction(_velocity.v.x, RUN_DEACCELERATION, dt);
     }
   }
 

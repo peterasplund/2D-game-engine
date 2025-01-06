@@ -23,7 +23,7 @@ public:
 
   void setTileMap(Level *x);
 
-  AbstractGameObject* instantiateGameObject(GAME_OBJECT obj);
+  AbstractGameObject* instantiateGameObject(std::string identifier);
   void instantiateLevelEntitites(World* world, Level *level);
 
   const std::vector<AbstractGameObject *> &getEntities();

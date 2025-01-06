@@ -9,6 +9,10 @@
 #include "globals.h"
 #include <SDL2/SDL_events.h>
 
+namespace obj {
+  class Player;
+};
+
 enum class Direction { LEFT, RIGHT };
 
 class AbstractGameObject {
@@ -22,6 +26,7 @@ public:
   bool dead = false;
   int _zIndex = 0;
   int damagePoints = 5;
+  bool canInteract = false;
 
   virtual void init();
   virtual void update(double dt);
@@ -33,6 +38,7 @@ public:
   void setListenForCollisions();
   virtual bool contains(RectF other);
   virtual bool contains(AbstractGameObject other);
+  virtual void onInteract(obj::Player *other) {};
   virtual void onCollision(AbstractGameObject *other) {}; // @TODO: connect this
   virtual void damage(int dmg) { printf("base damage!\n"); };
   Rect getRect();

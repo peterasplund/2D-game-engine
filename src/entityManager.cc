@@ -5,21 +5,23 @@
 #include "obj/skeleton.h"
 #include "obj/npc.h"
 #include "obj/player.h"
+#include "obj/savePoint.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the
 // object directory (bad idea?)
-AbstractGameObject *EntityManager::instantiateGameObject(GAME_OBJECT obj) {
+AbstractGameObject *EntityManager::instantiateGameObject(std::string identifier) {
   AbstractGameObject *o = nullptr;
-  switch (obj) {
-  case GAME_OBJECT::PLAYER:
+  if (identifier == "Player") {
     o = new obj::Player();
-    break;
-  case GAME_OBJECT::NPC:
+  }
+  else if (identifier == "SavePoint") {
+    o = new obj::SavePoint();
+  }
+  else if (identifier == "NPC") {
     o = new obj::Npc();
-    break;
-  case GAME_OBJECT::SKELETON:
+  }
+  else if (identifier == "Skeleton") {
     o = new obj::Skeleton();
-    break;
   }
 
   return o;
@@ -97,16 +99,12 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
   bat->init();
   addEntity(bat);
 
-  std::map<std::string, GAME_OBJECT> gameObjects = {
-      {"Player", GAME_OBJECT::PLAYER},
-  };
-
   for (auto layer : level->layers) {
     for (auto e : layer.entities) {
       auto entityDef = world->entityDefs[e.uid];
 
       if (entityDef.identifier == "NPC") {
-        auto npc = instantiateGameObject(GAME_OBJECT::NPC);
+        auto npc = instantiateGameObject(entityDef.identifier);
 
         npc->_position = {(float)e.position.x, (float)e.position.y};
 
@@ -142,16 +140,10 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
               enemyType = field.value;
             }
           }
-          object = instantiateGameObject(GAME_OBJECT::SKELETON);
+          object = instantiateGameObject("Skeleton");
         }
         else {
-          auto it = gameObjects.find(entityDef.identifier);
-
-          if (it == gameObjects.end()) {
-            continue;
-          }
-
-          object = instantiateGameObject(it->second);
+          object = instantiateGameObject(entityDef.identifier);
         }
 
         if (object != nullptr) {
@@ -159,6 +151,9 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
           object->init();
 
           addEntity(object);
+        }
+        else {
+          LOG_WARN("Could not instantiate entity with identifier: \"%s\". Object mapping is not implemented.", entityDef.identifier.c_str());
         }
       }
     }

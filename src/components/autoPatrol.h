@@ -30,14 +30,23 @@ struct AutoPatrol {
 
     auto tilesAhead = collidable->tileExistsAtF(rectAhead);
 
-    if (tilesAhead.size() > 0) {
-      return true;
+    for(auto t : tilesAhead) {
+      if (t.tile.getSolid()) {
+        return true;
+      }
     }
 
-    // @NOTE: This isn't working right now. Fix
     if (useGravity) {
       auto tilesBelow = collidable->tileExistsAtF(rectBelow);
-      if (tilesBelow.size() == 0) {
+
+      bool hasTileBelow = false;
+      for(auto t : tilesBelow) {
+        if (t.tile.getSolid()) {
+          hasTileBelow = true;
+        }
+      }
+
+      if (!hasTileBelow) {
         return true;
       }
     }

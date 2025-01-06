@@ -12,9 +12,8 @@ public:
   void init() override {
     AbstractGameObject::init();
 
+    canInteract = true;
     _type = GAME_OBJECT::NPC;
-
-    this->_persist = false;
 
     int tw = 75;
     int th = 75;
@@ -56,7 +55,7 @@ public:
     _dialogue = dialogue;
   }
 
-  void talk() {
+  void onInteract(Player* player) override {
     std::string message;
     message.append(_name);
     message.append("\n");

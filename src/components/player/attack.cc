@@ -36,9 +36,9 @@ void AttackController::update(double dt) {
         entity->damage(value);
 
         if (player->direction == Direction::RIGHT) {
-          entity->_velocity.v.x = 0.5f;
+          entity->_velocity.v.x = 0.2f;
         } else {
-          entity->_velocity.v.x = -0.5f;
+          entity->_velocity.v.x = -0.2f;
         }
       }
     }

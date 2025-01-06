@@ -109,16 +109,19 @@ public:
     }
 
     _collidable.moveAndSlide(&_position, &_velocity, dt);
-    _velocity.v.x = 0.0f;
     invincible = false;
     active = true;
     switch (_state) {
       case State::WALK:
         if (_direction == Direction::RIGHT) {
-          _velocity.v.x = SPEED;
+          if (_velocity.v.x < SPEED) {
+            _velocity.v.x += SPEED;
+          }
         }
         else {
-          _velocity.v.x = -SPEED;
+          if (_velocity.v.x > -SPEED) {
+            _velocity.v.x -= SPEED;
+          }
         }
 
         if (_stateTimer.elapsed() > _walkingTime) {
@@ -154,6 +157,8 @@ public:
     if (_timer.elapsed() > 350) {
       hurt = false;
     }
+
+    _velocity.v.x = _velocity.calcFriction(_velocity.v.x, 0.001f, dt);
   }
 
   void draw(Renderer *renderer) override {
