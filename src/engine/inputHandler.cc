@@ -1,5 +1,4 @@
 #include "inputHandler.h"
-#include "../abstractGameobject.h" // @TODO: remove this coupling
 
 InputHandler::InputHandler() {
   for (int i = BUTTON::UP; i != BUTTON::__LAST__; i++) {
@@ -10,15 +9,15 @@ InputHandler::InputHandler() {
 }
 
 void InputHandler::onKeyPressed(BUTTON button) {
-  for (const auto &obj : EntityManager::Instance()->getEntities()) {
-    obj->onInputPressed(button);
-  }
+  event_context ctx;
+  ctx.data.u16[0] = button;
+  event_fire(EVENT_CODE_KEY_PRESSED, 0, ctx);
 }
 
 void InputHandler::onKeyReleased(BUTTON button) {
-  for (const auto &obj : EntityManager::Instance()->getEntities()) {
-    obj->onInputReleased(button);
-  }
+  event_context ctx;
+  ctx.data.u16[0] = button;
+  event_fire(EVENT_CODE_KEY_RELEASED, 0, ctx);
 }
 
 void InputHandler::pollEvent(SDL_Event event) {

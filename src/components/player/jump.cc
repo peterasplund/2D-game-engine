@@ -33,7 +33,7 @@ void JumpController::jump() {
   }
 }
 
-void JumpController::onInputPressed(int button) {
+void JumpController::onInputPressed(u16 button) {
   if (button == BUTTON::JUMP) {
     if (player->state != obj::State::CROUCH && !player->hasTileAbove) {
       jump();
@@ -41,7 +41,7 @@ void JumpController::onInputPressed(int button) {
   }
 }
 
-void JumpController::onInputReleased(int button) {
+void JumpController::onInputReleased(u16 button) {
   if (button == BUTTON::JUMP) {
     jumpHold = false;
   }

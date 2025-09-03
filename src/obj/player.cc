@@ -28,6 +28,10 @@ void obj::Player::init() {
 
   _interactableTexture =
       AssetManager::Instance()->getTexture("assets/sprites/interactable.png");
+
+  // Bind key events
+  event_register(EVENT_CODE_KEY_PRESSED, this, &obj::Player::onInputPressed);
+  event_register(EVENT_CODE_KEY_RELEASED, this, &obj::Player::onInputReleased);
 }
 
 void obj::Player::setupAnimations() {
@@ -469,23 +473,33 @@ void obj::Player::update(double dt) {
   AbstractGameObject::update(dt);
 }
 
-void obj::Player::onInputPressed(int button) {
-  if (state != State::DEAD && (!hurt || hurtTimer.elapsed() > 250)) {
-    jumpController.onInputPressed(button);
-    attackController.onInputPressed(button);
-    slideController.onInputPressed(button);
+bool obj::Player::onInputPressed(u16 code, void* sender, void* listener_inst, event_context context) {
+  Player* self = (Player*)listener_inst;
+  u16 button = context.data.u16[0];
 
-    if (onOneWayPlatform && button == BUTTON::JUMP) {
-      onwayPlatformFallThroughTimer.reset();
-      onOneWayPlatform = false;
+  if (self->state != State::DEAD && (!self->hurt || self->hurtTimer.elapsed() > 250)) {
+    self->jumpController.onInputPressed(button);
+    self->attackController.onInputPressed(button);
+    self->slideController.onInputPressed(button);
+
+    if (self->onOneWayPlatform && button == BUTTON::JUMP) {
+      self->onwayPlatformFallThroughTimer.reset();
+      self->onOneWayPlatform = false;
     }
   }
+
+  return true;
 };
 
-void obj::Player::onInputReleased(int button) {
-  if (state != State::DEAD && (!hurt || hurtTimer.elapsed() > 250)) {
-    jumpController.onInputReleased(button);
+bool obj::Player::onInputReleased(u16 code, void* sender, void* listener_inst, event_context context) {
+  Player* self = (Player*)listener_inst;
+  u16 button = context.data.u16[0];
+
+  if (self->state != State::DEAD && (!self->hurt || self->hurtTimer.elapsed() > 250)) {
+    self->jumpController.onInputReleased(button);
   }
+
+  return true;
 };
 
 void obj::Player::draw(Renderer *renderer) {

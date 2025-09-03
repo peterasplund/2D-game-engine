@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/inputHandler.h"
+#include "engine/event.h"
 #include "engine/ldtk.h"
 #include "engine/renderer.h"
 #include "engine/window.h"
@@ -13,10 +14,40 @@
 
 class Game {
 public:
+  static bool application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
+    switch (code) {
+      case EVENT_CODE_APPLICATION_QUIT:
+        LOG_INFO("Application quit event called");
+        return true;
+    }
+
+    return false;
+  }
+
+  static bool application_on_key(u16 code, void* sender, void* listener_inst, event_context context) {
+    Game* self = (Game*)listener_inst;
+    if (code == EVENT_CODE_KEY_PRESSED) {
+      u16 key_code = context.data.u16[0];
+      if (key_code == BUTTON::QUIT_BTN) {
+        event_context ctx = {};
+        event_fire(EVENT_CODE_APPLICATION_QUIT, 0, ctx);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Game() {
     gameSettings().vsync = true;
     gameSettings().maxFrameRate = 60; // this doesn't matter when vsync is enabled
     gameSettings().zoom = 4;
+
+    event_initialize();
+
+    event_register(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
+    event_register(EVENT_CODE_KEY_PRESSED, this, &Game::application_on_key);
 
     InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
     InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
@@ -26,6 +57,7 @@ public:
     InputHandler::Instance()->addButton(SDLK_j, BUTTON::ATTACK);
     InputHandler::Instance()->addButton(SDLK_p, BUTTON::MENU);
     InputHandler::Instance()->addButton(SDLK_SPACE, BUTTON::DEBUG_FLY);
+    InputHandler::Instance()->addButton(SDLK_u, BUTTON::QUIT_BTN);
 
     int zoom = gameSettings().zoom;
     int width = gameSettings().windowWidth;
@@ -101,6 +133,7 @@ public:
 
     delete _gameplayScene;
     delete _sceneManager;
+    event_shutdown();
     EntityManager::release();
   }
 

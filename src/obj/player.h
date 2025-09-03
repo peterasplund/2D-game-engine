@@ -3,6 +3,7 @@
 #include "../abstractGameobject.h"
 #include "../engine/animator.h"
 #include "../engine/renderer.h"
+#include "../engine/event.h"
 #include "../components/player/jump.h"
 #include "../components/player/attack.h"
 #include "../components/player/climb.h"
@@ -30,8 +31,8 @@ public:
 
   template <class T, class J>
   Tile *tileAt(Rectangle<T, J> rect, std::string property);
-  void onInputPressed(int button) override;
-  void onInputReleased(int button) override;
+  static bool onInputPressed(u16 code, void* sender, void* listener_inst, event_context context);
+  static bool onInputReleased(u16 code, void* sender, void* listener_inst, event_context context);
   void draw(Renderer *renderer) override;
   State state = State::IDLE;
   bool hasTileAbove = false;

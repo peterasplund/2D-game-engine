@@ -33,8 +33,6 @@ public:
   virtual void draw(Renderer *renderer);
   virtual ~AbstractGameObject() {}
   virtual void handleEvent(SDL_Event *event) {};
-  virtual void onInputPressed(int button) {};
-  virtual void onInputReleased(int button) {};
   void setListenForCollisions();
   virtual bool contains(RectF other);
   virtual bool contains(AbstractGameObject other);

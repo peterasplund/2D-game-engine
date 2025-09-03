@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include "../../engine/defines.h"
 #include "../../engine/timer.h"
 
 namespace obj {
@@ -22,8 +23,8 @@ struct JumpController {
   void init(obj::Player* player) { this->player = player; }
 
   void update(double dt);
-  void onInputPressed(int button);
-  void onInputReleased(int button);
+  void onInputPressed(u16 button);
+  void onInputReleased(u16 button);
   void jump();
   void performJump();
 };
