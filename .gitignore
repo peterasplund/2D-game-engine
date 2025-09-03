@@ -1,7 +1,8 @@
-/bin
+/engine/bin
+/dummy_game/bin
 /Debug
 /Release
 /.vscode
-/.ccls-cache
+.ccls-cache
 /.cache
 .DS_Store
