@@ -48,8 +48,9 @@ bool AssetManager::freeTexture(std::string filename) {
   std::string fullPath = SDL_GetBasePath();
   fullPath.append(filename);
 
-  if (_textures[fullPath] == nullptr) {
-    SDL_DestroyTexture(_textures[fullPath]);
+  auto it = _textures.find(fullPath);
+  if (it != _textures.end() && it->second != nullptr) {
+    SDL_DestroyTexture(it->second);
     _textures.erase(fullPath);
     return true;
   }

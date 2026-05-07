@@ -11,16 +11,8 @@ GameState gameState;
 void GameplayScene::init() {
   dialogue = Dialogue::Instance();
   dialogue->init(_renderer);
-  int numCells = 0;
-
-  for (int i = 0; i < world->levels.size(); i++) {
-    numCells += world->levels[i].cell.w * world->levels[i].cell.h;
-  }
-
-  gameState.visited.resize(numCells);
-  for (int i = 0; i < numCells; i++) {
-    gameState.visited[i] = false;
-  }
+  int numCells = world->worldSizeInCells.x * world->worldSizeInCells.y;
+  gameState.visited.assign(numCells, false);
 
   damageNumberSystem = DamageNumbersSystem::Instance();
   damageNumberSystem->init();

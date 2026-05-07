@@ -21,30 +21,26 @@ enum BUTTON {
 
 class InputHandler {
 private:
-  static InputHandler *_instance;
   std::map<int, BUTTON> _buttons;
   std::map<BUTTON, int> _buttons_translation;
   std::map<BUTTON, bool> _buttonsHeld;
   v2i _mousePos;
 
   InputHandler();
+  InputHandler(const InputHandler&) = delete;
+  InputHandler& operator=(const InputHandler&) = delete;
+  InputHandler(InputHandler&&) = delete;
+  InputHandler& operator=(InputHandler&&) = delete;
 
   ~InputHandler() {}
 
 public:
   static InputHandler *Instance() {
-    static InputHandler *_instance = nullptr;
-    if (_instance == nullptr) {
-      _instance = new InputHandler();
-    }
-
-    return _instance;
+    static InputHandler instance;
+    return &instance;
   }
 
-  static void release() {
-    delete _instance;
-    _instance = NULL;
-  }
+  static void release() {}
 
   void addButton(int keyCode, BUTTON button);
   bool isHeld(BUTTON button);

@@ -4,12 +4,8 @@
 #include "assetManager.h"
 
 Application *Application::Instance() {
-  static Application *_instance = nullptr;
-  if (_instance == nullptr) {
-    _instance = new Application();
-  }
-
-  return _instance;
+  static Application instance;
+  return &instance;
 }
 
 bool Application::initialize(app_config* config) {
@@ -37,11 +33,20 @@ bool Application::initialize(app_config* config) {
 }
 
 Application::Application() {
+  is_initialized = false;
+  is_running = false;
+  is_suspended = false;
+  last_time = 0;
+  window = nullptr;
+  renderer = nullptr;
+  now = 0;
+  last = 0;
+  end = 0;
+  delta_time = 0;
 }
 
 Application::~Application() {
 	event_shutdown();
-	AssetManager::Instance()->release();
 
 	delete this->window;
 	delete this->renderer;

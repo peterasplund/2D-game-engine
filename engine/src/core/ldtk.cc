@@ -203,6 +203,7 @@ World createWorld(std::string filePath) {
       (int)data["worldGridWidth"] / world.tileSize,
       (int)data["worldGridHeight"] / world.tileSize,
   };
+  world.levels.reserve(data["levels"].size());
 
   int i = 0;
   LOG_TRACE("parsing tileset defs");
@@ -249,7 +250,8 @@ World createWorld(std::string filePath) {
   i = 0;
   LOG_TRACE("parsing levels");
   for (json levelJson : data["levels"]) {
-    Level level;
+    world.levels.emplace_back();
+    Level& level = world.levels.back();
 
     std::string identifier = levelJson["identifier"];
     level.iid = i;
@@ -257,6 +259,7 @@ World createWorld(std::string filePath) {
     level.tilesWide = (int)levelJson["pxWid"] / tileSize;
     level.tilesTall = (int)levelJson["pxHei"] / tileSize;
     level.tileSize = tileSize;
+    level.layers.reserve(levelJson["layerInstances"].size());
 
     LOG_TRACE("parsing level %s layer instances", identifier.c_str());
     for (json layerJson : levelJson["layerInstances"]) {
@@ -288,8 +291,6 @@ World createWorld(std::string filePath) {
       }
     }
 
-    level.world = &world;
-    world.levels.push_back(level);
     levelUidMap[levelJson["iid"]] = i;
     i++;
   }
@@ -307,8 +308,7 @@ World createWorld(std::string filePath) {
   int xMax = world.worldSizeInCells.x;
   int yMax = world.worldSizeInCells.y;
 
-  // Allocate for the levelsByCells lookup
-  world.levelsByCells = (Level **)malloc((xMax * yMax) * sizeof(Level *));
+  world.levelsByCells.resize(xMax * yMax, nullptr);
 
   for (Level level : world.levels) {
     for (int x = level.cell.x; x < level.cell.w + level.cell.x; x++) {
@@ -316,6 +316,13 @@ World createWorld(std::string filePath) {
         int idx = (y * xMax) + x;
         world.levelsByCells[idx] = &world.levels[level.iid];
       }
+    }
+  }
+
+  for (auto& level : world.levels) {
+    level.world = &world;
+    for (auto& layer : level.layers) {
+      layer.level = &level;
     }
   }
 

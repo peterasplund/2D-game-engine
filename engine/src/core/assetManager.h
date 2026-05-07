@@ -9,19 +9,29 @@
 class AssetManager {
 private:
   std::map<std::string, SDL_Texture *> _textures;
-  SDL_Renderer *_renderer;
+  SDL_Renderer *_renderer = nullptr;
   bool initialized = false;
 
   AssetManager() {}
+  AssetManager(const AssetManager&) = delete;
+  AssetManager& operator=(const AssetManager&) = delete;
+  AssetManager(AssetManager&&) = delete;
+  AssetManager& operator=(AssetManager&&) = delete;
 
   ~AssetManager() {
+    release();
+  }
+
+  void releaseTextures() {
     for (auto tex : _textures) {
-      if (tex.second != NULL) {
+      if (tex.second != nullptr) {
         SDL_DestroyTexture(tex.second);
       }
     }
 
     _textures.clear();
+    initialized = false;
+    _renderer = nullptr;
   }
 
   bool freeTexture(std::string filename);
@@ -29,12 +39,8 @@ private:
 
 public:
   static AssetManager *Instance() {
-    static AssetManager *_instance = nullptr;
-    if (_instance == nullptr) {
-      _instance = new AssetManager();
-    }
-
-    return _instance;
+    static AssetManager instance;
+    return &instance;
   }
 
   void init(SDL_Renderer *renderer) {
@@ -42,7 +48,7 @@ public:
     this->initialized = true;
   }
 
-  static void release() {}
+  static void release() { Instance()->releaseTextures(); }
 
   SDL_Texture *getTexture(std::string filename);
 };
