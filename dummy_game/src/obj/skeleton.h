@@ -47,7 +47,7 @@ public:
     SDL_Texture *texture = AssetManager::Instance()->getTexture(
         "assets/sprites/enemies/skeleton.png");
 
-    Animation *animWalk = new Animation(texture);
+    auto animWalk = std::make_unique<Animation>(texture);
     animWalk->addFrame({tw * 0, th * 0, tw, th}, 150);
     animWalk->addFrame({tw * 1, th * 0, tw, th}, 150);
     animWalk->addFrame({tw * 2, th * 0, tw, th}, 150);
@@ -57,7 +57,7 @@ public:
     animWalk->addFrame({tw * 6, th * 0, tw, th}, 150);
     animWalk->addFrame({tw * 7, th * 0, tw, th}, 150);
 
-    Animation *animRise = new Animation(texture, false);
+    auto animRise = std::make_unique<Animation>(texture, false);
     animRise->addFrame({tw * 0, th * 1, tw, th}, 100);
     animRise->addFrame({tw * 1, th * 1, tw, th}, 100);
     animRise->addFrame({tw * 2, th * 1, tw, th}, 100);
@@ -65,7 +65,7 @@ public:
     animRise->addFrame({tw * 4, th * 1, tw, th}, 100);
     animRise->addFrame({tw * 5, th * 1, tw, th}, 100);
 
-    Animation *animMelt = new Animation(texture, false);
+    auto animMelt = std::make_unique<Animation>(texture, false);
     animMelt->addFrame({tw * 5, th * 1, tw, th}, 100);
     animMelt->addFrame({tw * 4, th * 1, tw, th}, 100);
     animMelt->addFrame({tw * 3, th * 1, tw, th}, 100);
@@ -74,9 +74,9 @@ public:
     animMelt->addFrame({tw * 0, th * 1, tw, th}, 100);
 
     this->_animator = Animator();
-    _animator.addAnimation("walk", animWalk);
-    _animator.addAnimation("rise", animRise);
-    _animator.addAnimation("melt", animMelt);
+    _animator.addAnimation("walk", std::move(animWalk));
+    _animator.addAnimation("rise", std::move(animRise));
+    _animator.addAnimation("melt", std::move(animMelt));
 
     this->_renderable.texture = texture;
     _direction = Direction::LEFT;

@@ -25,7 +25,6 @@ typedef struct event_context {
 
 
 #include <functional>
-//using PFN_on_event = std::function<bool(u16, void*, void*, event_context)>;
 
 typedef bool (*PFN_on_event)(u16 code, void* sender, void* listener_inst, event_context data);
 

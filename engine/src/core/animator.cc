@@ -2,13 +2,14 @@
 #include "logger.h"
 
 bool Animator::setAnimation(std::string name) {
-  if (_animations[name] != nullptr) {
+  auto it = _animations.find(name);
+  if (it != _animations.end() && it->second != nullptr) {
 
     if (_currentAnimation != name) {
       _currentAnimation = name;
       // reset animation frame when changing animation
       timer.reset();
-      _animations[_currentAnimation]->reset();
+      it->second->reset();
     }
     else {
       _currentAnimation = name;
@@ -27,8 +28,8 @@ Rect Animator::getFrame() {
     return {};
   }
 
-  if (_animations[_currentAnimation] != nullptr) {
-    return _animations[_currentAnimation]->getFrame(&timer);
+  if (auto* animation = currentAnimation()) {
+    return animation->getFrame(&timer);
   }
 
   LOG_WARN("Error: No animation available at _currentAnimation");

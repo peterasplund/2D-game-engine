@@ -27,7 +27,7 @@ public:
     SDL_Texture *texture =
         AssetManager::Instance()->getTexture("assets/sprites/fruktkungen.png");
 
-    Animation *animIdle = new Animation(texture);
+    auto animIdle = std::make_unique<Animation>(texture);
     // 13 frames
     animIdle->addFrame({tw * 0, th * 0, tw, th}, 100);
     animIdle->addFrame({tw * 1, th * 0, tw, th}, 100);
@@ -44,7 +44,7 @@ public:
     animIdle->addFrame({tw * 12, th * 0, tw, th}, 100);
 
     this->_animator = Animator();
-    _animator.addAnimation("idle", animIdle);
+    _animator.addAnimation("idle", std::move(animIdle));
     _animator.setAnimation("idle");
 
     this->_renderable.texture = texture;

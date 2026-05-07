@@ -4,67 +4,93 @@
 #include "math.h"
 #include "timer.h"
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
 class Animator {
 public:
-  Animator() { 
-    timer = Timer(); 
+  Animator() {
+    timer = Timer();
   }
 
-  ~Animator() {}
+  ~Animator() = default;
+  Animator(const Animator&) = delete;
+  Animator& operator=(const Animator&) = delete;
+  Animator(Animator&&) = default;
+  Animator& operator=(Animator&&) = default;
 
-  void addAnimation(std::string name, Animation *animation) {
-    _animations[name] = animation;
+  void addAnimation(std::string name, std::unique_ptr<Animation> animation) {
+    _animations[name] = std::move(animation);
   }
 
   bool setAnimation(std::string name);
 
   void start() {
-    if (_animations[_currentAnimation] != nullptr) {
-      _animations[_currentAnimation]->start();
+    if (auto* animation = currentAnimation()) {
+      animation->start();
     }
   }
 
   void stop() {
-    if (_animations[_currentAnimation] != nullptr) {
-      _animations[_currentAnimation]->stop();
+    if (auto* animation = currentAnimation()) {
+      animation->stop();
     }
   }
 
   void reset() {
-    if (_animations[_currentAnimation] != nullptr) {
-      _animations[_currentAnimation]->reset();
+    if (auto* animation = currentAnimation()) {
+      animation->reset();
     }
   }
 
   bool hasPlayedThrough() {
-    if (_animations[_currentAnimation] == nullptr) {
-      return true;
+    if (auto* animation = currentAnimation()) {
+      return animation->hasPlayedThrough();
     }
 
-    return _animations[_currentAnimation]->hasPlayedThrough();
+    return true;
   }
 
   bool isPlaying() {
-    if (_animations[_currentAnimation] == nullptr) {
-      return true;
+    if (auto* animation = currentAnimation()) {
+      return animation->isPlaying();
     }
 
-    return _animations[_currentAnimation]->isPlaying();
+    return true;
   }
 
   std::string getCurrent() { return _currentAnimation; }
 
   SDL_Texture *getTexture() {
-    return _animations[_currentAnimation]->getTexture();
+    if (auto* animation = currentAnimation()) {
+      return animation->getTexture();
+    }
+
+    return nullptr;
   }
 
   Rect getFrame();
 
 private:
-  std::map<std::string, Animation *> _animations;
+  Animation* currentAnimation() {
+    auto it = _animations.find(_currentAnimation);
+    if (it == _animations.end()) {
+      return nullptr;
+    }
+
+    return it->second.get();
+  }
+
+  const Animation* currentAnimation() const {
+    auto it = _animations.find(_currentAnimation);
+    if (it == _animations.end()) {
+      return nullptr;
+    }
+
+    return it->second.get();
+  }
+
+  std::map<std::string, std::unique_ptr<Animation>> _animations;
   std::string _currentAnimation;
   Timer timer;
 };

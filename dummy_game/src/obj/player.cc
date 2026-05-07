@@ -44,19 +44,19 @@ void obj::Player::setupAnimations() {
 
   _renderable.spriteOffset = {15, 0};
 
-  Animation *animIdle = new Animation(texture);
-  Animation *animCrouch = new Animation(texture);
-  Animation *animRun = new Animation(texture);
-  Animation *animAttack = new Animation(texture, false);
-  Animation *animAttack2 = new Animation(texture, false);
-  Animation *animJumpAttack = new Animation(texture, false);
-  Animation *animJump = new Animation(texture, false);
-  Animation *animFall = new Animation(texture, false);
-  Animation *animBackDash = new Animation(texture, false);
-  Animation *animSlide = new Animation(texture, false);
-  Animation *animUpToFall = new Animation(texture, false);
-  Animation *animClimb = new Animation(texture);
-  Animation *animDie = new Animation(texture, false);
+  auto animIdle = std::make_unique<Animation>(texture);
+  auto animCrouch = std::make_unique<Animation>(texture);
+  auto animRun = std::make_unique<Animation>(texture);
+  auto animAttack = std::make_unique<Animation>(texture, false);
+  auto animAttack2 = std::make_unique<Animation>(texture, false);
+  auto animJumpAttack = std::make_unique<Animation>(texture, false);
+  auto animJump = std::make_unique<Animation>(texture, false);
+  auto animFall = std::make_unique<Animation>(texture, false);
+  auto animBackDash = std::make_unique<Animation>(texture, false);
+  auto animSlide = std::make_unique<Animation>(texture, false);
+  auto animUpToFall = std::make_unique<Animation>(texture, false);
+  auto animClimb = std::make_unique<Animation>(texture);
+  auto animDie = std::make_unique<Animation>(texture, false);
 
   animIdle->addFrame({tw * 0, th * 0, tw, th}, 400);
   animIdle->addFrame({tw * 1, th * 0, tw, th}, 400);
@@ -137,19 +137,19 @@ void obj::Player::setupAnimations() {
   animDie->addFrame({tw * 0, th * 6, tw, th}, 70);
 
   this->_animator = Animator();
-  _animator.addAnimation("idle", animIdle);
-  _animator.addAnimation("crouch", animCrouch);
-  _animator.addAnimation("run", animRun);
-  _animator.addAnimation("attack", animAttack);
-  _animator.addAnimation("attack2", animAttack2);
-  _animator.addAnimation("jumpAttack", animJumpAttack);
-  _animator.addAnimation("jump", animJump);
-  _animator.addAnimation("upToFall", animUpToFall);
-  _animator.addAnimation("fall", animFall);
-  _animator.addAnimation("backDash", animBackDash);
-  _animator.addAnimation("slide", animSlide);
-  _animator.addAnimation("climb", animClimb);
-  _animator.addAnimation("die", animDie);
+  _animator.addAnimation("idle", std::move(animIdle));
+  _animator.addAnimation("crouch", std::move(animCrouch));
+  _animator.addAnimation("run", std::move(animRun));
+  _animator.addAnimation("attack", std::move(animAttack));
+  _animator.addAnimation("attack2", std::move(animAttack2));
+  _animator.addAnimation("jumpAttack", std::move(animJumpAttack));
+  _animator.addAnimation("jump", std::move(animJump));
+  _animator.addAnimation("upToFall", std::move(animUpToFall));
+  _animator.addAnimation("fall", std::move(animFall));
+  _animator.addAnimation("backDash", std::move(animBackDash));
+  _animator.addAnimation("slide", std::move(animSlide));
+  _animator.addAnimation("climb", std::move(animClimb));
+  _animator.addAnimation("die", std::move(animDie));
 
   _animator.setAnimation("idle");
 
@@ -197,6 +197,7 @@ void obj::Player::update(double dt) {
     _velocity.v.x = _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
 
     _collidable.moveAndSlide(&_position, &_velocity, dt);
+
     AbstractGameObject::update(dt);
     return;
   }
@@ -445,7 +446,12 @@ void obj::Player::update(double dt) {
 
   _prevPosition = _position;
   CollisionResponse resp = _collidable.moveAndSlide(&_position, &_velocity, dt);
-  //resp.print();
+
+  // Set x velocity to 0 when colliding with a wall
+  // if (!resp.right || !resp.left) {
+  if (resp.right || resp.left) {
+    _velocity.v.x = 0.0f;
+  }
 
   _gravity.onFloor = false;
 

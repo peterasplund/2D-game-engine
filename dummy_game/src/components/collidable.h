@@ -3,6 +3,7 @@
 #include <core/logger.h>
 #include <core/math.h>
 #include <core/map.h>
+#include <optional>
 #include "../entityManager.h"
 #include "velocity.h"
 
@@ -15,19 +16,19 @@ struct CollisionAt {
 /// Each direction corresponds to the ID of the tile it collided with. -1 means
 /// no collision.
 struct CollisionResponse {
-  CollisionAt* top = nullptr;
-  CollisionAt* bottom = nullptr;
-  CollisionAt* left = nullptr;
-  CollisionAt* right = nullptr;
+  std::optional<CollisionAt> top = std::nullopt;
+  std::optional<CollisionAt> bottom = std::nullopt;
+  std::optional<CollisionAt> left = std::nullopt;
+  std::optional<CollisionAt> right = std::nullopt;
 
-  bool hasCollision() {
-    return top != nullptr || bottom != nullptr || left != nullptr || right != nullptr;
+  bool hasCollision() const {
+    return top != std::nullopt || bottom != std::nullopt || left != std::nullopt || right != std::nullopt;
   }
 
-  void print() {
+  void print() const {
     LOG_DEBUG(
       "collision (▲%d\t►%d\t▼%d\t◄%d)", 
-      top != nullptr, right != nullptr, bottom != nullptr, left != nullptr
+      top != std::nullopt, right != std::nullopt, bottom != std::nullopt, left != std::nullopt
     );
   }
 };

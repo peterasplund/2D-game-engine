@@ -132,7 +132,7 @@ void collidable::update(v2f position) {
           (float)boundingBox.w, (float)boundingBox.h};
 }
 
-CollisionAt* getCollisionAt(RectF r) {
+std::optional<CollisionAt> getCollisionAt(RectF r) {
   Level *tilemap = EntityManager::Instance()->getTilemap();
   static std::vector<int> possibleIndices;
   possibleIndices.clear();
@@ -159,13 +159,12 @@ CollisionAt* getCollisionAt(RectF r) {
       // DebugPrinter::Instance()->addDebugRect(&otherRect, 255, 255, 0);
 
       if (SDL_HasIntersection(&rSDL, &otherRectSDL)) {
-        CollisionAt* resp = new CollisionAt{possibleIdx, tile};
-        return resp;
+        return CollisionAt{possibleIdx, tile};
       }
     }
   }
 
-  return nullptr;
+  return std::nullopt;
 }
 
 CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
@@ -173,7 +172,7 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
   Level *tilemap = EntityManager::Instance()->getTilemap();
   CollisionResponse response;
   v2f newPos = *position;
-  CollisionAt* collidedWith;
+  std::optional<CollisionAt> collidedWith;
 
   float xValue = velocity->v.x * dt;
   float yValue = velocity->v.y * dt;
@@ -197,7 +196,7 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
     RectF r = addBoundingBox(newPos);
     collidedWith = getCollisionAt(r);
 
-    if (collidedWith != nullptr) {
+    if (collidedWith != std::nullopt) {
       Rect otherRect = tilemap->getTileRect(collidedWith->idx);
       if (otherRect.w != -1 && otherRect.h != -1) {
         if (velocity->v.x > 0.0f) {
@@ -225,7 +224,7 @@ CollisionResponse collidable::moveAndSlide(v2f *position, velocity *velocity,
     newPos.y = velocity->v.y > 0 ? position->y + framePos : position->y - framePos;
     RectF r = addBoundingBox(newPos);
     collidedWith = getCollisionAt(r);
-    if (collidedWith != nullptr) {
+    if (collidedWith != std::nullopt) {
       Rect otherRect = tilemap->getTileRect(collidedWith->idx);
 
       if (otherRect.w != -1 && otherRect.h != -1) {
