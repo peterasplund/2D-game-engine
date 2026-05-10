@@ -1,6 +1,7 @@
 #include "dialogue.h"
-#include <core/logger.h>
 #include <SDL2/SDL_image.h>
+#include <core/inputHandler.h>
+#include <core/logger.h>
 
 bool Dialogue::init(Renderer *renderer) {
   _renderer = renderer;
@@ -59,15 +60,23 @@ Message Dialogue::parseMessage(std::string s) {
 }
 
 void Dialogue::update() {
+  InputHandler *inputHandler = InputHandler::Instance();
+
+  uint32_t pause =
+      inputHandler->isHeld(BUTTON::ATTACK) ? LETTER_PAUSE_FAST : LETTER_PAUSE;
+
   if (_displayingMessage != "") {
-    if (_timer.elapsed() > LETTER_PAUSE) {
+    if (_timer.elapsed() > pause) {
       // display next character
       if (_currentCharacterIdx < _displayingMessage.length()) {
         _currentCharacterIdx++;
         _timer.reset();
       } else {
-        // @TODO: check input too
-        _displayingMessage = "";
+        _state = DialogueState::DONE;
+        // Close meesage when pressing the jump button at the end
+        if (inputHandler->isHeld(BUTTON::JUMP)) {
+          _displayingMessage = "";
+        }
       }
     }
   }
@@ -85,6 +94,18 @@ void Dialogue::draw() {
 
   const int GLYPH_WIDTH = _font->getGlyphWidth();
   const int GLYPH_HEIGHT = _font->getGlyphHeight();
+
+  if (_state == DialogueState::DONE) {
+    float yOffset = 0.6 * cos(0.008f * _timer.elapsed());
+    _font->drawLetter('~',
+                      {BOUNDS.w - (int)(PADDING * 2),
+                       BOUNDS.h - (int)(PADDING * 2.5) + (int)round(yOffset)},
+                      FONT_COLOR::NONE);
+    /*
+    _renderer->renderRectTexture({0, 0, GLYPH_WIDTH * 14, GLYPH_HEIGHT * 5},
+                                 _frameTexture, FRAME_WIDTH);
+    */
+  }
 
   for (uint32_t i = 0; _displayingMessage[i] != '\0'; i++) {
     if (i >= _currentCharacterIdx) {

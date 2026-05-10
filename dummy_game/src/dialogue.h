@@ -1,9 +1,9 @@
 #pragma once
 
+#include "font.h"
 #include <core/math.h>
 #include <core/renderer.h>
 #include <core/timer.h>
-#include "font.h"
 #include <string>
 #include <vector>
 
@@ -11,6 +11,12 @@
 
 enum class TagType {
   COLOR,
+};
+
+enum class DialogueState {
+  IDLE,
+  PRINTING,
+  DONE,
 };
 
 struct MsgTag {
@@ -35,6 +41,7 @@ public:
     static Dialogue *_instance = nullptr;
     if (_instance == nullptr) {
       _instance = new Dialogue();
+      _instance->_state = DialogueState::IDLE;
     }
 
     return _instance;
@@ -49,6 +56,10 @@ public:
   void message(std::string msg) {
     _currentCharacterIdx = 0;
     _displayingMessage = msg;
+
+    if (_displayingMessage.length() > 0) {
+      _state = DialogueState::PRINTING;
+    }
   }
 
   void update();
@@ -56,6 +67,7 @@ public:
 
 private:
   const uint32_t LETTER_PAUSE = 65;
+  const uint32_t LETTER_PAUSE_FAST = 15;
   const int FRAME_WIDTH = 16;
   // const Rect BOUNDS = { 0, (WINDOW_HEIGHT / WINDOW_ZOOM) -
   // DIALOGUE_BOX_HEIGHT, (WINDOW_WIDTH / WINDOW_ZOOM), DIALOGUE_BOX_HEIGHT };
@@ -68,4 +80,5 @@ private:
   Timer _timer;
   uint32_t _currentCharacterIdx = 0;
   Font *_font;
+  DialogueState _state;
 };
