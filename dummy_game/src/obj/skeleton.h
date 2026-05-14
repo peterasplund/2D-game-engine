@@ -104,6 +104,8 @@ public:
   void update(double dt) override {
     AbstractGameObject::update(dt);
 
+    _renderable.textureRect = _animator.getFrame();
+
     if (autoPatrol.shouldTurn(&_collidable, _direction, true)) {
       _direction = _direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
     }
@@ -162,7 +164,6 @@ public:
   }
 
   void draw(Renderer *renderer) override {
-    _renderable.textureRect = _animator.getFrame();
     _renderable.texture = _animator.getTexture();
 
     if (_direction == Direction::LEFT) {

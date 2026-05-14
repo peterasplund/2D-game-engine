@@ -64,10 +64,12 @@ public:
     Dialogue::Instance()->message(message);
   }
 
-  void update(double dt) override { AbstractGameObject::update(dt); }
+  void update(double dt) override { 
+    AbstractGameObject::update(dt);
+    _renderable.textureRect = _animator.getFrame();
+  }
 
   void draw(Renderer *renderer) override {
-    _renderable.textureRect = _animator.getFrame();
     _renderable.texture = _animator.getTexture();
 
     AbstractGameObject::draw(renderer);

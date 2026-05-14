@@ -46,6 +46,8 @@ public:
   }
 
   void update(double dt) override {
+    _renderable.textureRect = _animator.getFrame();
+
     _position += _velocity.v * dt;
     _position.y = AMPLITUDE * cos(SPEED / 2 * elapsedTime) + 50.0f;
     AbstractGameObject::update(dt);
@@ -64,7 +66,6 @@ public:
   }
 
   void draw(Renderer *renderer) override {
-    _renderable.textureRect = _animator.getFrame();
     _renderable.texture = _animator.getTexture();
     _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
 

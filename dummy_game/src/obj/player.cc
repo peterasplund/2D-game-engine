@@ -481,6 +481,10 @@ void obj::Player::update(double dt) {
 }
 
 bool obj::Player::onInputPressed(u16 code, void* sender, void* listener_inst, event_context context) {
+  if (Dialogue::Instance()->isDisplayingMessage()) {
+    return false;
+  }
+
   Player* self = (Player*)listener_inst;
   u16 button = context.data.u16[0];
 
