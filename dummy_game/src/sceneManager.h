@@ -1,13 +1,13 @@
 #pragma once
 
+#include "globals.h"
+#include "scene.h"
 #include <core/defines.h>
 #include <core/math.h>
 #include <core/renderer.h>
+#include <core/settings.h>
 #include <map>
 #include <string>
-#include <core/settings.h>
-#include "globals.h"
-#include "scene.h"
 
 const int FADE_SPEED = 8;
 

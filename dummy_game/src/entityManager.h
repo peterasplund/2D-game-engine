@@ -1,8 +1,8 @@
 #pragma once
 
-#include <core/map.h>
-#include "globals.h"
 #include "components/camera.h"
+#include "globals.h"
+#include <core/map.h>
 #define MAX_ENTITIES 1024
 
 class AbstractGameObject;
@@ -23,8 +23,8 @@ public:
 
   void setTileMap(Level *x);
 
-  AbstractGameObject* instantiateGameObject(std::string identifier);
-  void instantiateLevelEntitites(World* world, Level *level);
+  AbstractGameObject *instantiateGameObject(std::string identifier);
+  void instantiateLevelEntitites(World *world, Level *level);
 
   const std::vector<AbstractGameObject *> &getEntities();
   // std::vector<std::shared_ptr<AbstractGameObject>>
@@ -35,6 +35,6 @@ public:
   Level *getTilemap();
 
   static void release();
-  AbstractGameObject* _player = nullptr;
+  AbstractGameObject *_player = nullptr;
   camera _camera;
 };

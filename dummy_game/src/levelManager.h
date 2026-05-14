@@ -1,12 +1,12 @@
 #pragma once
+#include <core/map.h>
 #include <core/math.h>
 #include <core/renderer.h>
-#include <core/map.h>
 #include <core/settings.h>
 
+#include "components/camera.h"
 #include "globals.h"
 #include "obj/player.h"
-#include "components/camera.h"
 
 const int FADE_TIME = 150;
 
@@ -20,14 +20,12 @@ public:
   LevelTransition pendingLevel = {-1, {0, 0}};
   Timer transitionTimer;
   int _level;
-  World* _world;
+  World *_world;
   bool isFadingToBlack = true;
 
-  bool isTransitioning() {
-    return pendingLevel.iid != -1 && isFadingToBlack;
-  }
+  bool isTransitioning() { return pendingLevel.iid != -1 && isFadingToBlack; }
 
-  LevelManager(World* world) {
+  LevelManager(World *world) {
     _world = world;
     this->_level = -1;
 
@@ -50,7 +48,7 @@ public:
 
   void setLevel(int l) {
     this->_level = l;
-    camera* _camera = &EntityManager::Instance()->_camera;
+    camera *_camera = &EntityManager::Instance()->_camera;
     Level *lvl = &_world->levels[this->_level];
     std::vector<AbstractGameObject *> entities =
         EntityManager::Instance()->_entities;
@@ -64,13 +62,14 @@ public:
     EntityManager::Instance()->setTileMap(lvl);
     EntityManager::Instance()->instantiateLevelEntitites(_world, lvl);
 
-    _camera->setBounds({lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
+    _camera->setBounds(
+        {lvl->tilesWide * lvl->tileSize, lvl->tilesTall * lvl->tileSize});
   }
 
   void switchLevel(LevelTransition level) {
     setLevel(level.iid);
 
-    obj::Player* player = (obj::Player*) EntityManager::Instance()->_player;
+    obj::Player *player = (obj::Player *)EntityManager::Instance()->_player;
     player->setPosition(pendingLevel.playerPosition);
     player->_collidable.update(player->_position);
 
@@ -95,8 +94,7 @@ public:
           switchLevel(pendingLevel);
           return;
         }
-      }
-      else {
+      } else {
         if (transitionTimer.elapsed() > FADE_TIME) {
           transitionTimer.reset();
           isFadingToBlack = true;
@@ -110,7 +108,7 @@ public:
       }
     }
 
-    obj::Player* player = (obj::Player*) EntityManager::Instance()->_player;
+    obj::Player *player = (obj::Player *)EntityManager::Instance()->_player;
     char dir = '-';
     Level *nextLevel = nullptr;
     v2f newPlayerPos = player->getPosition();
@@ -121,13 +119,15 @@ public:
     if (playerRect.left() + 1 >= lvl.tilesWide * lvl.tileSize) {
       if (lvl.neighbours[NeighBourDirection::E].size() > 0) {
         dir = 'e';
-        nextLevel = _world->getLevelByCell({playerCellPos.x + 1, playerCellPos.y});
+        nextLevel =
+            _world->getLevelByCell({playerCellPos.x + 1, playerCellPos.y});
         newPlayerPos.x = -playerRect.w - (playerRect.w / 2);
       }
     } else if (playerRect.right() <= 1) {
       if (lvl.neighbours[NeighBourDirection::W].size() > 0) {
         dir = 'w';
-        nextLevel = _world->getLevelByCell({playerCellPos.x - 1, playerCellPos.y});
+        nextLevel =
+            _world->getLevelByCell({playerCellPos.x - 1, playerCellPos.y});
 
         int tilesWide = _world->levels[nextLevel->iid].tilesWide;
 
@@ -138,14 +138,16 @@ public:
       if (lvl.neighbours[NeighBourDirection::S].size() > 0) {
         dir = 's';
 
-        nextLevel = _world->getLevelByCell({playerCellPos.x, playerCellPos.y + 1});
+        nextLevel =
+            _world->getLevelByCell({playerCellPos.x, playerCellPos.y + 1});
         newPlayerPos.y = -playerRect.h;
       }
     } else if (playerRect.bottom() <= 1) {
       if (lvl.neighbours[NeighBourDirection::N].size() > 0) {
         dir = 'n';
 
-        nextLevel = _world->getLevelByCell({playerCellPos.x, playerCellPos.y - 1});
+        nextLevel =
+            _world->getLevelByCell({playerCellPos.x, playerCellPos.y - 1});
         nextLevel->cell.debugInt();
 
         int tilesTall = _world->levels[nextLevel->iid].tilesTall;
@@ -174,13 +176,12 @@ public:
     }
   }
 
-  void drawFade(Renderer* renderer) {
+  void drawFade(Renderer *renderer) {
     if (pendingLevel.iid != -1) {
       float timerValue = (float)transitionTimer.elapsed() / (float)FADE_TIME;
 
-      float fadeFraction = isFadingToBlack 
-        ? lerp(0, 1, easing(timerValue))
-        : lerp(1, 0, easing(timerValue));
+      float fadeFraction = isFadingToBlack ? lerp(0, 1, easing(timerValue))
+                                           : lerp(1, 0, easing(timerValue));
 
       int fade = fadeFraction * 255;
 

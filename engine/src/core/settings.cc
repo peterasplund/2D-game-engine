@@ -1,6 +1,6 @@
 #include "settings.h"
 
-GameSettings& gameSettings() {
+GameSettings &gameSettings() {
   static GameSettings _settings;
   return _settings;
 }

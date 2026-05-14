@@ -1,27 +1,25 @@
 #include <core/logger.h>
 
-#include "entityManager.h"
 #include "abstractGameobject.h"
+#include "entityManager.h"
 #include "obj/bat.h"
-#include "obj/skeleton.h"
 #include "obj/npc.h"
 #include "obj/player.h"
 #include "obj/savePoint.h"
+#include "obj/skeleton.h"
 
 // Use some configuration place to specify all game objects. Maybe even glob the
 // object directory (bad idea?)
-AbstractGameObject *EntityManager::instantiateGameObject(std::string identifier) {
+AbstractGameObject *
+EntityManager::instantiateGameObject(std::string identifier) {
   AbstractGameObject *o = nullptr;
   if (identifier == "Player") {
     o = new obj::Player();
-  }
-  else if (identifier == "SavePoint") {
+  } else if (identifier == "SavePoint") {
     o = new obj::SavePoint();
-  }
-  else if (identifier == "NPC") {
+  } else if (identifier == "NPC") {
     o = new obj::Npc();
-  }
-  else if (identifier == "Skeleton") {
+  } else if (identifier == "Skeleton") {
     o = new obj::Skeleton();
   }
 
@@ -132,7 +130,7 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
           continue;
         }
 
-        AbstractGameObject* object;
+        AbstractGameObject *object;
 
         if (entityDef.identifier == "Monster") {
           std::string enemyType = "";
@@ -142,8 +140,7 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
             }
           }
           object = instantiateGameObject("Skeleton");
-        }
-        else {
+        } else {
           object = instantiateGameObject(entityDef.identifier);
         }
 
@@ -152,16 +149,18 @@ void EntityManager::instantiateLevelEntitites(World *world, Level *level) {
           object->init();
 
           addEntity(object);
-        }
-        else {
-          LOG_WARN("Could not instantiate entity with identifier: \"%s\". Object mapping is not implemented.", entityDef.identifier.c_str());
+        } else {
+          LOG_WARN("Could not instantiate entity with identifier: \"%s\". "
+                   "Object mapping is not implemented.",
+                   entityDef.identifier.c_str());
         }
       }
     }
   }
 
   // Sort by zIndex to always render in the correct order.
-  std::sort(_entities.begin(), _entities.end(), [](const AbstractGameObject* a, const AbstractGameObject* b) {
-      return a->_zIndex < b->_zIndex;
-  });
+  std::sort(_entities.begin(), _entities.end(),
+            [](const AbstractGameObject *a, const AbstractGameObject *b) {
+              return a->_zIndex < b->_zIndex;
+            });
 }

@@ -1,5 +1,5 @@
-#include <core/inputHandler.h>
 #include <cmath>
+#include <core/inputHandler.h>
 #include <cstdlib>
 
 #include "player.h"
@@ -194,7 +194,8 @@ void obj::Player::update(double dt) {
     }
 
     _gravity.entityGravity = _normalGravity;
-    _velocity.v.x = _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+    _velocity.v.x =
+        _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
 
     _collidable.moveAndSlide(&_position, &_velocity, dt);
 
@@ -204,18 +205,16 @@ void obj::Player::update(double dt) {
 
   if (debugFly) {
     _animator.setAnimation("idle");
-    _velocity.v = { 0.0f, 0.0f };
+    _velocity.v = {0.0f, 0.0f};
     if (inputHandler->isHeld(BUTTON::LEFT)) {
       _position.x -= 0.5f * dt;
-    }
-    else if (inputHandler->isHeld(BUTTON::RIGHT)) {
+    } else if (inputHandler->isHeld(BUTTON::RIGHT)) {
       _position.x += 0.5f * dt;
     }
 
     if (inputHandler->isHeld(BUTTON::UP)) {
       _position.y -= 0.5f * dt;
-    }
-    else if (inputHandler->isHeld(BUTTON::DOWN)) {
+    } else if (inputHandler->isHeld(BUTTON::DOWN)) {
       _position.y += 0.5f * dt;
     }
 
@@ -235,15 +234,15 @@ void obj::Player::update(double dt) {
   if (!hurt) {
     for (auto other : entitiesTouching) {
       if (other->getType() == GAME_OBJECT::ENEMY && other->active) {
-        int entityCenter = other->_collidable.rect.x - (other->_collidable.rect.w / 2);
+        int entityCenter =
+            other->_collidable.rect.x - (other->_collidable.rect.w / 2);
         int center = _collidable.rect.x - (_collidable.rect.w / 2);
         if (center > entityCenter) {
-          _velocity.v.x = +_hurtForce; 
-          _velocity.v.y = -0.3f; 
-        }
-        else {
-          _velocity.v.x = -_hurtForce; 
-          _velocity.v.y = -0.3f; 
+          _velocity.v.x = +_hurtForce;
+          _velocity.v.y = -0.3f;
+        } else {
+          _velocity.v.x = -_hurtForce;
+          _velocity.v.y = -0.3f;
         }
 
         state = State::JUMP;
@@ -275,19 +274,24 @@ void obj::Player::update(double dt) {
   });
 
   onOneWayPlatform = false;
-  if (onwayPlatformFallThroughTimer.elapsed() > ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
-    RectF feet = { _collidable.rect.x, _collidable.rect.y + _collidable.rect.h - 2, _collidable.rect.w, 2 };
+  if (onwayPlatformFallThroughTimer.elapsed() >
+      ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+    RectF feet = {_collidable.rect.x,
+                  _collidable.rect.y + _collidable.rect.h - 2,
+                  _collidable.rect.w, 2};
     // DebugPrinter::Instance()->addDebugRect(&feet, 0, 255, 0);
     if (_velocity.v.y >= 0.0f) {
-      for(auto closeTile : closeTiles) {
-        Tileset* tileset = &tilemap->world->tilesetDefs[closeTile.tilesetId];
+      for (auto closeTile : closeTiles) {
+        Tileset *tileset = &tilemap->world->tilesetDefs[closeTile.tilesetId];
         if (tileset->tileHasTag(closeTile.tile.getTileId(), "Oneway")) {
           float ct;
           v2f cn, cp;
 
-          Rect closeTileRect = { closeTile.rect.x, closeTile.rect.y, closeTile.rect.w, 1 };
+          Rect closeTileRect = {closeTile.rect.x, closeTile.rect.y,
+                                closeTile.rect.w, 1};
 
-          if (_collidable.dynamicRectVsRect(&feet, _velocity, closeTileRect, cp, cn, ct, dt)) {
+          if (_collidable.dynamicRectVsRect(&feet, _velocity, closeTileRect, cp,
+                                            cn, ct, dt)) {
             if (cn.y < 0) {
               _position.y = closeTile.rect.y - 43;
               _velocity.v.y = 0.0f;
@@ -358,7 +362,7 @@ void obj::Player::update(double dt) {
           }
           isMoving = true;
         } else if (state != State::SLIDE && state != State::ATTACK &&
-                  !hasTileAbove) {
+                   !hasTileAbove) {
           state = State::IDLE;
         }
       }
@@ -386,7 +390,8 @@ void obj::Player::update(double dt) {
         if (state != State::ATTACK && !_gravity.onFloor &&
             _velocity.v.y < -0.01f) {
           _animator.setAnimation("jump");
-          if (_animator.getCurrent() == "jump" && _animator.hasPlayedThrough()) {
+          if (_animator.getCurrent() == "jump" &&
+              _animator.hasPlayedThrough()) {
             _animator.setAnimation("upToFall");
           }
         } else if (!_gravity.onFloor && _velocity.v.y > 0.01f) {
@@ -413,7 +418,6 @@ void obj::Player::update(double dt) {
     }
   }
 
-
   Rect tilesBelowRect = {(int)round(_collidable.rect.x),
                          (int)_collidable.rect.bottom(),
                          (int)_collidable.rect.w, 1};
@@ -425,9 +429,11 @@ void obj::Player::update(double dt) {
 
   if (!isMoving) {
     if (!_gravity.onFloor) {
-      _velocity.v.x = _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
+      _velocity.v.x =
+          _velocity.calcFriction(_velocity.v.x, AIR_DEACCELERATION, dt);
     } else if (state != State::SLIDE) {
-      _velocity.v.x = _velocity.calcFriction(_velocity.v.x, RUN_DEACCELERATION, dt);
+      _velocity.v.x =
+          _velocity.calcFriction(_velocity.v.x, RUN_DEACCELERATION, dt);
     }
   }
 
@@ -457,14 +463,15 @@ void obj::Player::update(double dt) {
 
   auto tilesBelow = _collidable.tileExistsAtI(tilesBelowRect);
   for (auto tile : tilesBelow) {
-    Tileset* tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
+    Tileset *tileset = &tilemap->world->tilesetDefs[tile.tilesetId];
     bool oneWay = tileset->tileHasTag(tile.tile.getTileId(), "Oneway");
 
     if (oneWay && tile.rect.y != tilesBelowRect.bottom() - 1) {
       oneWay = false;
     }
 
-    if (onwayPlatformFallThroughTimer.elapsed() <= ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
+    if (onwayPlatformFallThroughTimer.elapsed() <=
+        ONE_WAY_PLATFORM_FALLTHROUGH_WINDOW) {
       oneWay = false;
     }
 
@@ -480,15 +487,17 @@ void obj::Player::update(double dt) {
   AbstractGameObject::update(dt);
 }
 
-bool obj::Player::onInputPressed(u16 code, void* sender, void* listener_inst, event_context context) {
+bool obj::Player::onInputPressed(u16 code, void *sender, void *listener_inst,
+                                 event_context context) {
   if (Dialogue::Instance()->isDisplayingMessage()) {
     return false;
   }
 
-  Player* self = (Player*)listener_inst;
+  Player *self = (Player *)listener_inst;
   u16 button = context.data.u16[0];
 
-  if (self->state != State::DEAD && (!self->hurt || self->hurtTimer.elapsed() > 250)) {
+  if (self->state != State::DEAD &&
+      (!self->hurt || self->hurtTimer.elapsed() > 250)) {
     self->jumpController.onInputPressed(button);
     self->attackController.onInputPressed(button);
     self->slideController.onInputPressed(button);
@@ -502,11 +511,13 @@ bool obj::Player::onInputPressed(u16 code, void* sender, void* listener_inst, ev
   return true;
 };
 
-bool obj::Player::onInputReleased(u16 code, void* sender, void* listener_inst, event_context context) {
-  Player* self = (Player*)listener_inst;
+bool obj::Player::onInputReleased(u16 code, void *sender, void *listener_inst,
+                                  event_context context) {
+  Player *self = (Player *)listener_inst;
   u16 button = context.data.u16[0];
 
-  if (self->state != State::DEAD && (!self->hurt || self->hurtTimer.elapsed() > 250)) {
+  if (self->state != State::DEAD &&
+      (!self->hurt || self->hurtTimer.elapsed() > 250)) {
     self->jumpController.onInputReleased(button);
   }
 
@@ -532,8 +543,8 @@ void obj::Player::draw(Renderer *renderer) {
       Rect sr = {0, 0, 6, 14};
       RectF playerR = _collidable.addBoundingBox(_position);
       Rect dr = {(int)(playerR.x + playerR.w / 2) - 2 -
-                    (direction == Direction::LEFT ? 1 : 0),
-                (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
+                     (direction == Direction::LEFT ? 1 : 0),
+                 (int)(playerR.y - 22) + yAdded, sr.w, sr.h};
       renderer->renderTexture(_interactableTexture, &sr, &dr, SDL_FLIP_NONE);
     }
 

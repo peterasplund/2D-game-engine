@@ -1,6 +1,6 @@
 #include "jump.h"
-#include <core/inputHandler.h>
 #include "../../obj/player.h"
+#include <core/inputHandler.h>
 
 void JumpController::update(double dt) {
   // Jump buffer
@@ -23,7 +23,8 @@ void JumpController::performJump() {
 void JumpController::jump() {
   obj::State s = player->state;
   if (s != obj::State::ATTACK && s != obj::State::CROUCH) {
-    if (player->_gravity.onFloor || s == obj::State::SLIDE || s == obj::State::CLIMBING) {
+    if (player->_gravity.onFloor || s == obj::State::SLIDE ||
+        s == obj::State::CLIMBING) {
       performJump();
     }
     if (!player->_gravity.onFloor) {

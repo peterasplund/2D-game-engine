@@ -9,15 +9,13 @@
 
 class Animator {
 public:
-  Animator() {
-    timer = Timer();
-  }
+  Animator() { timer = Timer(); }
 
   ~Animator() = default;
-  Animator(const Animator&) = delete;
-  Animator& operator=(const Animator&) = delete;
-  Animator(Animator&&) = default;
-  Animator& operator=(Animator&&) = default;
+  Animator(const Animator &) = delete;
+  Animator &operator=(const Animator &) = delete;
+  Animator(Animator &&) = default;
+  Animator &operator=(Animator &&) = default;
 
   void addAnimation(std::string name, std::unique_ptr<Animation> animation) {
     _animations[name] = std::move(animation);
@@ -26,25 +24,25 @@ public:
   bool setAnimation(std::string name);
 
   void start() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       animation->start();
     }
   }
 
   void stop() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       animation->stop();
     }
   }
 
   void reset() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       animation->reset();
     }
   }
 
   bool hasPlayedThrough() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       return animation->hasPlayedThrough();
     }
 
@@ -52,7 +50,7 @@ public:
   }
 
   bool isPlaying() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       return animation->isPlaying();
     }
 
@@ -62,7 +60,7 @@ public:
   std::string getCurrent() { return _currentAnimation; }
 
   SDL_Texture *getTexture() {
-    if (auto* animation = currentAnimation()) {
+    if (auto *animation = currentAnimation()) {
       return animation->getTexture();
     }
 
@@ -72,7 +70,7 @@ public:
   Rect getFrame();
 
 private:
-  Animation* currentAnimation() {
+  Animation *currentAnimation() {
     auto it = _animations.find(_currentAnimation);
     if (it == _animations.end()) {
       return nullptr;
@@ -81,7 +79,7 @@ private:
     return it->second.get();
   }
 
-  const Animation* currentAnimation() const {
+  const Animation *currentAnimation() const {
     auto it = _animations.find(_currentAnimation);
     if (it == _animations.end()) {
       return nullptr;

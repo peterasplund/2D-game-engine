@@ -11,7 +11,7 @@
 #include "globals.h"
 
 namespace obj {
-  class Player;
+class Player;
 };
 
 enum class Direction { LEFT, RIGHT };
@@ -33,7 +33,8 @@ public:
   virtual void update(double dt);
   virtual void draw(Renderer *renderer);
   virtual ~AbstractGameObject() {}
-  virtual void handleEvent(SDL_Event *event) {}; // @TODO: remove this and rely solely on our own even system
+  virtual void handleEvent(SDL_Event *event) {
+  }; // @TODO: remove this and rely solely on our own even system
   void setListenForCollisions();
   virtual bool contains(RectF other);
   virtual bool contains(AbstractGameObject other);

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <cstdint>
-#include <cstdlib>
 #include <core/defines.h>
 #include <core/timer.h>
+#include <cstdint>
+#include <cstdlib>
 
 namespace obj {
-  struct Player;
+struct Player;
 };
 
 struct JumpController {
-  obj::Player* player;
+  obj::Player *player;
 
   Timer jumpBufferTimer;
   bool jumpHold = false;
@@ -20,7 +20,7 @@ struct JumpController {
   /// Jump buffer window in MS
   const uint32_t JUMP_BUFFER_WINDOW = 100;
 
-  void init(obj::Player* player) { this->player = player; }
+  void init(obj::Player *player) { this->player = player; }
 
   void update(double dt);
   void onInputPressed(u16 button);

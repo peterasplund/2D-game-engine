@@ -1,8 +1,8 @@
 #pragma once
 
+#include "hudMeter.h"
 #include <core/assetManager.h>
 #include <core/math.h>
-#include "hudMeter.h"
 
 class Hud {
 protected:
@@ -11,8 +11,8 @@ protected:
 
 public:
   Hud() {
-    hpMeter = new HudMeter({ 4, 4 , 154, 9 }, { 106, 190, 48, 255 } );
-    mpMeter = new HudMeter({ 4, 16 , 154, 9 }, { 48, 70, 190, 255 } );
+    hpMeter = new HudMeter({4, 4, 154, 9}, {106, 190, 48, 255});
+    mpMeter = new HudMeter({4, 16, 154, 9}, {48, 70, 190, 255});
   }
 
   ~Hud() {

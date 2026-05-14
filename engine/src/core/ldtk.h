@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../lib/json.hpp"
 #include "map.h"
 #include <string>
-#include "../../lib/json.hpp"
 
 World createWorld(std::string filePath);

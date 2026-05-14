@@ -1,9 +1,9 @@
 #include "gameplay.h"
+#include "../debugPrinter.h"
 #include "../obj/bat.h"
 #include "../obj/door.h"
-#include "../obj/player.h"
 #include "../obj/npc.h"
-#include "../debugPrinter.h"
+#include "../obj/player.h"
 #include <core/settings.h>
 
 GameState gameState;
@@ -21,9 +21,9 @@ void GameplayScene::init() {
 
   mapHud = new MapHud(
       _renderer, world,
-      {(windowWidth) - MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5), 8});
+      {(windowWidth)-MAP_HUD_CELL_WIDTH - (MAP_HUD_CELL_WIDTH * 5), 8});
 
-  camera* _camera = &EntityManager::Instance()->_camera;
+  camera *_camera = &EntityManager::Instance()->_camera;
   this->levelManager = new LevelManager(world);
   Level *level = &world->levels[this->levelManager->_level];
   if (level == nullptr) {
@@ -46,7 +46,7 @@ void GameplayScene::init() {
   hud = new Hud();
 
   auto player = EntityManager::Instance()->_player;
-  _player = (obj::Player*)player;
+  _player = (obj::Player *)player;
   _camera->follow(player->getRectPointer());
   _renderer->setOffsetPtr(&_camera->pos);
   loaded = true;
@@ -73,7 +73,8 @@ void GameplayScene::update(f64 dt) {
   }
 
   // Update visited on map
-  v2i playerCellPos = world->getCellByPx(_player->getPosition(),  levelManager->_level);
+  v2i playerCellPos =
+      world->getCellByPx(_player->getPosition(), levelManager->_level);
   gameState.visited[(playerCellPos.y * world->worldSizeInCells.x) +
                     playerCellPos.x] = true;
 

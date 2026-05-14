@@ -3,7 +3,7 @@
 #include <vector>
 
 typedef struct registered_event {
-  void* listener;
+  void *listener;
   PFN_on_event callback;
 } registered_event;
 
@@ -41,16 +41,17 @@ void event_shutdown() {
   }
 }
 
-bool event_register(u16 code, void* listener, PFN_on_event on_event) {
+bool event_register(u16 code, void *listener, PFN_on_event on_event) {
   if (is_initialized == false) {
-		LOG_ERROR("Event system is uninitialized");
+    LOG_ERROR("Event system is uninitialized");
     return false;
   }
 
   u64 registered_count = state.registered[code].events.size();
   for (u64 i = 0; i < registered_count; ++i) {
     if (state.registered[code].events[i].listener == listener) {
-      LOG_WARN("Event with code \"%d\" already registered for this listener.", code);
+      LOG_WARN("Event with code \"%d\" already registered for this listener.",
+               code);
       return false;
     }
   }
@@ -64,13 +65,15 @@ bool event_register(u16 code, void* listener, PFN_on_event on_event) {
   return true;
 }
 
-bool event_unregister(u16 code, void* listener, PFN_on_event on_event) {
+bool event_unregister(u16 code, void *listener, PFN_on_event on_event) {
   if (is_initialized == false) {
     return false;
   }
 
   if (state.registered[code].events.size() == 0) {
-    LOG_WARN("Event with code \"%d\" for this listener isn't registered. Cannot unregister.", code);
+    LOG_WARN("Event with code \"%d\" for this listener isn't registered. "
+             "Cannot unregister.",
+             code);
     return false;
   }
 
@@ -80,8 +83,7 @@ bool event_unregister(u16 code, void* listener, PFN_on_event on_event) {
     if (e.listener == listener && e.callback == on_event) {
       // Found one, remove it
       state.registered[code].events.erase(
-        state.registered[code].events.begin() + i
-      );
+          state.registered[code].events.begin() + i);
 
       return true;
     }
@@ -91,9 +93,9 @@ bool event_unregister(u16 code, void* listener, PFN_on_event on_event) {
   return false;
 }
 
-bool event_fire(u16 code, void* sender, event_context context) {
+bool event_fire(u16 code, void *sender, event_context context) {
   if (is_initialized == false) {
-		LOG_ERROR("Event system is uninitialized");
+    LOG_ERROR("Event system is uninitialized");
     return false;
   }
 

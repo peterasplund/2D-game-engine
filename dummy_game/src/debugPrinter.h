@@ -1,8 +1,8 @@
 #pragma once
 
-#include <core/renderer.h>
 #include "imgui_layer.h"
 #include "math.h"
+#include <core/renderer.h>
 #include <vector>
 
 struct DebugRect {

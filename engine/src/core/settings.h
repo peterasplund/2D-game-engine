@@ -10,4 +10,4 @@ struct GameSettings {
   int windowHeight = 272;
 };
 
-GameSettings& gameSettings();
+GameSettings &gameSettings();

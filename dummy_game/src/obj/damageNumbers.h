@@ -1,7 +1,7 @@
 #pragma once
 
-#include <core/defines.h>
 #include <core/assetManager.h>
+#include <core/defines.h>
 #include <core/renderer.h>
 #include <cstdlib>
 

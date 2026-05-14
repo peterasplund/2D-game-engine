@@ -1,6 +1,6 @@
 #include "slide.h"
-#include <core/inputHandler.h>
 #include "../../obj/player.h"
+#include <core/inputHandler.h>
 
 void SlideController::update(double dt) {
   obj::State s = player->state;
@@ -14,8 +14,8 @@ void SlideController::update(double dt) {
   // Decelerate
   if (!player->isMoving) {
     if (player->_gravity.onFloor && s == obj::State::SLIDE) {
-      player->_velocity.v.x =
-          player->_velocity.calcFriction(player->_velocity.v.x, SLIDE_DEACCELERATION, dt);
+      player->_velocity.v.x = player->_velocity.calcFriction(
+          player->_velocity.v.x, SLIDE_DEACCELERATION, dt);
     }
   }
 }
@@ -38,9 +38,8 @@ void SlideController::slide() {
 
       player->_animator.reset();
       player->_animator.setAnimation("slide");
-      player->_velocity.v.x = player->direction == Direction::LEFT
-                                  ? -SLIDE_POWER
-                                  : SLIDE_POWER;
+      player->_velocity.v.x =
+          player->direction == Direction::LEFT ? -SLIDE_POWER : SLIDE_POWER;
     }
   }
 }

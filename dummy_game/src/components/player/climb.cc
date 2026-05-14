@@ -1,6 +1,6 @@
 #include "climb.h"
-#include <core/inputHandler.h>
 #include "../../obj/player.h"
+#include <core/inputHandler.h>
 
 bool ClimbController::update(double dt) {
   Level *tilemap = EntityManager::Instance()->getTilemap();
@@ -10,8 +10,8 @@ bool ClimbController::update(double dt) {
   Tile *ladderAbove = player->tileAt<float, float>(
       {rect.x, rect.y - rect.h / 2, rect.w, rect.h / 2}, "Ladder");
 
-  Tile *onLadder =
-      player->tileAt<float, float>({rect.x, rect.y - 9, rect.w, rect.h - 9}, "Ladder");
+  Tile *onLadder = player->tileAt<float, float>(
+      {rect.x, rect.y - 9, rect.w, rect.h - 9}, "Ladder");
 
   if (player->state == obj::State::CLIMBING) {
     player->_velocity.v.y = 0.0f;
@@ -42,13 +42,12 @@ bool ClimbController::update(double dt) {
       // @TODO: reverse animation
     }
 
-    if (onLadder == nullptr/* && !hasTileAbove*/) {
+    if (onLadder == nullptr /* && !hasTileAbove*/) {
       player->state = obj::State::IDLE;
     }
 
     return true;
   }
-
 
   // Climb onto ladder
   if (tilesWithin.size() > 0) {

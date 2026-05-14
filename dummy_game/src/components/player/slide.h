@@ -1,15 +1,15 @@
 #pragma once
 
+#include <core/timer.h>
 #include <cstdint>
 #include <cstdlib>
-#include <core/timer.h>
 
 namespace obj {
-  struct Player;
+struct Player;
 };
 
 struct SlideController {
-  obj::Player* player;
+  obj::Player *player;
 
   /// How long to slide
   const float SLIDE_POWER = 0.45f;
@@ -18,7 +18,7 @@ struct SlideController {
   float slideDelay = 450.0f;
   Timer slideTimer;
 
-  void init(obj::Player* player) { this->player = player; }
+  void init(obj::Player *player) { this->player = player; }
   void update(double dt);
   void onInputPressed(int button);
   void slide();

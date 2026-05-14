@@ -13,14 +13,12 @@ private:
   bool initialized = false;
 
   AssetManager() {}
-  AssetManager(const AssetManager&) = delete;
-  AssetManager& operator=(const AssetManager&) = delete;
-  AssetManager(AssetManager&&) = delete;
-  AssetManager& operator=(AssetManager&&) = delete;
+  AssetManager(const AssetManager &) = delete;
+  AssetManager &operator=(const AssetManager &) = delete;
+  AssetManager(AssetManager &&) = delete;
+  AssetManager &operator=(AssetManager &&) = delete;
 
-  ~AssetManager() {
-    release();
-  }
+  ~AssetManager() { release(); }
 
   void releaseTextures() {
     for (auto tex : _textures) {

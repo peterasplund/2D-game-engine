@@ -3,63 +3,68 @@
 #include "defines.h"
 
 typedef struct event_context {
-    // 128 bits
-    union {
-        ::i64 i64[2];
-        ::u64 u64[2];
-        ::f64 f64[2];
+  // 128 bits
+  union {
+    ::i64 i64[2];
+    ::u64 u64[2];
+    ::f64 f64[2];
 
-        ::i32 i32[4];
-        ::u32 u32[4];
-        ::f32 f32[4];
+    ::i32 i32[4];
+    ::u32 u32[4];
+    ::f32 f32[4];
 
-        ::i16 i16[8];
-        ::u16 u16[8];
+    ::i16 i16[8];
+    ::u16 u16[8];
 
-        ::i8 i8[16];
-        ::u8 u8[16];
+    ::i8 i8[16];
+    ::u8 u8[16];
 
-        char c[16];
-    } data;
+    char c[16];
+  } data;
 } event_context;
-
 
 #include <functional>
 
-typedef bool (*PFN_on_event)(u16 code, void* sender, void* listener_inst, event_context data);
+typedef bool (*PFN_on_event)(u16 code, void *sender, void *listener_inst,
+                             event_context data);
 
 bool event_initialize();
 void event_shutdown();
 
 /**
- * Register to listen for when events are sent with the provided code. Events with duplicate
- * listener/callback combos will not be registered again and will cause this to return FALSE.
+ * Register to listen for when events are sent with the provided code. Events
+ * with duplicate listener/callback combos will not be registered again and will
+ * cause this to return FALSE.
  * @param code The event code to listen for
  * @param listener A pointer to a listener instance. Can be 0/NULL.
- * @param on_event The callback function pointer to be invoked when the event code is fired.
+ * @param on_event The callback function pointer to be invoked when the event
+ * code is fired.
  * @returns TRUE if the event is successfully registered; otherwise FALSE.
  */
-ENGINE_EXPORT bool event_register(u16 code, void* listener, PFN_on_event on_event);
+ENGINE_EXPORT bool event_register(u16 code, void *listener,
+                                  PFN_on_event on_event);
 
 /**
- * Unregister from listening for when events are sent with the provided code. If no
- * matching registration is found, this function returns FALSE.
+ * Unregister from listening for when events are sent with the provided code. If
+ * no matching registration is found, this function returns FALSE.
  * @param code The event code to stop listen for
  * @param listener A pointer to a listener instance. Can be 0/NULL.
  * @param on_event The callback function pointer to be unregistered.
  * @returns TRUE if the event is successfully unregistered; otherwise FALSE.
  */
-ENGINE_EXPORT bool event_unregister(u16 code, void* listener, PFN_on_event on_event);
+ENGINE_EXPORT bool event_unregister(u16 code, void *listener,
+                                    PFN_on_event on_event);
 
 /**
- * Fires an event to listeners of the given code. If an event handler returns TRUE,
- * the event is considered handled and is not passed on to any more listeners.
+ * Fires an event to listeners of the given code. If an event handler returns
+ * TRUE, the event is considered handled and is not passed on to any more
+ * listeners.
  * @param code The event code to fire.
  * @param sender A pointer to the sender. Can be 0/NULL.
  * @param data The event data.
  * @returns TRUE if handled, otherwise FALSE.
  */
-ENGINE_EXPORT bool event_fire(u16 code, void* sender, event_context context);
+ENGINE_EXPORT bool event_fire(u16 code, void *sender, event_context context);
 
 /**
  * Custom event codes need to be > 0xFF

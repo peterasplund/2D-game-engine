@@ -18,18 +18,15 @@ public:
 
     if (_lastValue != -1 && value != _lastValue) {
       _timer.reset();
-      _animateFromFraction = _lastValue == 0 ? 0.0f : (double)_lastValue / (double)maxValue;
+      _animateFromFraction =
+          _lastValue == 0 ? 0.0f : (double)_lastValue / (double)maxValue;
     }
 
-    if (_timer.elapsed() < lerpTiming && _timer.elapsed() != 0.0f && _animateFromFraction != -1) {
+    if (_timer.elapsed() < lerpTiming && _timer.elapsed() != 0.0f &&
+        _animateFromFraction != -1) {
       float time = (float)_timer.elapsed() / (float)lerpTiming;
-      fraction = lerp(
-        _animateFromFraction,
-        fraction,
-        easing(time)
-      );
+      fraction = lerp(_animateFromFraction, fraction, easing(time));
     }
-
 
     int valueWidth = (_rect.w - _rect.x) * fraction;
 
@@ -43,7 +40,7 @@ public:
       SDL_RenderFillRect(renderer, &filled);
     }
 
-    _lastValue = value; 
+    _lastValue = value;
   }
 
 protected:

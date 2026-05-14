@@ -20,7 +20,7 @@ LayerType strToLayerType(const char *str) {
 }
 
 Layer parse_layer_instance(World *world, Level *level, json layerJson) {
-    LOG_WARN("> parse_layer_instance");
+  LOG_WARN("> parse_layer_instance");
   Layer layer;
 
   int layerDefId = layerJson["layerDefUid"];
@@ -36,7 +36,8 @@ Layer parse_layer_instance(World *world, Level *level, json layerJson) {
       int x = (int)tile["px"][0];
       int y = (int)tile["px"][1];
 
-      // Can happen if we change tileset in LDTK and keep old unused mappings. Just skip them.
+      // Can happen if we change tileset in LDTK and keep old unused mappings.
+      // Just skip them.
       if (tile["t"].is_null()) {
         continue;
       }
@@ -85,9 +86,8 @@ Layer parse_layer_instance(World *world, Level *level, json layerJson) {
         fieldValue.identifier = field["__identifier"];
 
         if (field["__value"].is_array()) {
-          //fieldValue.value = field["__value"][0]; // @TODO: implment this 
-        }
-        else {
+          // fieldValue.value = field["__value"][0]; // @TODO: implment this
+        } else {
           fieldValue.value = field["__value"];
         }
 
@@ -126,8 +126,7 @@ Tileset parse_tileset(std::string projectPath, json data) {
   auto texture = AssetManager::Instance()->getTexture(path);
 
   if (texture == nullptr) {
-    LOG_FATAL("ERROR: Failed to load the tileset texture at: %s",
-              path.c_str());
+    LOG_FATAL("ERROR: Failed to load the tileset texture at: %s", path.c_str());
   }
 
   std::map<std::string, std::vector<int>> tags;
@@ -209,9 +208,13 @@ World createWorld(std::string filePath) {
   LOG_TRACE("parsing tileset defs");
   for (json tilesetDefJson : data["defs"]["tilesets"]) {
     // Skip internal icons
-    if (tilesetDefJson["identifier"] == "Internal_Icons") { continue; }
+    if (tilesetDefJson["identifier"] == "Internal_Icons") {
+      continue;
+    }
     // Skip tilesets without textures
-    if (tilesetDefJson["relPath"].is_null()) { continue; }
+    if (tilesetDefJson["relPath"].is_null()) {
+      continue;
+    }
 
     Tileset tileset = parse_tileset(projectPath, tilesetDefJson);
     tilesetUidMap[tileset.id] = i;
@@ -251,7 +254,7 @@ World createWorld(std::string filePath) {
   LOG_TRACE("parsing levels");
   for (json levelJson : data["levels"]) {
     world.levels.emplace_back();
-    Level& level = world.levels.back();
+    Level &level = world.levels.back();
 
     std::string identifier = levelJson["identifier"];
     level.iid = i;
@@ -319,9 +322,9 @@ World createWorld(std::string filePath) {
     }
   }
 
-  for (auto& level : world.levels) {
+  for (auto &level : world.levels) {
     level.world = &world;
-    for (auto& layer : level.layers) {
+    for (auto &layer : level.layers) {
       layer.level = &level;
     }
   }

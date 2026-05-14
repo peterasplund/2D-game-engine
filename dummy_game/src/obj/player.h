@@ -1,13 +1,13 @@
 #pragma once
 
-#include <core/animator.h>
-#include <core/renderer.h>
-#include <core/event.h>
 #include "../abstractGameobject.h"
-#include "../components/player/jump.h"
 #include "../components/player/attack.h"
 #include "../components/player/climb.h"
+#include "../components/player/jump.h"
 #include "../components/player/slide.h"
+#include <core/animator.h>
+#include <core/event.h>
+#include <core/renderer.h>
 
 namespace obj {
 enum class State {
@@ -31,8 +31,10 @@ public:
 
   template <class T, class J>
   Tile *tileAt(Rectangle<T, J> rect, std::string property);
-  static bool onInputPressed(u16 code, void* sender, void* listener_inst, event_context context);
-  static bool onInputReleased(u16 code, void* sender, void* listener_inst, event_context context);
+  static bool onInputPressed(u16 code, void *sender, void *listener_inst,
+                             event_context context);
+  static bool onInputReleased(u16 code, void *sender, void *listener_inst,
+                              event_context context);
   void draw(Renderer *renderer) override;
   State state = State::IDLE;
   bool hasTileAbove = false;
@@ -44,6 +46,7 @@ public:
   int hp = maxHp;
 
   void restoreHp() { hp = maxHp; }
+
 protected:
   /// How much higher the player should go if they hold the jump button (lower
   /// value means higher jump).

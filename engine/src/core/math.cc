@@ -19,13 +19,11 @@ Rectangle<int, int> group_rects(Rectangle<float, float> r1,
   };
 }
 
-float lerp(float v0, float v1, float t) {
-  return (1 - t) * v0 + t * v1;
-}
+float lerp(float v0, float v1, float t) { return (1 - t) * v0 + t * v1; }
 
 float easing(float t) {
   if (t <= 0.5f) {
-      return 2.0f * t * t;
+    return 2.0f * t * t;
   }
 
   t -= 0.5f;

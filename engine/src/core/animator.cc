@@ -10,8 +10,7 @@ bool Animator::setAnimation(std::string name) {
       // reset animation frame when changing animation
       timer.reset();
       it->second->reset();
-    }
-    else {
+    } else {
       _currentAnimation = name;
     }
 
@@ -28,7 +27,7 @@ Rect Animator::getFrame() {
     return {};
   }
 
-  if (auto* animation = currentAnimation()) {
+  if (auto *animation = currentAnimation()) {
     return animation->getFrame(&timer);
   }
 

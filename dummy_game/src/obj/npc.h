@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../abstractGameobject.h"
+#include "../dialogue.h"
 #include <core/animator.h>
 #include <core/assetManager.h>
 #include <core/renderer.h>
-#include "../abstractGameobject.h"
-#include "../dialogue.h"
 
 namespace obj {
 class Npc : public AbstractGameObject {
@@ -55,7 +55,7 @@ public:
     _dialogue = dialogue;
   }
 
-  void onInteract(Player* player) override {
+  void onInteract(Player *player) override {
     std::string message;
     message.append(_name);
     message.append("\n");
@@ -64,7 +64,7 @@ public:
     Dialogue::Instance()->message(message);
   }
 
-  void update(double dt) override { 
+  void update(double dt) override {
     AbstractGameObject::update(dt);
     _renderable.textureRect = _animator.getFrame();
   }

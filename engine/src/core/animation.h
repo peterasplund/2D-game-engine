@@ -2,8 +2,8 @@
 
 #include "math.h"
 #include "timer.h"
-#include <vector>
 #include <SDL2/SDL_render.h>
+#include <vector>
 
 class Animation {
   struct Frame {

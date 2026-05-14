@@ -98,7 +98,11 @@ v2i World::getCellByPx(v2i px, int currentLevelId) {
   return ((px / tileSize) / cellSize) + lvl->getPosition();
 }
 
-template void Level::getIndicesWithinRect(Rectangle<int, int> r, std::vector<int> &out);
-template void Level::getIndicesWithinRect(Rectangle<float, float> r, std::vector<int> &out);
-template void Level::getIndicesWithinRect(Rectangle<float, int> r, std::vector<int> &out);
-template void Level::getIndicesWithinRect(Rectangle<int, float> r, std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<int, int> r,
+                                          std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<float, float> r,
+                                          std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<float, int> r,
+                                          std::vector<int> &out);
+template void Level::getIndicesWithinRect(Rectangle<int, float> r,
+                                          std::vector<int> &out);

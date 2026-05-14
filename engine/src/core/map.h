@@ -175,7 +175,7 @@ struct World {
   std::vector<EntityDef> entityDefs;
   std::vector<Tileset> tilesetDefs;
 
-  std::vector<Level*> levelsByCells;
+  std::vector<Level *> levelsByCells;
 
   v2i worldSizeInCells;
   v2i cellSize;

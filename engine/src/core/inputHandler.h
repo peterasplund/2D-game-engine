@@ -1,9 +1,9 @@
 #pragma once
 
-#include "math.h"
 #include "event.h"
-#include <map>
+#include "math.h"
 #include <SDL2/SDL_events.h>
+#include <map>
 
 enum BUTTON {
   UP = 0x01,
@@ -27,10 +27,10 @@ private:
   v2i _mousePos;
 
   InputHandler();
-  InputHandler(const InputHandler&) = delete;
-  InputHandler& operator=(const InputHandler&) = delete;
-  InputHandler(InputHandler&&) = delete;
-  InputHandler& operator=(InputHandler&&) = delete;
+  InputHandler(const InputHandler &) = delete;
+  InputHandler &operator=(const InputHandler &) = delete;
+  InputHandler(InputHandler &&) = delete;
+  InputHandler &operator=(InputHandler &&) = delete;
 
   ~InputHandler() {}
 

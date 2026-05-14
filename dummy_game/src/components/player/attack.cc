@@ -1,16 +1,14 @@
 #include "attack.h"
 // #include "../../debugPrinter.h"
-#include <core/inputHandler.h>
 #include "../../obj/damageNumbers.h"
 #include "../../obj/player.h"
-#include "../../obj/player.h"
+#include <core/inputHandler.h>
 
 void AttackController::update(double dt) {
   obj::State s = player->state;
 
   swordHitBox = {
-      player->_position.x +
-          (player->direction == Direction::LEFT ? -0 : 36),
+      player->_position.x + (player->direction == Direction::LEFT ? -0 : 36),
       player->_position.y + 5.0f,
       20.0f,
       40.0f,

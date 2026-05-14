@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../abstractGameobject.h"
+#include "../components/autoPatrol.h"
 #include <core/animator.h>
 #include <core/assetManager.h>
 #include <core/renderer.h>
-#include "../abstractGameobject.h"
-#include "../components/autoPatrol.h"
 
 namespace obj {
 class Skeleton : public AbstractGameObject {
@@ -12,14 +12,11 @@ class Skeleton : public AbstractGameObject {
   std::string stateToStr(State s) {
     if (s == State::WALK) {
       return "walk";
-    }
-    else if (s == State::RISING) {
+    } else if (s == State::RISING) {
       return "rising";
-    }
-    else if (s == State::MELTING) {
+    } else if (s == State::MELTING) {
       return "melting";
-    }
-    else if (s == State::HIDING) {
+    } else if (s == State::HIDING) {
       return "hiding";
     }
 
@@ -27,6 +24,7 @@ class Skeleton : public AbstractGameObject {
   }
 
   AutoPatrol autoPatrol;
+
 public:
   void init() override {
     AbstractGameObject::init();
@@ -107,53 +105,53 @@ public:
     _renderable.textureRect = _animator.getFrame();
 
     if (autoPatrol.shouldTurn(&_collidable, _direction, true)) {
-      _direction = _direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+      _direction =
+          _direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
     }
 
     _collidable.moveAndSlide(&_position, &_velocity, dt);
     invincible = false;
     active = true;
     switch (_state) {
-      case State::WALK:
-        if (_direction == Direction::RIGHT) {
-          if (_velocity.v.x < SPEED) {
-            _velocity.v.x += SPEED;
-          }
+    case State::WALK:
+      if (_direction == Direction::RIGHT) {
+        if (_velocity.v.x < SPEED) {
+          _velocity.v.x += SPEED;
         }
-        else {
-          if (_velocity.v.x > -SPEED) {
-            _velocity.v.x -= SPEED;
-          }
+      } else {
+        if (_velocity.v.x > -SPEED) {
+          _velocity.v.x -= SPEED;
         }
+      }
 
-        if (_stateTimer.elapsed() > _walkingTime) {
-          setState(State::MELTING);
-        }
-        break;
-      case State::RISING:
-        invincible = true;
-        active = false;
-        if (_stateTimer.elapsed() > _risingTime) {
-          setState(State::WALK);
-        }
-        break;
-      case State::MELTING:
-        invincible = true;
-        active = false;
-        if (_stateTimer.elapsed() > _meltingTime) {
-          setState(State::HIDING);
-        }
-        break;
-      case State::HIDING:
-        invincible = true;
-        active = false;
-        if (_stateTimer.elapsed() > _hidingTime) {
-          setState(State::RISING);
-        }
-        break;
-      default:
-        
-        break;
+      if (_stateTimer.elapsed() > _walkingTime) {
+        setState(State::MELTING);
+      }
+      break;
+    case State::RISING:
+      invincible = true;
+      active = false;
+      if (_stateTimer.elapsed() > _risingTime) {
+        setState(State::WALK);
+      }
+      break;
+    case State::MELTING:
+      invincible = true;
+      active = false;
+      if (_stateTimer.elapsed() > _meltingTime) {
+        setState(State::HIDING);
+      }
+      break;
+    case State::HIDING:
+      invincible = true;
+      active = false;
+      if (_stateTimer.elapsed() > _hidingTime) {
+        setState(State::RISING);
+      }
+      break;
+    default:
+
+      break;
     }
 
     if (_timer.elapsed() > 350) {
@@ -168,8 +166,7 @@ public:
 
     if (_direction == Direction::LEFT) {
       _renderable.textureFlip = SDL_FLIP_NONE;
-    }
-    else {
+    } else {
       _renderable.textureFlip = SDL_FLIP_HORIZONTAL;
     }
 

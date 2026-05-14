@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../abstractGameobject.h"
 #include <core/animator.h>
 #include <core/assetManager.h>
 #include <core/inputHandler.h>
 #include <core/renderer.h>
-#include "../abstractGameobject.h"
 
 namespace obj {
 class PlayerOverworld : public AbstractGameObject {

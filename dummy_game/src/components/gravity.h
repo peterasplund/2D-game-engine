@@ -1,7 +1,7 @@
 #pragma once
 
-#include <core/math.h>
 #include "velocity.h"
+#include <core/math.h>
 
 struct gravity {
   bool previouslyOnFloor = false;

@@ -1,14 +1,14 @@
-#include <stdio.h>
 #include <core/application.h>
 #include <core/inputHandler.h>
 #include <core/ldtk.h>
+#include <stdio.h>
 
+#include "imgui_layer.h"
 #include "scene/gameplay.h"
 #include "sceneManager.h"
-#include "imgui_layer.h"
 
 int main() {
-  Application* app = Application::Instance();
+  Application *app = Application::Instance();
   app_config config = {
       .window_x = 0,
       .window_y = 0,
@@ -21,7 +21,8 @@ int main() {
   };
 
   app->initialize(&config);
-  ImguiLayer::Instance()->init(app->window->getWindow(), app->window->getRenderer());
+  ImguiLayer::Instance()->init(app->window->getWindow(),
+                               app->window->getRenderer());
 
   InputHandler::Instance()->addButton(SDLK_w, BUTTON::UP);
   InputHandler::Instance()->addButton(SDLK_s, BUTTON::DOWN);
@@ -46,25 +47,25 @@ int main() {
 
   ImguiLayer *imgui = ImguiLayer::Instance();
 
-	while (!app->window->isClosed()) {
+  while (!app->window->isClosed()) {
     app->beforeUpdate();
 
-		SDL_Event event;
+    SDL_Event event;
 
-		while (SDL_PollEvent(&event)) {
-			for (const auto &obj : EntityManager::Instance()->getEntities()) {
-				obj->handleEvent(&event);
-			}
+    while (SDL_PollEvent(&event)) {
+      for (const auto &obj : EntityManager::Instance()->getEntities()) {
+        obj->handleEvent(&event);
+      }
 
-			if (event.key.keysym.sym == SDLK_LSHIFT &&
-					event.key.state == SDL_PRESSED) {
-				  imgui->toggleVisible();
-			}
+      if (event.key.keysym.sym == SDLK_LSHIFT &&
+          event.key.state == SDL_PRESSED) {
+        imgui->toggleVisible();
+      }
 
-			app->window->pollEvent(event);
-			InputHandler::Instance()->pollEvent(event);
-			imgui->processEvents(&event);
-		}
+      app->window->pollEvent(event);
+      InputHandler::Instance()->pollEvent(event);
+      imgui->processEvents(&event);
+    }
 
     _sceneManager->update(app->getDeltaTime());
     _sceneManager->draw(app->renderer);
@@ -75,7 +76,7 @@ int main() {
     imgui->drawEnd();
 
     app->afterUpdate();
-	}
+  }
 
   return 0;
 }

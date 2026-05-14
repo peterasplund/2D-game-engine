@@ -1,15 +1,15 @@
 #pragma once
 
-#include <core/map.h>
 #include "../abstractGameobject.h"
 #include "../bg.h"
 #include "../dialogue.h"
 #include "../entityManager.h"
 #include "../hud.h"
+#include "../levelManager.h"
 #include "../map-hud.h"
 #include "../obj/damageNumbers.h"
 #include "../scene.h"
-#include "../levelManager.h"
+#include <core/map.h>
 
 class GameplayScene : public Scene {
 private:
@@ -25,7 +25,7 @@ private:
   DamageNumbersSystem *damageNumberSystem;
   void drawFade();
   void onSwitchLevel();
-  LevelManager* levelManager;
+  LevelManager *levelManager;
 
 public:
   ~GameplayScene() {

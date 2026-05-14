@@ -1,11 +1,11 @@
 #pragma once
 
-#include <core/logger.h>
-#include <core/math.h>
-#include <core/map.h>
-#include <optional>
 #include "../entityManager.h"
 #include "velocity.h"
+#include <core/logger.h>
+#include <core/map.h>
+#include <core/math.h>
+#include <optional>
 
 struct CollisionAt {
   int idx;
@@ -22,14 +22,14 @@ struct CollisionResponse {
   std::optional<CollisionAt> right = std::nullopt;
 
   bool hasCollision() const {
-    return top != std::nullopt || bottom != std::nullopt || left != std::nullopt || right != std::nullopt;
+    return top != std::nullopt || bottom != std::nullopt ||
+           left != std::nullopt || right != std::nullopt;
   }
 
   void print() const {
-    LOG_DEBUG(
-      "collision (▲%d\t►%d\t▼%d\t◄%d)", 
-      top != std::nullopt, right != std::nullopt, bottom != std::nullopt, left != std::nullopt
-    );
+    LOG_DEBUG("collision (▲%d\t►%d\t▼%d\t◄%d)", top != std::nullopt,
+              right != std::nullopt, bottom != std::nullopt,
+              left != std::nullopt);
   }
 };
 
@@ -50,10 +50,9 @@ public:
   collidable(v2f position, Rect boundingBox);
   bool checkCollision(Rect *r, Level *tilemap, Rect *outRect);
 
-  bool dynamicRectVsRect(
-      RectF* r_dynamic, velocity inVelocity,
-      Rect& r_static, v2f& contact_point,
-      v2f& contact_normal, float& contact_time, float dt);
+  bool dynamicRectVsRect(RectF *r_dynamic, velocity inVelocity, Rect &r_static,
+                         v2f &contact_point, v2f &contact_normal,
+                         float &contact_time, float dt);
 
   std::vector<TileExistsAtResponse> tileExistsAtF(RectF rect) {
     static std::vector<TileExistsAtResponse> response;

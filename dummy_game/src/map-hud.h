@@ -1,7 +1,7 @@
 #pragma once
 
-#include <core/renderer.h>
 #include <core/map.h>
+#include <core/renderer.h>
 
 #define MAP_HUD_CELL_WIDTH 10
 #define MAP_HUD_CELL_HEIGHT 8
@@ -37,16 +37,17 @@ struct MapCell {
 
 class MapHud {
 private:
-  Renderer* _renderer;
+  Renderer *_renderer;
   v2i _position;
   v2i _mapSizeInCells;
-  World* world;
+  World *world;
   std::vector<MapCell> _cells;
   void drawCell(MapCell cell, Marker marker, v2i playerTilePosition);
 
   int _worldCellWidth;
   int _worldCellHeight;
+
 public:
-  MapHud(Renderer* renderer, World* world, v2i position);
+  MapHud(Renderer *renderer, World *world, v2i position);
   void draw(int currentLevel, v2i playerPosition);
 };
